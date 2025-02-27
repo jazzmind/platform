@@ -10,8 +10,9 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
+    "ai": "^4.1.46",
     "next": "15.1.7",
-    "openai": "^4.85.4",
+    "openai": "^4.86.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^10.0.0"

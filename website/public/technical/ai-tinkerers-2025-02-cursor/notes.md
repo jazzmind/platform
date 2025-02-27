@@ -4,17 +4,13 @@
 
 The rush to stay on top of AI developments comes with risks. Key concerns to watch out for:
 
-🔹 Dubious Software Downloads – A Disney employee recently lost his job after downloading and running an open-source AI tool from GitHub without inspecting the code. https://lnkd.in/dW77wN-2
+- 🔹 Dubious Software Downloads – A Disney employee recently lost his job after downloading and running an open-source AI tool from GitHub without inspecting the code. https://lnkd.in/dW77wN-2
+- 🔹 Insecure AI-Generated Code – AI doesn’t automatically build in proper authentication or check for common security vulnerabilities.
+- 🔹 AI Agent Exploits – AI-powered coders can be tricked into installing compromised dependencies or packages - there have been numerous examples of hackers creating fake libraries on github that seem real.
+- 🔹 Execution of Malware – YOLO / operator / desktop mode can be manipulated into running malicious code.
+- 🔹 Credential Hijacking – MCP servers and similar tools can expose sensitive data or credentials.
 
-🔹 Insecure AI-Generated Code – AI doesn’t automatically build in proper authentication or check for common security vulnerabilities.
-
-🔹 AI Agent Exploits – AI-powered coders can be tricked into installing compromised dependencies or packages - there have been numerous examples of hackers creating fake libraries on github that seem real.
-
-🔹 Execution of Malware – YOLO / operator / desktop mode can be manipulated into running malicious code.
-
-🔹 Credential Hijacking – MCP servers and similar tools can expose sensitive data or credentials.
-
-⚠️ If you’re developing at the edge of AI, stay cautious. You can build fast, but you can also get compromised—personally and professionally. It’s not just about your app’s security; it’s about yours too.
+| ⚠️ If you’re developing at the edge of AI, stay cautious. You can build fast, but you can also get compromised—personally and professionally. It’s not just about your app’s security; it’s about yours too.
 
 # Cursor New UI for Agent mode & FAQ from the team
 

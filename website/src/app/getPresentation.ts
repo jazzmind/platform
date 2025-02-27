@@ -1,5 +1,5 @@
-import fs from "fs";
 import path from "path";
+import fs from "fs";
 
 // Define types for our data structures
 export type Presentation = {
@@ -8,165 +8,127 @@ export type Presentation = {
   description: string;
   date: string;
   url: string;
+  hasNotes: boolean;
+  hasData: boolean;
 };
 
 // Function to get a specific presentation
 export async function getPresentation(categoryId: string, presentationId: string): Promise<Presentation | null> {
   try {
-    // Check if this is an AI Tinkerers presentation
-    const isAiTinkerers = presentationId.includes("ai-tinkerers");
-    
-    // Get the presentation directory path
-    let presentationDir: string | null = null;
-    
-    if (isAiTinkerers) {
-      if (presentationId === "ai-tinkerers-2023-12-the-future-of-ai") {
-        // Special case for this specific presentation
-        // Try multiple path patterns
-        const pathsToCheck = [
-          path.join(process.cwd(), "public", "technical", "ai-tinkerers", "ai-tinkerers-2023-12-the-future-of-ai"),
-          path.join(process.cwd(), "public", "technical", "ai-tinkerers-2023-12-the-future-of-ai"),
-          path.join(process.cwd(), "..", "technical", "ai-tinkerers", "ai-tinkerers-2023-12-the-future-of-ai"),
-          path.join(process.cwd(), "..", "technical", "ai-tinkerers-2023-12-the-future-of-ai")
-        ];
-        
-        // Find the first path that exists
-        for (const pathToCheck of pathsToCheck) {
-          if (fs.existsSync(pathToCheck)) {
-            presentationDir = pathToCheck;
-            break;
-          }
-        }
-      } else {
-        // Parse the AI Tinkerers presentation ID to get subfolder structure
-        const parts = presentationId.split("-");
-        const datePart = parts.length > 3 ? `${parts[2]}-${parts[3]}` : ""; // e.g., feb-25
-        const subfolderPart = parts.length > 4 ? parts.slice(4).join("-") : ""; // e.g., cursor or mcp-demo
-        
-        // Try multiple path patterns
-        const pathsToCheck = [];
-        
-        if (datePart && subfolderPart) {
-          pathsToCheck.push(
-            path.join(process.cwd(), "public", "technical", "ai-tinkerers", datePart, subfolderPart),
-            path.join(process.cwd(), "public", "technical", "ai-tinkerers-" + datePart + "-" + subfolderPart),
-            path.join(process.cwd(), "..", "technical", "ai-tinkerers", datePart, subfolderPart),
-            path.join(process.cwd(), "..", "technical", "ai-tinkerers-" + datePart + "-" + subfolderPart)
-          );
-        } else if (datePart) {
-          pathsToCheck.push(
-            path.join(process.cwd(), "public", "technical", "ai-tinkerers", datePart),
-            path.join(process.cwd(), "public", "technical", "ai-tinkerers-" + datePart),
-            path.join(process.cwd(), "..", "technical", "ai-tinkerers", datePart),
-            path.join(process.cwd(), "..", "technical", "ai-tinkerers-" + datePart)
-          );
-        } else {
-          pathsToCheck.push(
-            path.join(process.cwd(), "public", "technical", "ai-tinkerers"),
-            path.join(process.cwd(), "..", "technical", "ai-tinkerers")
-          );
-        }
-        
-        // Find the first path that exists
-        for (const pathToCheck of pathsToCheck) {
-          if (fs.existsSync(pathToCheck)) {
-            presentationDir = pathToCheck;
-            break;
-          }
-        }
-      }
-    } else {
-      // For other presentations, use the standard path
-      const pathsToCheck = [
-        path.join(process.cwd(), "public", categoryId, presentationId),
-        path.join(process.cwd(), "..", categoryId, presentationId)
-      ];
+    // First check in the public directory
+    const publicDirPath = path.join(process.cwd(), "public", categoryId);
+    let presentationPath = path.join(publicDirPath, presentationId);
+    let resolvedPresentationId = presentationId;
+    let baseUrl = `/${categoryId}/${presentationId}`;
+
+    // Special handling for AI Tinkerers presentations
+    if (presentationId.startsWith("ai-tinkerers/")) {
+      // This is a nested presentation inside the ai-tinkerers folder
+      resolvedPresentationId = presentationId;
+      baseUrl = `/${categoryId}/${presentationId}`;
+    } else if (presentationId.startsWith("ai-tinkerers-")) {
+      // This is a top-level ai-tinkerers presentation
+      resolvedPresentationId = presentationId;
+      baseUrl = `/${categoryId}/${presentationId}`;
+    }
+
+    // If not found in public dir, try the legacy location
+    if (!fs.existsSync(presentationPath)) {
+      console.log(`Presentation not found in public dir: ${presentationPath}, trying legacy location`);
+      presentationPath = path.join(process.cwd(), "..", categoryId, resolvedPresentationId);
       
-      // Find the first path that exists
-      for (const pathToCheck of pathsToCheck) {
-        if (fs.existsSync(pathToCheck)) {
-          presentationDir = pathToCheck;
-          break;
-        }
+      if (!fs.existsSync(presentationPath)) {
+        console.error(`Presentation not found at path: ${presentationPath}`);
+        return null;
       }
     }
     
-    // Check if we found a valid directory
-    if (!presentationDir || !fs.existsSync(presentationDir)) {
-      console.log(`Directory not found for presentation: ${presentationId}`);
-      return null;
-    }
-    
-    // Get presentation title
-    let title: string;
-    if (presentationId.includes("ai-tinkerers-feb-25-cursor")) {
-      title = "Hands on with Cursor";
-    } else if (presentationId.includes("ai-tinkerers-feb-25-mcp-demo")) {
-      title = "Multi-Context Programming Demo";
-    } else if (presentationId.includes("ai-tinkerers-sept-24")) {
-      title = "Hands on with the OpenAI Assistant API";
-    } else if (presentationId.includes("ai-tinkerers-2023-12-the-future-of-ai")) {
-      title = "The Future of AI";
-    } else {
-      title = presentationId.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
-    }
-    
-    // Create presentation description based on title
-    const description = `Presentation about ${title.toLowerCase()}`;
-    
-    // Set date based on presentation ID
+    // Check if there's a metadata.json file
+    let title = "";
+    let description = "";
     let date = "";
-    if (presentationId.includes("sept-24")) {
-      date = "September 24, 2023";
-    } else if (presentationId.includes("feb-25")) {
-      date = "February 25, 2023";
-    } else if (presentationId.includes("2023-12")) {
-      date = "December 15, 2023";
+    
+    if (fs.existsSync(path.join(presentationPath, "metadata.json"))) {
+      const metadata = JSON.parse(fs.readFileSync(path.join(presentationPath, "metadata.json"), "utf8"));
+      title = metadata.title || formatTitle(resolvedPresentationId);
+      description = metadata.description || `Presentation about ${resolvedPresentationId.replace(/-/g, " ")}`;
+      date = metadata.date || new Date().toISOString().split("T")[0];
     } else {
-      date = new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-    }
-    
-    // Build the URL for accessing the presentation
-    // For AI Tinkerers presentations, use the correct path structure
-    let presentationUrl: string;
-    
-    if (presentationId === "ai-tinkerers-2023-12-the-future-of-ai") {
-      // Use the direct path to the file we know exists
-      presentationUrl = `/technical/ai-tinkerers/ai-tinkerers-2023-12-the-future-of-ai/index.html`;
-    } else if (isAiTinkerers) {
-      // Parse the AI Tinkerers presentation ID to get subfolder structure
-      const parts = presentationId.split("-");
-      const datePart = parts.length > 3 ? `${parts[2]}-${parts[3]}` : ""; // e.g., feb-25
-      const subfolderPart = parts.length > 4 ? parts.slice(4).join("-") : ""; // e.g., cursor or mcp-demo
+      // For AI tinkerers presentations, parse the ID to get a better title
+      title = formatTitle(resolvedPresentationId);
+      date = extractDateFromId(resolvedPresentationId) || new Date().toISOString().split("T")[0];
       
-      if (datePart && subfolderPart) {
-        presentationUrl = `/technical/ai-tinkerers/${datePart}/${subfolderPart}/index.html`;
-      } else if (datePart) {
-        presentationUrl = `/technical/ai-tinkerers/${datePart}/index.html`;
-      } else {
-        presentationUrl = `/technical/ai-tinkerers/index.html`;
+      // Try to extract description from data.md if it exists
+      description = `Presentation about ${resolvedPresentationId.replace(/-/g, " ")}`;
+      
+      if (fs.existsSync(path.join(presentationPath, "data.md"))) {
+        const data = fs.readFileSync(path.join(presentationPath, "data.md"), "utf8");
+        const descMatch = data.match(/## Presentation Metadata[\s\S]*?Description:(.*?)(?:\n|$)/i);
+        if (descMatch && descMatch[1]) {
+          description = descMatch[1].trim();
+        }
       }
-    } else {
-      // For standard presentations
-      presentationUrl = `/${categoryId}/${presentationId}/index.html`;
     }
     
-    // Create a presentation object
-    const presentation: Presentation = {
-      id: presentationId,
+    // Check if notes.md exists
+    const hasNotes = fs.existsSync(path.join(presentationPath, "notes.md"));
+    
+    // Check if data.md exists
+    const hasData = fs.existsSync(path.join(presentationPath, "data.md"));
+    
+    // URL for the presentation
+    const url = `${baseUrl}/index.html`;
+    
+    return {
+      id: resolvedPresentationId,
       title,
       description,
       date,
-      url: presentationUrl,
+      url,
+      hasNotes,
+      hasData
     };
-    
-    return presentation;
   } catch (error) {
-    console.error("Error fetching presentation:", error);
+    console.error("Error getting presentation:", error);
     return null;
   }
+}
+
+// Helper function to format a title from an ID
+function formatTitle(id: string): string {
+  // Special cases for AI Tinkerers presentations
+  if (id.includes("ai-tinkerers")) {
+    if (id.includes("cursor")) {
+      return "Hands on with Cursor";
+    } else if (id.includes("openai-assistants")) {
+      return "OpenAI Assistants API";
+    } else if (id.includes("the-future-of-ai")) {
+      return "The Future of AI";
+    }
+  }
+  
+  // Default formatting
+  return id.split("/").pop()?.split("-")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ") || id;
+}
+
+// Helper function to extract a date from an ID
+function extractDateFromId(id: string): string | null {
+  // Try to parse dates in formats like YYYY-MM or YY-MM
+  const dateMatch = id.match(/(\d{4}|\d{2})-(0[1-9]|1[0-2])/);
+  if (dateMatch) {
+    const year = dateMatch[1].length === 2 ? `20${dateMatch[1]}` : dateMatch[1];
+    const month = dateMatch[2];
+    
+    // Convert month number to month name
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    return `${months[parseInt(month) - 1]} ${year}`;
+  }
+  
+  return null;
 } 

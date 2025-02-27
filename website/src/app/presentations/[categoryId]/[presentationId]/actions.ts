@@ -119,9 +119,7 @@ export async function chatWithPresentation(
     // Call the OpenAI API
     const completion = await openai.chat.completions.create({
       messages: formattedMessages,
-      model: 'gpt-3.5-turbo',
-      temperature: 0.7,
-      max_tokens: 1000,
+      model: 'o3-mini'
     });
     
     // Return the assistant's response

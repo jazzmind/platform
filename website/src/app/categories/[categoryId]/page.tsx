@@ -9,6 +9,7 @@ type Presentation = {
   title: string;
   description: string;
   date: string;
+  type: string;
   thumbnail?: string;
 };
 
@@ -44,56 +45,60 @@ const categories: Record<string, CategoryInfo> = {
 // Function to fetch presentations from the actual directories
 async function getPresentationsFromDirectory(categoryId: string): Promise<Presentation[]> {
   try {
-    // Get the presentations directory path - this is at the project root, outside the NextJS app
-    const presentationsDir = path.join(process.cwd(), "..", categoryId);
+    // First check the public directory (which is more reliable)
+    const publicDir = path.join(process.cwd(), "public", categoryId);
     
     // Check if the directory exists
-    if (!fs.existsSync(presentationsDir)) {
-      return [];
-    }
-    
     const presentations: Presentation[] = [];
     
-    // Get all subdirectories (each one is a presentation)
-    const dirs = fs.readdirSync(presentationsDir, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory());
-    
-    // Process each directory
-    for (const dirent of dirs) {
-      const id = dirent.name;
+    if (fs.existsSync(publicDir)) {
+      console.log(`Scanning presentations from public directory: ${publicDir}`);
       
-      // Special handling for AI Tinkerers
-      if (id === "ai-tinkerers") {
-        const aiTinkerersPath = path.join(presentationsDir, id);
+      // Get all subdirectories (each one is a presentation)
+      const dirs = fs.readdirSync(publicDir, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory());
+      
+      // Process each directory
+      for (const dirent of dirs) {
+        const id = dirent.name;
         
-        // Check sept-24 folder
-        if (fs.existsSync(path.join(aiTinkerersPath, "sept-24"))) {
-          presentations.push({
-            id: "ai-tinkerers-sept-24",
-            title: "Hands on with the OpenAI Assistant API",
-            description: "Learn how to use the OpenAI Assistant API to build your own AI assistant.",
-            date: "September 24, 2024",
-          });
+        // Check for nested directories in specific cases (like ai-tinkerers)
+        if (id === "ai-tinkerers") {
+          // Special case: this is a folder containing multiple presentations
+          const aiTinkerersDir = path.join(publicDir, id);
+          if (fs.existsSync(aiTinkerersDir)) {
+            const subDirs = fs.readdirSync(aiTinkerersDir, { withFileTypes: true })
+              .filter(subDirent => subDirent.isDirectory());
+              
+            for (const subDir of subDirs) {
+              // This is a nested presentation
+              processPresentation(`${id}/${subDir.name}`, presentations, publicDir);
+            }
+          }
+        } else if (id.startsWith("ai-tinkerers-")) {
+          // This is a top-level ai-tinkerers presentation
+          processPresentation(id, presentations, publicDir);
+        } else {
+          // Regular presentation
+          processPresentation(id, presentations, publicDir);
         }
+      }
+    } else {
+      // Fallback to the original directory structure
+      const presentationsDir = path.join(process.cwd(), "..", categoryId);
+      if (fs.existsSync(presentationsDir)) {
+        console.log(`Scanning presentations from project root: ${presentationsDir}`);
         
-        // Check feb-25 cursor folder
-        if (fs.existsSync(path.join(aiTinkerersPath, "feb-25", "cursor"))) {
-          presentations.push({
-            id: "ai-tinkerers-feb-25-cursor",
-            title: "Hands on with Cursor",
-            description: "Explore the Cursor IDE and how to use it effectively with AI.",
-            date: "February 25, 2025",
-          });
+        // Get all subdirectories (each one is a presentation)
+        const dirs = fs.readdirSync(presentationsDir, { withFileTypes: true })
+          .filter(dirent => dirent.isDirectory());
+        
+        // Process each directory
+        for (const dirent of dirs) {
+          processPresentation(dirent.name, presentations, presentationsDir);
         }
-        
       } else {
-        // Regular presentation
-        presentations.push({
-          id,
-          title: id.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" "),
-          description: `Presentation about ${id.replace(/-/g, " ")}`,
-          date: new Date().toISOString().split("T")[0], // Placeholder date
-        });
+        console.log(`No presentations directory found for category: ${categoryId}`);
       }
     }
     
@@ -107,6 +112,89 @@ async function getPresentationsFromDirectory(categoryId: string): Promise<Presen
     console.error("Error fetching presentations:", error);
     return [];
   }
+}
+
+// Helper function to process a presentation directory
+function processPresentation(id: string, presentations: Presentation[], baseDir: string) {
+  try {
+    const dirPath = path.join(baseDir, id);
+    
+    // Check if there's a metadata.json file
+    if (fs.existsSync(path.join(dirPath, "metadata.json"))) {
+      const metadata = JSON.parse(fs.readFileSync(path.join(dirPath, "metadata.json"), "utf8"));
+      presentations.push({
+        id,
+        title: metadata.title || formatTitle(id),
+        description: metadata.description || `Presentation about ${id.replace(/-/g, " ")}`,
+        date: metadata.date || extractDateFromId(id) || new Date().toISOString().split("T")[0],
+        type: metadata.type || "revealjs",
+      });
+    } else {
+      // For AI tinkerers presentations, parse the ID to get a better title and date
+      const title = formatTitle(id);
+      const date = extractDateFromId(id) || new Date().toISOString().split("T")[0];
+      
+      // Extract description from index.html if possible
+      let description = `Presentation about ${id.replace(/-/g, " ")}`;
+      
+      if (fs.existsSync(path.join(dirPath, "data.md"))) {
+        const data = fs.readFileSync(path.join(dirPath, "data.md"), "utf8");
+        const descMatch = data.match(/## Presentation Metadata[\s\S]*?Description:(.*?)(?:\n|$)/i);
+        if (descMatch && descMatch[1]) {
+          description = descMatch[1].trim();
+        }
+      }
+      
+      presentations.push({
+        id,
+        title,
+        description,
+        date,
+        type: "revealjs",
+      });
+    }
+  } catch (error) {
+    console.error(`Error processing presentation ${id}:`, error);
+  }
+}
+
+// Helper function to format a title from an ID
+function formatTitle(id: string): string {
+  // Special cases for AI Tinkerers presentations
+  if (id.includes("ai-tinkerers")) {
+    if (id.includes("cursor")) {
+      return "Hands on with Cursor";
+    } else if (id.includes("openai-assistants")) {
+      return "OpenAI Assistants API";
+    } else if (id.includes("the-future-of-ai")) {
+      return "The Future of AI";
+    }
+  }
+  
+  // Default formatting
+  return id.split("/").pop()?.split("-")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ") || id;
+}
+
+// Helper function to extract a date from an ID
+function extractDateFromId(id: string): string | null {
+  // Try to parse dates in formats like YYYY-MM or YY-MM
+  const dateMatch = id.match(/(\d{4}|\d{2})-(0[1-9]|1[0-2])/);
+  if (dateMatch) {
+    const year = dateMatch[1].length === 2 ? `20${dateMatch[1]}` : dateMatch[1];
+    const month = dateMatch[2];
+    
+    // Convert month number to month name
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    return `${months[parseInt(month) - 1]} ${year}`;
+  }
+  
+  return null;
 }
 
 export default async function CategoryPage({ params: paramsPromise }: { params: Promise<{ categoryId: string }> }) {
