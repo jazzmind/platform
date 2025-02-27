@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- Background -->
+  <rect width="180" height="180" rx="40" fill="#dc2626" />
+  
+  <!-- Stylized "W" -->
+  <path d="M45 60 L75 120 L90 90 L105 120 L135 60" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+</svg> 
