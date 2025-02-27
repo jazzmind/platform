@@ -16,7 +16,7 @@ const NavLink = ({ href, children }: { href: string; children: React.ReactNode }
           ? 'text-white bg-red-600 hover:bg-red-700' 
           : 'text-gray-700 hover:text-red-600 dark:text-gray-300 dark:hover:text-white'
       }`}
-      style={{ backgroundColor: isActive ? '#e74c3c' : 'transparent' }}
+      style={{ backgroundColor: isActive ? 'rgb(220 38 38/var(--tw-bg-opacity,1))' : 'transparent' }}
     >
       {children}
     </Link>
@@ -36,9 +36,9 @@ export default function Navbar() {
           
           <div className="hidden md:flex space-x-3">
             <NavLink href="/">Home</NavLink>
-            <NavLink href="/about">About</NavLink>
-            <NavLink href="/publications">Publications</NavLink>
+            <NavLink href="/#about">About</NavLink>
             <NavLink href="/categories/technical">Presentations</NavLink>
+            <NavLink href="/publications">Publications</NavLink>
             <NavLink href="/contact">Contact</NavLink>
           </div>
           

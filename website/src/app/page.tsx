@@ -50,7 +50,7 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-4">
                 <a 
-                  href="https://linkedin.com/in/wes-sonnenreich" 
+                  href="https://linkedin.com/in/sonnenreich" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center"
@@ -85,7 +85,7 @@ export default function Home() {
       </div>
 
       {/* Biography Section */}
-      <div className="relative">
+      <div className="relative" id="about">
         <BiographyBackground />
         <div className="container mx-auto px-4 pt-32 relative z-10">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
@@ -263,7 +263,7 @@ export default function Home() {
             </div>
             <div className="flex space-x-4">
               <a 
-                href="https://linkedin.com/in/wes-sonnenreich" 
+                href="https://linkedin.com/in/sonnenreich" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400"
