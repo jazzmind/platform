@@ -50,22 +50,19 @@ export default function ContactForm({
 }: { 
   sendContactEmail: (formData: FormData) => Promise<FormState> 
 }) {
-  // Initialize form state
-  const [state, formAction] = useFormState(sendContactEmail, {});
-  const [submitted, setSubmitted] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
-  
-  // Handle form submission wrapper
-  const handleSubmit = async (formData: FormData) => {
+  // Initialize form state with a wrapper function that handles the form data
+  const formActionWrapper = async (prevState: FormState, formData: FormData) => {
     const result = await sendContactEmail(formData);
-    
     if (result.success) {
       setSubmitted(true);
       formRef.current?.reset();
     }
-    
     return result;
   };
+  
+  const [state, formAction] = useFormState(formActionWrapper, {});
+  const [submitted, setSubmitted] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   if (submitted) {
     return (

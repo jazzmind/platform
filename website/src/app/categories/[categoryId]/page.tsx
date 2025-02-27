@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import fs from "fs";
 import path from "path";
-
+import Image from "next/image";
 // Define types for our data structures
 type Presentation = {
   id: string;
@@ -241,7 +241,7 @@ export default async function CategoryPage({ params: paramsPromise }: { params: 
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105">
                   <div className="h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                     {presentation.thumbnail ? (
-                      <img
+                      <Image
                         src={presentation.thumbnail}
                         alt={presentation.title}
                         className="w-full h-full object-cover"
