@@ -1,0 +1,8 @@
+**/venv/**
+
+**/technical/glycans/node_modules/**
+**/credentials.json
+**/credentials.json.key
+**/credentials.json.json
+**/credentials.json.json.key
+**/credentials.json.json.key.json

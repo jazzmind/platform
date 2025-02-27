@@ -1,0 +1,35 @@
+{
+  "name": "mcp-notion-demo",
+  "version": "1.0.0",
+  "description": "Demo of MCP server integration with Notion for AI Tinkerer's meetup",
+  "type": "module",
+  "main": "mcp-server.js",
+  "scripts": {
+    "start": "node mcp-server.js",
+    "dev": "nodemon mcp-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mcp",
+    "cursor",
+    "notion",
+    "ai",
+    "documentation"
+  ],
+  "author": "AI Tinkerer's Meetup",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/mcp-sdk": "^0.1.0",
+    "@notionhq/client": "^2.2.13",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+} 

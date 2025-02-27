@@ -1,0 +1,170 @@
+---
+description: Use when creating or modifying business presentations including sales, investor pitches, and internal communications
+globs: business/**/*.{md,html}
+alwaysApply: false
+---
+---
+description: Use when creating or modifying business presentations including sales, investor pitches, and internal communications
+globs: business/**/*.{md,html}
+---
+
+# Business Presentation Rules
+
+## Context
+- Applied to business-focused presentations and communications
+- Requires understanding of stakeholder needs and business objectives
+- Used for both external and internal business communications
+
+## Core Experts
+
+### Sales Expert
+**Purpose**: Create compelling sales and customer presentations
+
+<required>
+- Identify customer pain points and needs
+- Develop value propositions
+- Structure ROI calculations
+- Create compelling calls to action
+</required>
+
+<example>
+✅ Good Sales Presentation:
+```markdown
+## Enterprise Solution Overview
+- Problem: "40% of enterprise budgets lost to inefficient processes"
+- Impact: $2.5M annual cost for average Fortune 500
+- Solution: AI-powered workflow automation
+- ROI: 300% return within 6 months
+- Social Proof: "Saved us $4M annually" - Fortune 100 CTO
+```
+</example>
+
+<example type="invalid">
+❌ Poor Sales Presentation:
+```markdown
+## Our Product
+- It's really good
+- Lots of features
+- Better than competitors
+- You should buy it
+```
+</example>
+
+### Investor Relations Expert
+**Purpose**: Create compelling investor presentations
+
+<required>
+- Structure financial narratives
+- Present growth metrics
+- Highlight market opportunities
+- Address risk factors
+</required>
+
+<example>
+✅ Good Investor Deck:
+```markdown
+## Market Opportunity
+- TAM: $50B growing at 15% CAGR
+- Current penetration: 2% of addressable market
+- Growth trajectory: 150% YoY for past 3 quarters
+- Customer acquisition cost: Decreased 40% YoY
+- LTV/CAC ratio: 5.2x (Industry avg: 3x)
+```
+</example>
+
+### Strategy Expert
+**Purpose**: Create internal strategy presentations
+
+<required>
+- Analyze market dynamics
+- Present competitive insights
+- Structure strategic options
+- Define execution roadmaps
+</required>
+
+#### Strategy Framework Template
+```markdown
+## Strategic Initiative Assessment
+1. Market Analysis (10 mins)
+   - Market size and growth
+   - Competitive landscape
+   - Key trends
+2. Strategic Options (15 mins)
+   - Option analysis
+   - Resource requirements
+   - Risk assessment
+3. Recommendations (20 mins)
+   - Preferred approach
+   - Implementation plan
+   - Success metrics
+```
+
+#### Executive Summary Structure
+<rules>
+- Context: Market and business situation
+- Challenge: Key strategic issues
+- Options: Strategic alternatives
+- Recommendation: Clear path forward
+</rules>
+
+### Business Presenter
+**Purpose**: Deliver impactful business communications
+
+<required>
+- Read audience dynamics
+- Handle objections effectively
+- Drive decision-making
+- Create action plans
+</required>
+
+## Presentation Structure
+
+### Opening
+<rules>
+- Hook: Compelling business challenge
+- Stakes: Business impact and urgency
+- Preview: Value proposition
+</rules>
+
+### Body
+<rules>
+- Situation: Current business context
+- Complication: Key challenges/opportunities
+- Resolution: Proposed solution/strategy
+- Validation: Proof points and data
+</rules>
+
+### Closing
+<rules>
+- Summary: Key business benefits
+- Action: Clear next steps
+- Value: ROI and success metrics
+</rules>
+
+## Best Practices
+
+### Data Visualization
+- Clear metrics presentation
+- Trend visualization
+- Comparative analysis
+- Impact demonstration
+
+### Business Storytelling
+- Situation-Complication-Resolution
+- Data-driven narratives
+- Customer/market insights
+- Clear value proposition
+
+### Stakeholder Management
+- Decision-maker focus
+- Objection handling
+- Risk mitigation
+- Success metrics
+
+<critical>
+- NEVER present unvalidated data
+- ALWAYS include actionable next steps
+- ENSURE alignment with business objectives
+- MAINTAIN professional tone
+- ACKNOWLEDGE stakeholder concerns
+</critical>

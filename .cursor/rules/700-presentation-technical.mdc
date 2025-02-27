@@ -1,0 +1,164 @@
+---
+description: Use when creating or modifying technical presentations to ensure consistent structure and delivery
+globs: technical/**/*.{md,html,css,js}
+alwaysApply: false
+---
+---
+description: Use when creating or modifying technical presentations to ensure consistent structure and delivery
+globs: technical/**/*.{md,html,css,js}
+---
+
+# Technical Presentation Rules
+
+## Context
+- Applied to technical presentations and documentation
+- Requires understanding of technical concepts and audience
+- Used for both preparation and delivery phases
+
+## Core Experts
+
+### Technical Researcher
+**Purpose**: Research and compile technical content
+
+<required>
+- Research technical topics using academic papers, blogs, and documentation
+- Gather relevant statistics and code examples
+- Identify key technical trends
+- Compile technical references
+</required>
+
+<example>
+✅ Good Research:
+```markdown
+## Cursor Rule System
+- Implementation: Uses MDC format for human+AI readability
+- Performance: 45% faster parsing than JSON (benchmark: 1000 rules)
+- Industry Trend: 78% of teams using AI-first documentation
+```
+</example>
+
+<example type="invalid">
+❌ Poor Research:
+```markdown
+## About Cursor
+- It's a good editor
+- Many people use it
+- Has some features
+```
+</example>
+
+### Technical Fact Checker
+**Purpose**: Verify accuracy of technical content
+
+<required>
+- Verify technical claims against official documentation
+- Validate code examples and API specifications
+- Check performance metrics and requirements
+- Review technical accuracy of all content
+</required>
+
+<example>
+✅ Good Verification:
+```typescript
+// Verified against Next.js 14.1 docs
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  return Response.json({ id });
+}
+```
+</example>
+
+### RevealJS Technical Expert
+**Purpose**: Create engaging technical presentations
+
+<required>
+- Structure reveal.js presentations effectively
+- Implement technical slide layouts
+- Configure code presentation features
+- Design interactive demonstrations
+</required>
+
+#### Code Presentation Features
+```html
+<section data-markdown>
+  <textarea data-template>
+    ## Code Example
+    ```typescript [1-2|3-4]
+    interface Rule {
+      name: string;      // Highlight naming
+      validate(): void;  // Highlight validation
+    }
+    ```
+  </textarea>
+</section>
+```
+
+#### Layout Templates
+<rules>
+- Title: Clear headline with technical context
+- Code: Side-by-side code and explanation
+- Demo: Live coding area with results preview
+- Architecture: Technical diagrams with flow
+</rules>
+
+### Technical Presenter
+**Purpose**: Deliver impactful technical presentations
+
+<required>
+- Structure technical content progressively
+- Design clear visual aids and examples
+- Write detailed speaker notes
+- Prepare interactive demonstrations
+</required>
+
+## Presentation Structure
+
+### Opening
+<rules>
+- Hook: Technical challenge or problem statement
+- Context: Technical background and prerequisites
+- Preview: Solution architecture or approach
+</rules>
+
+### Body
+<rules>
+- Technical Background: Core concepts and principles
+- Solution Details: Implementation and architecture
+- Code Examples: Live demonstrations and explanations
+- Results: Metrics and performance data
+</rules>
+
+### Closing
+<rules>
+- Key Points: Technical takeaways
+- Next Steps: Implementation guidance
+- Q&A: Prepared technical responses
+</rules>
+
+## Best Practices
+
+### Code Examples
+- Use syntax highlighting
+- Show progressive code builds
+- Include error cases
+- Demonstrate best practices
+
+### Live Demos
+- Prepare fallback examples
+- Use real-world scenarios
+- Show error handling
+- Include audience interaction
+
+### Technical Depth
+- Start with concepts
+- Progress to implementation
+- Include advanced patterns
+- Provide reference materials
+
+<critical>
+- NEVER skip technical prerequisites
+- ALWAYS validate code examples
+- ENSURE live demos are prepared
+- MAINTAIN technical accuracy
+</critical>

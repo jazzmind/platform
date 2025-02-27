@@ -1,0 +1,195 @@
+/**
+ * Custom styles for the MCP Server presentation
+ */
+
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --accent-color: #e74c3c;
+  --text-color: #ecf0f1;
+  --background-color: #2c3e50;
+  --code-background: #34495e;
+}
+
+/* Override default reveal.js styles */
+.reveal {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-color);
+}
+
+.reveal h1, 
+.reveal h2, 
+.reveal h3, 
+.reveal h4 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-transform: none;
+  letter-spacing: -0.03em;
+}
+
+.reveal h1 {
+  font-size: 2.5em;
+  color: var(--primary-color);
+}
+
+.reveal h2 {
+  font-size: 1.8em;
+  color: var(--primary-color);
+}
+
+.reveal h3 {
+  font-size: 1.4em;
+  color: var(--secondary-color);
+}
+
+/* Custom classes */
+.reveal .api-method {
+  background-color: var(--code-background);
+  border-left: 4px solid var(--primary-color);
+  padding: 0.5em 1em;
+  margin: 0.5em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.reveal .note {
+  background-color: rgba(46, 204, 113, 0.2);
+  border-left: 4px solid var(--secondary-color);
+  padding: 0.5em 1em;
+  margin: 0.5em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.reveal .warning {
+  background-color: rgba(231, 76, 60, 0.2);
+  border-left: 4px solid var(--accent-color);
+  padding: 0.5em 1em;
+  margin: 0.5em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Code styling */
+.reveal pre {
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.reveal code {
+  font-family: 'Consolas', 'Monaco', monospace;
+  border-radius: 3px;
+}
+
+/* Better table styling */
+.reveal table {
+  margin: 1em 0;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.reveal table th {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  font-weight: bold;
+  text-align: left;
+  padding: 0.5em 1em;
+}
+
+.reveal table td {
+  padding: 0.5em 1em;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.reveal table tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Two-column layout improvements */
+.container .col {
+  text-align: left;
+}
+
+.col img {
+  max-width: 100%;
+  height: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+/* Make links more visible */
+.reveal a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.reveal a:hover {
+  color: var(--secondary-color);
+  text-shadow: 0 0 5px rgba(46, 204, 113, 0.3);
+}
+
+/* Enhance list items */
+.reveal ul li, 
+.reveal ol li {
+  margin-bottom: 0.5em;
+}
+
+/* Fragments */
+.reveal .fragment.highlight-blue {
+  opacity: 1;
+  visibility: inherit;
+}
+
+.reveal .fragment.highlight-blue.visible {
+  color: var(--primary-color);
+}
+
+/* Code window styling */
+.code-window {
+  background-color: #1e1e1e;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  margin: 1em 0;
+}
+
+.code-window-header {
+  background-color: #333;
+  padding: 0.5em 1em;
+  display: flex;
+  align-items: center;
+}
+
+.code-window-title {
+  font-size: 0.8em;
+  margin: 0;
+  color: #ddd;
+}
+
+.code-window-dots {
+  display: flex;
+  margin-right: 1em;
+}
+
+.code-window-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.code-window-dot.red { background-color: #ff5f56; }
+.code-window-dot.yellow { background-color: #ffbd2e; }
+.code-window-dot.green { background-color: #27c93f; }
+
+.code-window-content {
+  padding: 1em;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  
+  .col {
+    margin-bottom: 1em;
+  }
+} 

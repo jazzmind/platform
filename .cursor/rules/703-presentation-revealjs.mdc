@@ -1,0 +1,266 @@
+---
+description: Use when creating reveal.js presentations to ensure consistent structure and professional delivery
+globs: **/*.{html,md,css,js}
+alwaysApply: false
+---
+---
+description: Use when creating reveal.js presentations to ensure consistent structure and professional delivery
+globs: **/*.{html,md,css,js}
+---
+
+# Reveal.js Presentation Template Rules
+
+## Context
+- Applied to reveal.js-based presentations
+- Provides templates and structure for consistent slides
+- Ensures optimal presentation experience across devices
+- Supports both technical and non-technical content
+
+## Core Templates
+
+### Basic Slide Structure
+**Purpose**: Create consistent HTML structure for reveal.js presentations
+
+<required>
+- Use proper HTML5 doctype and structure
+- Include required reveal.js dependencies
+- Configure presentation settings appropriately
+- Organize slides using section elements
+</required>
+
+<example>
+✅ Basic Template:
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentation Title</title>
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/white.css">
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h1>Presentation Title</h1>
+          <p>Author Name</p>
+        </section>
+        <!-- Additional slides here -->
+      </div>
+    </div>
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+      });
+    </script>
+  </body>
+</html>
+```
+</example>
+
+<example type="invalid">
+❌ Poor Structure:
+```html
+<html>
+  <head>
+    <title>My Slides</title>
+    <link rel="stylesheet" href="reveal.css">
+  </head>
+  <body>
+    <div class="slides">
+      <div>Slide 1</div>
+      <div>Slide 2</div>
+    </div>
+    <script src="reveal.js"></script>
+  </body>
+</html>
+```
+</example>
+
+### Markdown Integration
+**Purpose**: Simplify content creation using Markdown
+
+<required>
+- Use data-markdown for content-heavy slides
+- Structure markdown with proper hierarchy
+- Apply slide attributes consistently
+- Include notes and formatting
+</required>
+
+<example>
+✅ Markdown Slides:
+```html
+<section data-markdown>
+  <textarea data-template>
+    ## Slide Title
+
+    - Point 1
+    - Point 2
+    - Point 3
+
+    Note: Speaker notes go here
+  </textarea>
+</section>
+```
+</example>
+
+### Layout Templates
+
+#### Title Slide
+```html
+<section>
+  <h1>Presentation Title</h1>
+  <h3>Subtitle</h3>
+  <p>
+    <small>Presented by <a href="mailto:email@example.com">Author Name</a></small>
+  </p>
+</section>
+```
+
+#### Two-Column Layout
+```html
+<section>
+  <h2>Two Columns</h2>
+  <div class="r-stack">
+    <div class="r-hstack">
+      <div style="width: 45%;">
+        <h3>Left Column</h3>
+        <p>Content for the left column</p>
+      </div>
+      <div style="width: 45%;">
+        <h3>Right Column</h3>
+        <p>Content for the right column</p>
+      </div>
+    </div>
+  </div>
+</section>
+```
+
+#### Code Example Slide
+```html
+<section>
+  <h2>Code Example</h2>
+  <pre><code class="hljs javascript" data-trim data-line-numbers="1-2|3-4">
+    function example() {
+      // First part explanation
+      let result = doSomething();
+      return result;
+    }
+  </code></pre>
+  <p>Code explanation here</p>
+</section>
+```
+
+## Advanced Features
+
+### Animations and Transitions
+<rules>
+- Use consistent transitions between slides
+- Apply animations thoughtfully for emphasis
+- Avoid excessive motion that distracts
+- Ensure animations support your message
+</rules>
+
+<example>
+✅ Good Animation Config:
+```javascript
+Reveal.initialize({
+  transition: 'slide', // or fade, convex, concave, zoom
+  transitionSpeed: 'default', // or fast, slow
+  autoSlide: 0, // disable auto-sliding
+  autoAnimateDuration: 0.7,
+  autoAnimateEasing: 'ease-out',
+  plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+});
+```
+</example>
+
+### Interactive Elements
+<rules>
+- Implement interactive demonstrations when valuable
+- Use fragments to control content reveal timing
+- Add links to external resources when appropriate
+- Consider audience participation elements
+</rules>
+
+<example>
+✅ Fragment Example:
+```html
+<section>
+  <h2>Revealed Points</h2>
+  <ul>
+    <li class="fragment fade-in">This point appears first</li>
+    <li class="fragment fade-in">This point appears second</li>
+    <li class="fragment fade-in">This point appears third</li>
+  </ul>
+</section>
+```
+</example>
+
+### Responsive Design
+<rules>
+- Test presentations on multiple screen sizes
+- Use relative sizing (%, em) instead of pixels
+- Set appropriate viewport settings
+- Ensure content is readable on all devices
+</rules>
+
+<example>
+✅ Responsive CSS:
+```css
+.custom-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.custom-content {
+  width: 80%;
+  max-width: 1200px;
+  font-size: 2em;
+}
+
+@media (max-width: 768px) {
+  .custom-content {
+    font-size: 1.5em;
+  }
+}
+```
+</example>
+
+## Best Practices
+
+### Content Structure
+- Follow a clear narrative arc
+- Use consistent visual hierarchy
+- Limit text on each slide
+- Include compelling visuals
+
+### Visual Design
+- Use consistent color scheme
+- Maintain adequate contrast for readability
+- Apply consistent typography
+- Use high-quality images and graphics
+
+### Delivery Preparation
+- Include speaker notes
+- Practice with presentation mode
+- Prepare backup examples
+- Test all interactive elements
+
+<critical>
+- NEVER use excessive animations that distract from content
+- ALWAYS test presentation in the actual presentation environment
+- ENSURE content is readable from the back of the room
+- MAINTAIN a consistent design throughout the presentation
+</critical>

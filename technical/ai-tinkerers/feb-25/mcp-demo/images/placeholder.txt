@@ -1,0 +1,9 @@
+The following images need to be created for the presentation:
+
+1. mcp-architecture.png - Diagram showing the MCP architecture and components
+2. auth-flow.png - Diagram illustrating the authentication flow between Cursor, MCP, and external services
+3. notion-cursor.png - Screenshot or illustration showing Notion and Cursor integration
+4. doc-workflow.png - Diagram showing the documentation workflow process
+5. qr-code.png - QR code linking to resources
+
+These images are referenced in the presentation HTML file and should be created or replaced with actual visuals before presenting. 

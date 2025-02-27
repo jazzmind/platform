@@ -1,0 +1,165 @@
+---
+description: Use when creating or modifying coaching, mentoring, career, educational and other life advice presentations to ensure consistent structure and delivery
+globs: coach/**/*.{md,html}
+alwaysApply: false
+---
+---
+description: Use when creating or modifying coaching, mentoring, career, educational and other life advice presentations to ensure consistent structure and delivery
+globs: coach/**/*.{md,html}
+---
+
+# Coaching and Mentoring Presentation Rules
+
+## Context
+- Applied to personal development and career guidance presentations
+- Requires understanding of human psychology and learning patterns
+- Used for both individual and group coaching sessions
+
+## Core Experts
+
+### Empathy Expert
+**Purpose**: Create connection and understanding with audience
+
+<required>
+- Identify audience pain points and aspirations
+- Develop relatable scenarios and examples
+- Create safe space for vulnerability
+- Build trust through authentic storytelling
+</required>
+
+<example>
+✅ Good Empathy:
+```markdown
+## Career Transition Journey
+- Challenge: "I felt stuck in my role, afraid to make a change"
+- Emotion: Fear of failure, imposter syndrome
+- Resolution: Small steps approach, building confidence
+- Outcome: Successfully transitioned to dream role
+```
+</example>
+
+<example type="invalid">
+❌ Poor Empathy:
+```markdown
+## How to Change Careers
+- Just quit your job
+- Learn new skills
+- Get a better job
+- Simple as that
+```
+</example>
+
+### Research Expert
+**Purpose**: Provide evidence-based coaching strategies
+
+<required>
+- Research psychological studies and frameworks
+- Gather success stories and case studies
+- Identify proven coaching methodologies
+- Compile practical exercises and tools
+</required>
+
+<example>
+✅ Good Research:
+```markdown
+## Growth Mindset Framework
+- Based on Dr. Carol Dweck's 30-year research
+- 84% improvement in learning outcomes
+- Practical application in 500+ organizations
+- Key behavioral indicators identified
+```
+</example>
+
+### Engagement Expert
+**Purpose**: Create interactive learning experiences
+
+<required>
+- Design participatory exercises
+- Create self-reflection moments
+- Develop group activities
+- Structure accountability frameworks
+</required>
+
+#### Workshop Templates
+```markdown
+## Personal Values Exercise
+1. Individual Reflection (5 mins)
+   - List top 10 values
+   - Rate importance 1-10
+2. Partner Discussion (10 mins)
+   - Share top 3 values
+   - Explore life examples
+3. Group Sharing (15 mins)
+   - Volunteer stories
+   - Common themes
+```
+
+#### Session Structure
+<rules>
+- Opening: Create psychological safety
+- Activity: Hands-on learning
+- Reflection: Personal insights
+- Action: Concrete next steps
+</rules>
+
+### Coaching Presenter
+**Purpose**: Deliver transformative learning experiences
+
+<required>
+- Read room energy and adapt
+- Guide meaningful discussions
+- Handle emotional moments
+- Create accountability systems
+</required>
+
+## Presentation Structure
+
+### Opening
+<rules>
+- Hook: Relatable challenge or aspiration
+- Safety: Establish trust and openness
+- Journey: Preview transformation path
+</rules>
+
+### Body
+<rules>
+- Awareness: Current state exploration
+- Insight: New perspectives and frameworks
+- Practice: Interactive exercises
+- Integration: Personal application
+</rules>
+
+### Closing
+<rules>
+- Reflection: Key insights gained
+- Commitment: Specific action steps
+- Support: Follow-up resources
+</rules>
+
+## Best Practices
+
+### Story Elements
+- Personal vulnerability
+- Authentic experiences
+- Clear transformation
+- Actionable lessons
+
+### Interactive Components
+- Self-reflection prompts
+- Partner exercises
+- Group discussions
+- Role-playing scenarios
+
+### Learning Integration
+- Journal prompts
+- Action planning
+- Accountability pairs
+- Progress tracking
+
+<critical>
+- NEVER force participation
+- ALWAYS respect confidentiality
+- ENSURE psychological safety
+- MAINTAIN professional boundaries
+- ACKNOWLEDGE emotional responses
+</critical>
