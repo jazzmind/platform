@@ -33,7 +33,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-red-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 overflow-hidden">
+      <div className="relative overflow-hidden">
         <HeroBackground />
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="flex flex-col md:flex-row items-center">
@@ -117,7 +117,7 @@ export default function Home() {
       </div>
 
       {/* Presentations Section */}
-      <div className="relative bg-gray-50 dark:bg-gray-800 pt-32">
+      <div className="relative pt-32">
         <PresentationsBackground />
         <div className="container mx-auto mt-8 px-4 relative z-10">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2 text-center">
@@ -227,7 +227,7 @@ export default function Home() {
       </div>
 
       {/* Testimonials Section */}
-      <div className="relative bg-gray-50 dark:bg-gray-800 pb-32 pt-32">
+      <div className="relative pb-32 pt-32">
         <TestimonialsBackground />
         <div className="container mx-auto px-4 relative z-10">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
