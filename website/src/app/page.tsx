@@ -66,12 +66,12 @@ export default function Home() {
                 >
                   View Presentations
                 </Link>
-                <Link 
+                {/* <Link 
                   href="/publications" 
                   className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-semibold py-3 px-6 rounded-lg transition-colors"
                 >
                   View Publications
-                </Link>
+                </Link> */}
               </div>
             </div>
             <div className="md:w-1/2 flex justify-center">
