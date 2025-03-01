@@ -1,6 +1,8 @@
 **/venv/**
-
-**/technical/glycans/node_modules/**
+.venv/**
+.github/**
+website/node_modules/**
+website/.next/**
 **/credentials.json
 **/credentials.json.key
 **/credentials.json.json
