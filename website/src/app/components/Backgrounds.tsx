@@ -54,12 +54,12 @@ export const BiographyBackground = () => {
       >
         <defs>
           <linearGradient id="bioGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f8fafc" stopOpacity="1" className="dark:stop-color-gray-900" />
-            <stop offset="100%" stopColor="#f1f5f9" stopOpacity="1" className="dark:stop-color-gray-800" />
+            <stop offset="0%" className="text-gray-50 dark:text-gray-900" stopColor="currentColor" stopOpacity="1" />
+            <stop offset="100%" className="text-gray-100 dark:text-gray-800" stopColor="currentColor" stopOpacity="1" />
           </linearGradient>
           <linearGradient id="bioGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f1f5f9" stopOpacity="1" className="dark:stop-color-gray-800" />
-            <stop offset="100%" stopColor="#f8fafc" stopOpacity="1" className="dark:stop-color-gray-900" />
+            <stop offset="0%" className="text-gray-100 dark:text-gray-800" stopColor="currentColor" stopOpacity="1" />
+            <stop offset="100%" className="text-gray-50 dark:text-gray-900" stopColor="currentColor" stopOpacity="1" />
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#bioGradient)" />
@@ -112,23 +112,23 @@ export const PresentationsBackground = () => {
       >
         <defs>
           <linearGradient id="presentationsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f1f5f9" stopOpacity="1" className="dark:stop-color-gray-800" />
-            <stop offset="100%" stopColor="#e2e8f0" stopOpacity="1" className="dark:stop-color-gray-700" />
+            <stop offset="0%" className="text-gray-100 dark:text-gray-800" stopColor="currentColor" stopOpacity="1" />
+            <stop offset="100%" className="text-gray-200 dark:text-gray-700" stopColor="currentColor" stopOpacity="1" />
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#presentationsGradient)" />
         
-        {/* Top wave divider */}
+        {/* Top wave divider - updated to match About section background */}
         <path
           d="M0,0 L1440,0 L1440,100 C1080,60,720,140,360,100 C180,80,90,60,0,80 Z"
-          fill="url(#bioGradient2)"
+          className="fill-gray-100 dark:fill-gray-800"
           fillOpacity="1"
         />
               
         {/* Bottom wave divider */}
         <path
           d="M0,100% L1440,100% L1440,calc(100% - 80px) C1080,calc(100% - 40px),720,calc(100% - 120px),360,calc(100% - 80px) C180,calc(100% - 60px),90,calc(100% - 40px),0,calc(100% - 60px) Z"
-          fill="#f8fafc"
+          className="fill-white dark:fill-gray-900"
           fillOpacity="0.9"
           transform="rotate(180) translate(-1440, -100%)"
         />
@@ -148,8 +148,8 @@ export const SpeakingTopicsBackground = () => {
       >
         <defs>
           <linearGradient id="speakingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="1" className="dark:stop-color-gray-900" />
-            <stop offset="100%" stopColor="#f8fafc" stopOpacity="1" className="dark:stop-color-gray-800" />
+            <stop offset="0%" className="text-white dark:text-gray-900" stopColor="currentColor" stopOpacity="1" />
+            <stop offset="100%" className="text-gray-50 dark:text-gray-800" stopColor="currentColor" stopOpacity="1" />
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#speakingGradient)" />
@@ -157,7 +157,8 @@ export const SpeakingTopicsBackground = () => {
         {/* Top diagonal divider */}
         <path
           d="M0,0 L1440,0 L1440,120 L0,60 Z"
-          fill="#e2e8f0"
+          fill="currentColor"
+          className="text-gray-200 dark:text-gray-700"
           fillOpacity="0.8"
         />
         
@@ -196,30 +197,32 @@ export const TestimonialsBackground = () => {
       >
         <defs>
           <linearGradient id="testimonialGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f1f5f9" stopOpacity="1" className="dark:stop-color-gray-800" />
-            <stop offset="100%" stopColor="#e2e8f0" stopOpacity="1" className="dark:stop-color-gray-700" />
+            <stop offset="0%" className="text-white dark:text-gray-900" stopColor="currentColor" stopOpacity="1" />
+            <stop offset="100%" className="text-gray-50 dark:text-gray-800" stopColor="currentColor" stopOpacity="1" />
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#testimonialGradient)" />
         
-        {/* Top curved divider */}
+        {/* Top curved divider - adjusted to align with previous section */}
         <path
           d="M0,0 C240,80,480,120,720,80 C960,40,1200,80,1440,120 L1440,0 Z"
-          fill="#ffffff"
+          className="fill-gray-50 dark:fill-gray-800"
           fillOpacity="0.9"
+          transform="translate(0, -6)"
         />
         
-        {/* Red accent */}
+        {/* Red accent - curved to match top divider */}
         <path
-          d="M0,0 C240,60,480,90,720,60 C960,30,1200,60,1440,90 L1440,0 Z"
-          fill="#e74c3c"
-          fillOpacity="0.2"
+          d="M0,0 C240,80,480,120,720,80 C960,40,1200,80,1440,120 L1440,0 Z"
+          className="fill-red-600 dark:fill-red-800"
+          fillOpacity=".3"
+          transform="translate(0, -3)"
         />
         
         {/* Bottom curved divider */}
         <path
           d="M0,100% C240,calc(100% - 80px),480,calc(100% - 120px),720,calc(100% - 80px) C960,calc(100% - 40px),1200,calc(100% - 80px),1440,calc(100% - 120px) L1440,100% Z"
-          fill="#ffffff"
+          className="fill-white dark:fill-gray-900"
           fillOpacity="0.9"
         />
       </svg>

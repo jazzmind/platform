@@ -77,7 +77,16 @@ export async function getPresentation(categoryId: string, presentationId: string
     const hasData = fs.existsSync(path.join(presentationPath, "data.md"));
     
     // URL for the presentation
-    const url = `${baseUrl}/index.html`;
+    let url = `${baseUrl}/index.html`;
+    
+    // Check if this is a PDF presentation
+    if (fs.existsSync(path.join(presentationPath, "presentation.pdf"))) {
+      url = `${baseUrl}/presentation.pdf`;
+    } else if (fs.existsSync(path.join(presentationPath, "slides.pdf"))) {
+      url = `${baseUrl}/slides.pdf`;
+    } else if (fs.existsSync(path.join(presentationPath, "deck.pdf"))) {
+      url = `${baseUrl}/deck.pdf`;
+    }
     
     return {
       id: resolvedPresentationId,

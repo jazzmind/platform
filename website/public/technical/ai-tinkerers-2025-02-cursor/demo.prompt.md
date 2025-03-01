@@ -1,1 +1,0 @@
-Create a technical presentation for the AI Tinkerer's meetup here@demo that explains what MCP servers are, how to connected them in cursor and how they can drive cursor's agent mode. Let's use an example of connecting Notion and showing how an agent can create end user documentation as it's building code.

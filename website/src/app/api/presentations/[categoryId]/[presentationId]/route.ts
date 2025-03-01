@@ -145,6 +145,9 @@ function getContentType(filePath: string): string {
     case ".pdf":
       contentType = "application/pdf";
       break;
+    case ".pptx":
+      contentType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+      break;
     case ".md":
       contentType = "text/markdown";
       break;

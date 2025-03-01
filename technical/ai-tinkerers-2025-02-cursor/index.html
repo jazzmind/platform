@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Cursor Features - Feb 2024</title>
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/reveal.css">
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/theme/night.css">
+    <script src="https://unpkg.com/reveal.js/dist/reveal.js"></script>
+    <script src="https://unpkg.com/reveal.js/plugin/markdown/markdown.js"></script>
+    <script src="https://unpkg.com/reveal.js/plugin/notes/notes.js"></script>
+    <script src="https://unpkg.com/reveal.js/plugin/highlight/highlight.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/highlight.js/styles/monokai.css">
+    <style>
+        .reveal section {
+            font-size: 1.6rem;
+            overflow-y: auto;
+        }
+        .reveal {
+            background-color: #1a1a1a;
+        }
+        .reveal li {
+            margin-bottom: 0.7rem;
+        }
+        .reveal pre {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .reveal h1, .reveal h2 {
+            color: #61afef;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .reveal .highlight {
+            color: #98c379;
+            font-weight: bold;
+        }
+        .reveal .demo {
+            border: 2px solid #61afef;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            background: rgba(97, 175, 239, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section data-markdown="presentation.md" data-separator="^---$" data-separator-vertical="^--$">
+            </section>
+        </div>
+    </div>
+    <script>
+        Reveal.initialize({
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            highlight: {
+                highlightOnLoad: true
+            },
+            transition: 'slide',
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+</body>
+</html> 

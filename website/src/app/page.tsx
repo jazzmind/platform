@@ -19,13 +19,13 @@ export default function Home() {
     {
       id: "business",
       title: "Business",
-      description: "Business strategies, market analyses, and investment opportunities.",
+      description: "Innovation, strategy, and leadership.",
       icon: "📊",
     },
     {
       id: "education",
-      title: "Educational",
-      description: "Learning materials, tutorials, and educational resources.",
+      title: "Education",
+      description: "Work integrated learning and the future of education.",
       icon: "🎓",
     },
   ];
@@ -61,6 +61,12 @@ export default function Home() {
                   LinkedIn
                 </a>
                 <Link 
+                  href="/presentations" 
+                  className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                >
+                  View Presentations
+                </Link>
+                <Link 
                   href="/publications" 
                   className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-semibold py-3 px-6 rounded-lg transition-colors"
                 >
@@ -92,18 +98,16 @@ export default function Home() {
             About Wes
           </h2>
           <div className="max-w-4xl mx-auto">
-            <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
-              Wes Sonnenreich is a distinguished technology executive, entrepreneur, author, and speaker with extensive 
-              experience in cybersecurity, artificial intelligence, and blockchain technologies. As a thought leader 
-              in these fields, Wes has helped numerous organizations implement cutting-edge technology solutions while 
-              managing risk and security challenges.
+            <p className="text-lg text-gray-700 dark:text-gray-200 mb-6 max-w-2xl mx-auto">
+              Wes Sonnenreich is a distinguished technology executive, entrepreneur, author, and speaker. As a business and thought leader, 
+              Wes has helped numerous organizations develop sustainable capabilities in innovation, education, and cybersecurity.
             </p>
-            <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
+            <p className="text-lg text-gray-700 dark:text-gray-200 mb-6 max-w-2xl mx-auto">
               With multiple patents and publications to his name, Wes combines deep technical knowledge with strategic 
               business acumen. He has founded successful technology companies and led teams at major enterprises, 
               bringing innovative solutions to complex problems.
             </p>
-            <p className="text-lg text-gray-700 dark:text-gray-300">
+            <p className="text-lg text-gray-700 dark:text-gray-200 max-w-2xl mx-auto">
               A sought-after speaker and educator, Wes regularly shares his insights at industry conferences, 
               executive roundtables, and educational workshops. His presentations blend technical expertise with 
               practical business applications, making complex topics accessible to diverse audiences.
@@ -130,13 +134,13 @@ export default function Home() {
                 key={category.id}
                 className="block group"
               >
-                <div className="bg-white dark:bg-gray-700 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105">
-                  <div className="p-6">
+                <div className="bg-white dark:bg-gray-700 flex flex-col h-full rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105">
+                  <div className="flex-grow p-6">
                     <div className="text-4xl mb-4">{category.icon}</div>
                     <h2 className="text-2xl font-bold mb-2 text-gray-800 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                       {category.title} Presentations
                     </h2>
-                    <p className="text-gray-600 dark:text-gray-300">
+                    <p className="text-gray-600 dark:text-gray-200">
                       {category.description}
                     </p>
                   </div>
@@ -173,7 +177,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mt-8 mb-2 text-center">
             Speaking Topics
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-12 text-center max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-200 mb-12 text-center max-w-3xl mx-auto">
             Wes speaks on a range of topics at the intersection of technology, business, and AI
           </p>
 
@@ -181,7 +185,7 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
               <div className="text-3xl mb-4">🤖 + 🧠</div>
               <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Learning alongside Machines</h3>
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-gray-700 dark:text-gray-200">
                 What education from preK-100+ looks like in the age of hyper-intelligent machines and what that means for the future of human work.
               </p>
             </div>
@@ -189,7 +193,7 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
               <div className="text-3xl mb-4">🤖 + 💰</div>
               <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Building or Becoming an AI-Native Business</h3>
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-gray-700 dark:text-gray-200">
                  What the most innovative companies are doing to become AI-native, what is coming next, and what you need to do to stay competitive.
               </p>
             </div>
@@ -197,7 +201,7 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
               <div className="text-3xl mb-4">🤖 + 🔐</div>
               <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">AI and Cybersecurity - The New Playbook</h3>
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-gray-700 dark:text-gray-200">
                   BYO killed the network perimeter. AI is killing endpoint and data security. Quantum will kill cryptography. How is cybersecurity evolving?
               </p>
             </div>
@@ -205,7 +209,7 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
               <div className="text-3xl mb-4">🤖 + 🚀</div>
               <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Organizational Innovation + AI</h3>
-              <p className="text-gray-700 dark:text-gray-300">
+              <p className="text-gray-700 dark:text-gray-200">
                   How to level up your organization&apos;s ability to innovate with AI. What tools, processes, and mindsets are working today.
               </p>
             </div>
@@ -223,7 +227,7 @@ export default function Home() {
       </div>
 
       {/* Testimonials Section */}
-      <div className="relative bg-gray-50 dark:bg-gray-800 mt-16 pb-32 pt-32">
+      <div className="relative bg-gray-50 dark:bg-gray-800 pb-32 pt-32">
         <TestimonialsBackground />
         <div className="container mx-auto px-4 relative z-10">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-12 text-center">
@@ -232,8 +236,8 @@ export default function Home() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
-              <p className="text-gray-600 dark:text-gray-300 italic mb-4">
-                &quot;Wes&apos;s presentation on AI security was incredibly insightful. He has a unique ability to make complex technical concepts accessible without oversimplifying.&quot;
+              <p className="text-gray-600 dark:text-gray-200 italic mb-4">
+                &quot;Wes&apos;s presentation on AI tools was incredibly insightful. He has a unique ability to make complex technical concepts accessible without oversimplifying.&quot;
               </p>
               <div className="font-semibold text-gray-800 dark:text-white">
                 Tech Conference Attendee
@@ -241,7 +245,7 @@ export default function Home() {
             </div>
             
             <div className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md">
-              <p className="text-gray-600 dark:text-gray-300 italic mb-4">
+              <p className="text-gray-600 dark:text-gray-200 italic mb-4">
                 &quot;As a keynote speaker, Wes combined technical expertise with engaging storytelling. His session was the highlight of our annual conference.&quot;
               </p>
               <div className="font-semibold text-gray-800 dark:text-white">

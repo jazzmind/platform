@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reveal.js Presentation with Markdown</title>
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/reveal.css">
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js/dist/theme/night.css">
+    <script src="https://unpkg.com/reveal.js/dist/reveal.js"></script>
+    <script src="https://unpkg.com/reveal.js/plugin/markdown/markdown.js"></script>
+    <script src="https://unpkg.com/reveal.js/plugin/notes/notes.js"></script>
+    <script src="https://unpkg.com/reveal.js/plugin/highlight/highlight.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/highlight.js/styles/monokai.css">
+    <style>
+        /* Adjust font size for better screen fitting */
+        .reveal section {
+            font-size: 1.6rem;
+            overflow-y: auto;
+        }
+        .reveal  {
+            background-color: #333;
+        }
+        .reveal li {
+            margin-bottom: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section data-markdown="data.md" data-separator="^---$" data-separator-vertical="^--$">
+            </section>
+        </div>
+    </div>
+    <script>
+        Reveal.initialize({
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            highlight: {
+                highlightOnLoad: true  // Ensure syntax highlighting is triggered after loading
+            }
+        });
+        hljs.initHighlightingOnLoad();  // Initialize the syntax highlighting plugin
+    </script>
+</body>
+</html>

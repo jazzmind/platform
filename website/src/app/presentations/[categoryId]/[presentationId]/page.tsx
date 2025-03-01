@@ -25,7 +25,7 @@ const categories: Record<string, CategoryInfo> = {
   },
   education: {
     id: "education",
-    title: "Educational Presentations",
+    title: "Education Presentations",
     icon: "🎓",
   },
 };
