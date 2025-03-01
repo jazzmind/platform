@@ -49,7 +49,7 @@ export async function loadMarkdownFile(categoryId: string, presentationId: strin
 export async function askQuestion(categoryId: string, presentationId: string, question: string): Promise<string> {
   try {
     // Load presentation data
-    const dataContent = await loadMarkdownFile(categoryId, presentationId, "data.md");
+    const dataContent = await loadMarkdownFile(categoryId, presentationId, "presentation.md");
     const notesContent = await loadMarkdownFile(categoryId, presentationId, "notes.md");
     
     // Combine content for context
@@ -84,9 +84,7 @@ export async function askQuestion(categoryId: string, presentationId: string, qu
           role: "user",
           content: question
         }
-      ],
-      temperature: 0.7,
-      max_tokens: 500,
+      ]
     });
     
     return response.choices[0].message.content || "I couldn't generate a response. Please try again.";

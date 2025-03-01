@@ -71,7 +71,7 @@ export default async function PresentationPage({
             Home
           </Link>
           <span className="mx-2 text-gray-400 dark:text-gray-500">/</span>
-          <Link href={`/categories/${categoryId}`} className="text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400">
+          <Link href={`/presentations/${categoryId}`} className="text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400">
             {category.title}
           </Link>
           <span className="mx-2 text-gray-400 dark:text-gray-500">/</span>

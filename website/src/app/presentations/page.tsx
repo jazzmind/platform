@@ -51,7 +51,7 @@ export default function PresentationsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {Object.values(categories).map((category) => (
             <Link
-              href={`/categories/${category.id}`}
+              href={`/presentations/${category.id}`}
               key={category.id}
               className="block group"
             >

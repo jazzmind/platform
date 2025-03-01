@@ -58,11 +58,11 @@ export async function getPresentation(categoryId: string, presentationId: string
       title = formatTitle(resolvedPresentationId);
       date = extractDateFromId(resolvedPresentationId) || new Date().toISOString().split("T")[0];
       
-      // Try to extract description from data.md if it exists
+      // Try to extract description from presentation.md if it exists
       description = `Presentation about ${resolvedPresentationId.replace(/-/g, " ")}`;
       
-      if (fs.existsSync(path.join(presentationPath, "data.md"))) {
-        const data = fs.readFileSync(path.join(presentationPath, "data.md"), "utf8");
+      if (fs.existsSync(path.join(presentationPath, "presentation.md"))) {
+        const data = fs.readFileSync(path.join(presentationPath, "presentation.md"), "utf8");
         const descMatch = data.match(/## Presentation Metadata[\s\S]*?Description:(.*?)(?:\n|$)/i);
         if (descMatch && descMatch[1]) {
           description = descMatch[1].trim();
@@ -73,8 +73,8 @@ export async function getPresentation(categoryId: string, presentationId: string
     // Check if notes.md exists
     const hasNotes = fs.existsSync(path.join(presentationPath, "notes.md"));
     
-    // Check if data.md exists
-    const hasData = fs.existsSync(path.join(presentationPath, "data.md"));
+    // Check if presentation.md exists
+    const hasData = fs.existsSync(path.join(presentationPath, "presentation.md"));
     
     // URL for the presentation
     let url = `${baseUrl}/index.html`;

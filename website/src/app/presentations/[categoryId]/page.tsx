@@ -137,8 +137,8 @@ function processPresentation(id: string, presentations: Presentation[], baseDir:
       // Extract description from index.html if possible
       let description = `Presentation about ${id.replace(/-/g, " ")}`;
       
-      if (fs.existsSync(path.join(dirPath, "data.md"))) {
-        const data = fs.readFileSync(path.join(dirPath, "data.md"), "utf8");
+      if (fs.existsSync(path.join(dirPath, "presentation.md"))) {
+        const data = fs.readFileSync(path.join(dirPath, "presentation.md"), "utf8");
         const descMatch = data.match(/## Presentation Metadata[\s\S]*?Description:(.*?)(?:\n|$)/i);
         if (descMatch && descMatch[1]) {
           description = descMatch[1].trim();
@@ -215,7 +215,7 @@ export default async function CategoryPage({ params: paramsPromise }: { params: 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-16">
-        <Link href="/" className="inline-flex items-center text-red-600 hover:text-red-800 mb-8">
+        <Link href="/presentations" className="inline-flex items-center text-red-600 hover:text-red-800 mb-8">
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
