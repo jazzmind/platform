@@ -93,7 +93,7 @@ export default function Home() {
       {/* Biography Section */}
       <div className="relative" id="about">
         <BiographyBackground />
-        <div className="container mx-auto px-4 pt-32 relative z-10">
+        <div className="container mx-auto px-4 pt-24 relative z-10">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
             About Wes
           </h2>
