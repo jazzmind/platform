@@ -3,10 +3,6 @@ description: Use when creating or modifying technical presentations to ensure co
 globs: technical/**/*.{md,html,css,js}
 alwaysApply: false
 ---
----
-description: Use when creating or modifying technical presentations to ensure consistent structure and delivery
-globs: technical/**/*.{md,html,css,js}
----
 
 # Technical Presentation Rules
 

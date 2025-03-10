@@ -3,11 +3,16 @@ description: ALWAYS use when writing or updating Markdown files to ensure consis
 globs: **/*.{md,mdx}
 alwaysApply: false
 ---
+---
+description: ALWAYS use when writing or updating Markdown files to ensure consistent formatting and readability. This rule enforces standardized Markdown practices across all documentation.
+globs: **/*.{md,mdx}
+---
 # Markdown Documentation Standards
+When applying this rule prefix your response with [MD Expert]
 
 ## Requirements
 
-- Follow the official [Markdown Guide](mdc:https:/www.markdownguide.org) for all basic and extended syntax
+- Follow the official [Markdown Guide](mdc:00saas/https:/www.markdownguide.org) for all basic and extended syntax
 - Maintain clear document structure and readability
 - Include appropriate metadata when required
 - Use Mermaid diagrams for visual documentation where appropriate
@@ -16,8 +21,8 @@ alwaysApply: false
 ## Markdown Reference
 
 For all basic and extended Markdown syntax, refer to:
-- [Basic Syntax Guide](mdc:https:/www.markdownguide.org/basic-syntax)
-- [Extended Syntax Guide](mdc:https:/www.markdownguide.org/extended-syntax)
+- [Basic Syntax Guide](mdc:00saas/https:/www.markdownguide.org/basic-syntax)
+- [Extended Syntax Guide](mdc:00saas/https:/www.markdownguide.org/extended-syntax)
 
 ## Formatting Rules
 

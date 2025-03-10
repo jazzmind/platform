@@ -3,10 +3,6 @@ description: Use when creating or modifying business presentations including sal
 globs: business/**/*.{md,html}
 alwaysApply: false
 ---
----
-description: Use when creating or modifying business presentations including sales, investor pitches, and internal communications
-globs: business/**/*.{md,html}
----
 
 # Business Presentation Rules
 

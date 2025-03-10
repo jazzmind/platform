@@ -3,10 +3,6 @@ description: Use when creating or modifying coaching, mentoring, career, educati
 globs: coach/**/*.{md,html}
 alwaysApply: false
 ---
----
-description: Use when creating or modifying coaching, mentoring, career, educational and other life advice presentations to ensure consistent structure and delivery
-globs: coach/**/*.{md,html}
----
 
 # Coaching and Mentoring Presentation Rules
 
