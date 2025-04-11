@@ -144,9 +144,9 @@ export default async function EventPage({
                     <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white">
                       {topic.title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">
-                      {topic.description}
-                    </p>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4"
+                      dangerouslySetInnerHTML={{ __html: topic.description }}
+                    />
                     <div className="space-y-2 ml-4">
                       {topic.questions.map((question, qIndex) => (
                         <div key={qIndex} className="flex items-start">
