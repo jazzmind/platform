@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
@@ -15,9 +15,12 @@ export const metadata: Metadata = {
     ],
     apple: { url: '/apple-touch-icon.svg', sizes: '180x180' },
   },
-  manifest: '/manifest.json',
-  themeColor: '#dc2626',
+  manifest: '/manifest.json'
 };
+
+export const viewport: Viewport = {
+  themeColor: '#dc2626',
+}
 
 export default function RootLayout({
   children,

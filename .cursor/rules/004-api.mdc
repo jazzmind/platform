@@ -1,0 +1,74 @@
+---
+description: Use when working with API integrations, especially OpenAI
+globs: src/app/api/**/*.ts
+---
+
+# API Integration Rules
+
+## OpenAI Model Usage
+- **NEVER** change OpenAI models unless explicitly requested by the user
+- Use `o3-mini` as the default model for all OpenAI API calls
+- Maintain model consistency across the application
+- Document model choices in comments for future reference
+
+## API Configuration
+- Keep API keys and credentials secure as environment variables
+- Never expose API keys in client-side code
+- Always use server-side API routes for external service calls
+- Implement proper error handling and logging for all API calls
+- Include request validation for all API endpoints
+
+## Response Formatting
+- Use consistent JSON response structures across API endpoints
+- Include appropriate HTTP status codes for success and error responses
+- Implement proper error messages for debugging
+- Consider rate limiting for expensive API calls
+- Add logging for monitoring API usage and performance
+
+## Error Handling
+- Implement try/catch blocks around all external API calls
+- Return appropriate status codes (4xx for client errors, 5xx for server errors)
+- Log detailed error information for debugging
+- Provide user-friendly error messages in responses
+- Consider implementing retries for transient failures
+
+## Examples
+
+<example>
+✅ Good OpenAI Implementation:
+```typescript
+const response = await openai.chat.completions.create({
+  model: "o3-mini", // Default model as per standards
+  messages: [
+    {
+      role: "system",
+      content: "You are a helpful assistant."
+    },
+    {
+      role: "user",
+      content: userMessage
+    }
+  ],
+  response_format: { type: "json_object" }
+});
+```
+</example>
+
+<example type="invalid">
+❌ Bad OpenAI Implementation:
+```typescript
+// Arbitrarily changing model without explicit requirement
+const response = await openai.chat.completions.create({
+  model: "gpt-4", // Changed from default without specific requirement
+  messages: [
+    // Messages...
+  ]
+});
+```
+</example>
+
+<critical>
+- NEVER change OpenAI models from the default o3-mini unless explicitly requested
+- ALWAYS implement proper error handling for API calls
+- ALWAYS keep API authentication data secure and server-side only
+</critical> 

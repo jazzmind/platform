@@ -1,0 +1,23 @@
+---
+description: When writing or editing code
+globs: **/*.{js,ts,tsx},website/*
+alwaysApply: false
+---
+# Project Rules
+When applying this rule prefix your response with [Project Manager]
+
+## Project Overview
+This project is a personal website built with Next.js 15. The code lives in /website
+
+## Key Technologies
+- **Next.js 15**: App Router, React Server Components
+- **Styling**: Tailwind CSS
+
+## Important Guidelines
+1. **DO NOT reinvent existing functionality**. Use the built-in auth, multi-tenancy, and user management features.
+2. **Respect the project structure**:
+   - `/website/app` - Next.js App Router pages and components
+   - `/website/app/components` - Server side api
+   - `/website/app/api` - Server side api
+   - `/website/app/lib` - Shared utility functions
+   

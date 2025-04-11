@@ -10,12 +10,7 @@ import {
 
 export default function Home() {
   const categories = [
-    {
-      id: "technical",
-      title: "Technical",
-      description: "Deep dives into technical topics, code walkthroughs, and architecture discussions.",
-      icon: "💻",
-    },
+
     {
       id: "business",
       title: "Business",
@@ -27,6 +22,12 @@ export default function Home() {
       title: "Education",
       description: "Work integrated learning and the future of education.",
       icon: "🎓",
+    },
+    {
+      id: "technical",
+      title: "Technical",
+      description: "Deep dives into technical topics, code walkthroughs, and architecture discussions.",
+      icon: "💻",
     },
   ];
 
@@ -124,7 +125,7 @@ export default function Home() {
             Presentations
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-12 text-center max-w-3xl mx-auto">
-            Explore Wes&apos;s collection of presentations across various categories
+            Presentation materials, links and interactive tools for exploring the topics further.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -220,7 +221,7 @@ export default function Home() {
               href="/contact" 
               className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
             >
-              Book Wes for Your Event
+              Book A Speaking Engagement
             </Link>
           </div>
         </div>

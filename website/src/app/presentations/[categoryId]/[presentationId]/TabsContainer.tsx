@@ -3,8 +3,16 @@
 import { useState, useEffect } from "react";
 import PresentationIframe from "./PresentationIframe";
 import NotesPanel from "./NotesPanel";
+import dynamic from "next/dynamic";
 
-type Tab = "presentation" | "notes";
+// Dynamically import the DynamicTab component with no SSR
+// This is important since it uses browser-only features like speech recognition
+const DynamicTab = dynamic(
+  () => import('./DynamicTab/DynamicTab'),
+  { ssr: false }
+);
+
+type Tab = "presentation" | "notes" | "dynamic";
 
 interface TabsContainerProps {
   presentationUrl: string;
@@ -63,6 +71,15 @@ export default function TabsContainer({
               Notes
             </TabButton>
           )}
+          <TabButton 
+            isActive={activeTab === "dynamic"} 
+            onClick={() => setActiveTab("dynamic")}
+          >
+            <div className="flex items-center">
+              <span className="mr-1">Dynamic</span>
+              <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">New</span>
+            </div>
+          </TabButton>
         </div>
         <a 
           href={presentationUrl}
@@ -89,6 +106,12 @@ export default function TabsContainer({
         {activeTab === "notes" && (
           <div className="h-full overflow-auto p-4">
             <NotesPanel categoryId={categoryId} presentationId={presentationId} />
+          </div>
+        )}
+
+        {activeTab === "dynamic" && (
+          <div className="h-full overflow-auto">
+            <DynamicTab categoryId={categoryId} presentationId={presentationId} />
           </div>
         )}
       </div>

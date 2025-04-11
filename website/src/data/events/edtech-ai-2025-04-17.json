@@ -1,0 +1,76 @@
+{
+    "public" : {
+        "title": "AI in EdTech - Roundtable Discussion",
+        "date": "2025-04-17",
+        "location": "Kendall Square, Cambridge, MA",
+
+        "time": "5pm - 6pm",
+        "description": "Join us for a roundtable discussion on what is really happening with AI in EdTech. This is a small (<40 person), in-person event for senior leaders and experts in AI and education.\n\nIt's a <a href=\"https://en.wikipedia.org/wiki/Chatham_House_rule\">Chatham House rule</a> discussion on what is really working and not working with AI in edtech. There's a lot of hype, everyone is now an AI-first company but I'm hoping we can get real and talk about what is really happening in our organizations.",
+        "topics": [
+            {
+                "title": "Strategy",
+                "description": "What is the future vision for life and work that we believe we are working toward? 2/5/10+ years out?",
+                "questions": [
+                    "What is the future vision for life and work that we believe we are working toward? <strong>2/5/10+ years out?</strong>",
+                    "What <em>purposes</em> will drive us?",
+                    "What <em>relationships</em> will we have?",
+                    "What <em>problems</em> will we solve?"
+                ]
+            },
+            {
+                "title": "Skills",
+                "description": "What skills are rising/falling in importance within our companies? What impact is AI having on this?",
+                "questions": [
+                    "What skills are <strong>rising/falling</strong> in importance within our companies? What impact is AI having on this?",
+                    "How does this impact our <em>leadership</em>?",
+                    "How does this impact our <em>sales & marketing</em>?",
+                    "How does this impact our <em>tech</em>?"
+                ]
+            },
+            {
+                "title": "ROI",
+                "description": "How are we calculating ROI for our investment in AI? Is it driving revenue, lowering costs or simply a sunk cost to stay competitive?",
+                "questions": [
+                    "How are we calculating <strong>ROI</strong> for our investment in AI?",
+                    "Is it driving <em>revenue</em>, lowering <em>costs</em> or simply a <em>sunk cost</em> to stay competitive?",
+                    "Are customers/capital investing in us, new competitors, big players like MS or holding off on spend?",
+                    "Are we able to separate geopolitics, economy and AI?"
+                ]
+            },
+            {
+                "title": "AI Burnout",
+                "description": "What impact is the pace of AI innovation having on us and our teams? What are we doing about it?",
+                "questions": [
+                    "What impact is the <strong>pace of AI innovation</strong> having on us and our teams? What are we doing about it?",
+                    "Are we trying to <em>stay on top</em>?",
+                    "Are we feeling <em>left behind</em>?",
+                    "Are we lacking <em>scope/time</em> to upskill?",
+                    "Are we fearful of <em>job loss</em> due to automation?"
+                ]
+            }
+       ]
+    },
+    "private" : {
+        "code": "REALTALK-AI-ED",
+        "datahash": "08e0s9j93209fu0932h0jsepfodsi023",
+        "location": "Santo Domingo Room, Cambridge Innovation Center, 1 Broadway, Cambridge, MA",
+        "polls": [
+            {"Roundtable First Choice": [
+                "Strategy",
+                "Skills",
+                "ROI",
+                "AI Burnout"
+            ]},
+            {"Roundtable Second Choice": [
+                "Strategy",
+                "Skills",
+                "ROI",
+                "AI Burnout"
+            ]},
+            {"Suggest connections to other attendees before the session (will share your linkedIn URL with 3-5 people based on aligned interests)?": [
+                "Yes",
+                "No"
+            ]}
+        ]
+    }
+}
