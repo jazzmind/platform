@@ -9,9 +9,8 @@
         "topics": [
             {
                 "title": "Strategy",
-                "description": "What is the future vision for life and work that we believe we are working toward? 2/5/10+ years out?",
+                "description": "What is the future vision for life and work that we believe we are working toward? <strong>2/5/10+ years out?</strong>",
                 "questions": [
-                    "What is the future vision for life and work that we believe we are working toward? <strong>2/5/10+ years out?</strong>",
                     "What <em>purposes</em> will drive us?",
                     "What <em>relationships</em> will we have?",
                     "What <em>problems</em> will we solve?"
@@ -19,9 +18,8 @@
             },
             {
                 "title": "Skills",
-                "description": "What skills are rising/falling in importance within our companies? What impact is AI having on this?",
+                "description": "What skills are <strong>rising/falling</strong> in importance within our companies? What impact is AI having on this?",
                 "questions": [
-                    "What skills are <strong>rising/falling</strong> in importance within our companies? What impact is AI having on this?",
                     "How does this impact our <em>leadership</em>?",
                     "How does this impact our <em>sales & marketing</em>?",
                     "How does this impact our <em>tech</em>?"
@@ -29,9 +27,8 @@
             },
             {
                 "title": "ROI",
-                "description": "How are we calculating ROI for our investment in AI? Is it driving revenue, lowering costs or simply a sunk cost to stay competitive?",
+                "description": "How are we calculating <strong>ROI</strong> for our investment in AI?",
                 "questions": [
-                    "How are we calculating <strong>ROI</strong> for our investment in AI?",
                     "Is it driving <em>revenue</em>, lowering <em>costs</em> or simply a <em>sunk cost</em> to stay competitive?",
                     "Are customers/capital investing in us, new competitors, big players like MS or holding off on spend?",
                     "Are we able to separate geopolitics, economy and AI?"
@@ -39,9 +36,8 @@
             },
             {
                 "title": "AI Burnout",
-                "description": "What impact is the pace of AI innovation having on us and our teams? What are we doing about it?",
+                "description": "What impact is the <strong>pace of AI innovation</strong> having on us and our teams? What are we doing about it?",
                 "questions": [
-                    "What impact is the <strong>pace of AI innovation</strong> having on us and our teams? What are we doing about it?",
                     "Are we trying to <em>stay on top</em>?",
                     "Are we feeling <em>left behind</em>?",
                     "Are we lacking <em>scope/time</em> to upskill?",
