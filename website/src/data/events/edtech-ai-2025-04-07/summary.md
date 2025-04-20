@@ -31,27 +31,27 @@
 
 ### Lens-by-Lens Highlights
 
-#### Strategy → Skills (Table 1, Ashley Chiampo)
+#### Strategy → Skills (Table 1, Moderated by [Ashley Chiampo](https://www.linkedin.com/in/ashley-chiampo-7755175/))
 - **Vision (2/5/10 yrs)**: Personal AI "copilots" everywhere, professors morph into learning orchestrators, parents pay premiums for "low-AI" schooling.
 - **Strategic tension**: Who owns the learner-data & the agent?
 - **Skills flagged**: Creativity, critical thinking, contextual judgment. Measuring them remains the open challenge.
 
-#### Skills → Strategy (Table 2, Dr. Patrice Torcivia Prusko)
+#### Skills → Strategy (Table 2, Moderated by [Dr. Patrice Torcivia Prusko](https://www.linkedin.com/in/patrice-torcivia-prusko/))
 - **Critical skills rising**: Curiosity, agility, large-scale collaboration, systems thinking, AI-fluency & bias literacy.
 - **Institutional response**: Shift from "teaching occupations" to building problem-solvers; invest in consumer + builder learning communities.
 - **Gap**: New graduates strong on tools, weak on communication & team execution.
 
-#### ROI for AI in EdTech → Skills/Strategy (Table 3, Wes Sonnenreich)
+#### ROI for AI in EdTech → Skills/Strategy (Table 3, Moderated by [Wes Sonnenreich](https://www.linkedin.com/in/sonnenreich/))
 - **Metrics drift**: Conversion-rate & reach trump robust learning impact measures. "We rent AI until the moat is clear."
 - **Drivers of value**: Data quality > data volume; self-disruption > incrementalism.
 - **Investment dilemma**: Quick wins demanded, but foundational models consume budget before ROI manifests.
 
-#### Burnout → Strategy (Table 4, Tim Connors)
+#### Burnout → Strategy (Table 4, Moderated by [Tim Connors](https://www.linkedin.com/in/tim-connors-4402298/))
 - **Symptoms**: Cognitive overload, "AI tool-sprawl", purpose anxiety.
 - **Strategic antidotes**: Set pacing thresholds, rotate AI "sprint teams", bake mental-health metrics into OKRs.
 - **Competitive upside**: Institutions that manage human energy outperform in sustained innovation.
 
-#### Free-form discussion (Table 5)
+#### Free-form discussion (Table 5, Presented by [Albert Chen](https://www.linkedin.com/in/albertchen/))
 - Confirmed that policy, ethics & equitable access are lagging the tech curve.
 - Called for multi-tier playbooks: early adopters experiment in sandboxes; mainstream players follow validated patterns.
 
@@ -149,4 +149,4 @@ The event reaffirmed that AI in education is less a technology problem and more 
 
 ---
 
-*This summary was compiled based on table discussions under Chatham House Rules. Specific attributions have been omitted to preserve anonymity.*
+*This summary was compiled based on table discussions under the Chatham House Rule. Specific attributions have been omitted to preserve anonymity.*
