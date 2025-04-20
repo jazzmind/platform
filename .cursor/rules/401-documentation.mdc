@@ -1,6 +1,6 @@
 ---
 description: When working on the API or documenting the API
-globs: handlers/*,services/*
+globs: website/src/**/*
 alwaysApply: false
 ---
 # Documentation Rules

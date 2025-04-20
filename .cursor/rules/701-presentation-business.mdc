@@ -1,6 +1,6 @@
 ---
 description: Use when creating or modifying business presentations including sales, investor pitches, and internal communications
-globs: business/**/*.{md,html}
+globs: 
 alwaysApply: false
 ---
 

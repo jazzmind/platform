@@ -1,6 +1,6 @@
 ---
 description: Use when working with database functionality
-globs: **/*.{ts,tsx,js}
+globs: website/**/*.ts,website/**/*.js,website/**/*.tsx
 alwaysApply: false
 ---
 # Database Implementation Rules

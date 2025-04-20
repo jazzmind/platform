@@ -1,6 +1,6 @@
 ---
 description: When documenting requirements for a new feature or project
-globs: docs/requirements/*.md
+globs: 
 alwaysApply: false
 ---
 # Requirements Documentation Template

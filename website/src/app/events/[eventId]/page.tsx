@@ -6,6 +6,7 @@ import EventRegistrationForm from "../EventRegistrationForm";
 import { sendEventRegistration } from "../actions";
 import EventCodeAccess from "../EventCodeAccess";
 import { PollQuestion } from "../../lib/types";
+import EventTabs from "../../components/EventTabs";
 
 // Define Topic interface
 interface Topic {
@@ -32,39 +33,70 @@ interface EventData {
   };
 }
 
-// Function to get event data
-async function getEventData(eventId: string): Promise<EventData | null> {
+interface EventFiles {
+  event: EventData;
+  summary: string | null;
+  notes: string | null;
+}
+
+// Function to get event data and related files
+async function getEventFiles(eventId: string): Promise<EventFiles | null> {
   const eventsDirectory = path.join(process.cwd(), "src/data/events");
-  const filePath = path.join(eventsDirectory, `${eventId}.json`);
+  const eventDirectory = path.join(eventsDirectory, eventId);
+  const eventJsonPath = path.join(eventDirectory, "event.json");
+  const summaryPath = path.join(eventDirectory, "summary.md");
+  const notesPath = path.join(eventDirectory, "notes.md");
   
   try {
-    if (!fs.existsSync(filePath)) {
+    // Check if event directory exists
+    if (!fs.existsSync(eventDirectory)) {
+      return null;
+    }
+
+    // Check if event.json exists
+    if (!fs.existsSync(eventJsonPath)) {
       return null;
     }
     
-    const fileContents = fs.readFileSync(filePath, "utf8");
-    const eventData = JSON.parse(fileContents);
+    // Read and parse event.json
+    const eventContents = fs.readFileSync(eventJsonPath, "utf8");
+    const eventData = JSON.parse(eventContents);
+    
+    // Check for summary.md
+    let summary = null;
+    if (fs.existsSync(summaryPath)) {
+      summary = fs.readFileSync(summaryPath, "utf8");
+    }
+    
+    // Check for notes.md
+    let notes = null;
+    if (fs.existsSync(notesPath)) {
+      notes = fs.readFileSync(notesPath, "utf8");
+    }
     
     return {
-      id: eventId,
-      ...eventData
+      event: {
+        id: eventId,
+        ...eventData
+      },
+      summary,
+      notes
     };
   } catch (error) {
-    console.error(`Error reading event file: ${error}`);
+    console.error(`Error reading event files: ${error}`);
     return null;
   }
 }
 
 export async function generateStaticParams() {
   const eventsDirectory = path.join(process.cwd(), "src/data/events");
-  const eventFiles = fs.readdirSync(eventsDirectory);
+  const eventDirs = fs.readdirSync(eventsDirectory, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
   
-  // Filter for JSON files and create params
-  return eventFiles
-    .filter(file => file.endsWith(".json"))
-    .map(file => ({
-      eventId: file.replace(/\.json$/, "")
-    }));
+  return eventDirs.map(dir => ({
+    eventId: dir
+  }));
 }
 
 export default async function EventPage({ 
@@ -73,12 +105,15 @@ export default async function EventPage({
   params: Promise<{ eventId: string }>
 }) {
   const { eventId } = await params;
-  const eventData = await getEventData(eventId);
+  const eventFiles = await getEventFiles(eventId);
   
   // If event not found, return 404
-  if (!eventData) {
+  if (!eventFiles) {
     notFound();
   }
+  
+  const eventData = eventFiles.event;
+  const hasMaterials = eventFiles.summary !== null || eventFiles.notes !== null;
   
   // Format the date
   const formattedDate = new Date(eventData.public.date).toLocaleDateString("en-US", {
@@ -126,103 +161,115 @@ export default async function EventPage({
         </header>
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2">
+          <div className={hasMaterials ? "col-span-full" : "lg:col-span-2"}>
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">About This Event</h2>
-              <div 
-                className="prose prose-lg dark:prose-invert max-w-none" 
-                dangerouslySetInnerHTML={{ __html: eventData.public.description }}
-              />
-            </div>
-            
-            {/* Topics section */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Discussion Topics</h2>
-              <div className="space-y-8">
-                {eventData.public.topics.map((topic, index) => (
-                  <div key={index} className="mb-8">
-                    <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white">
-                      {topic.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300 mb-4"
-                      dangerouslySetInnerHTML={{ __html: topic.description }}
-                    />
-                    <div className="space-y-2 ml-4">
-                      {topic.questions.map((question, qIndex) => (
-                        <div key={qIndex} className="flex items-start">
-                          <div className="text-red-600 mr-2">•</div>
-                          <div 
-                            className="text-gray-700 dark:text-gray-300"
-                            dangerouslySetInnerHTML={{ __html: question }}
+              {hasMaterials ? (
+                <EventTabs 
+                  summary={eventFiles.summary}
+                  notes={eventFiles.notes}
+                  eventData={eventData}
+                />
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">About This Event</h2>
+                  <div 
+                    className="prose prose-lg dark:prose-invert max-w-none" 
+                    dangerouslySetInnerHTML={{ __html: eventData.public.description }}
+                  />
+                  
+                  {/* Topics section */}
+                  <div className="mt-8">
+                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Discussion Topics</h2>
+                    <div className="space-y-8">
+                      {eventData.public.topics.map((topic, index) => (
+                        <div key={index} className="mb-8">
+                          <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white">
+                            {topic.title}
+                          </h3>
+                          <p className="text-gray-600 dark:text-gray-300 mb-4"
+                            dangerouslySetInnerHTML={{ __html: topic.description }}
                           />
+                          <div className="space-y-2 ml-4">
+                            {topic.questions.map((question, qIndex) => (
+                              <div key={qIndex} className="flex items-start">
+                                <div className="text-red-600 mr-2">•</div>
+                                <div 
+                                  className="text-gray-700 dark:text-gray-300"
+                                  dangerouslySetInnerHTML={{ __html: question }}
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Private Event Content (Unlocked with Code) */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Event Details & Poll</h2>
-              
-              <div className="mb-6">
-                <p className="text-gray-600 dark:text-gray-300">
-                  Additional event details will be sent to your email after registration. 
-                  If you&apos;ve already registered, you&apos;ll receive a code to access these details.
-                </p>
-              </div>
-              
-              {/* Code Input Form (Client Component) */}
-              <div className="space-y-4">
-                <div className="border border-gray-300 dark:border-gray-600 p-6 rounded-lg">
-                  {/* Client component for code access */}
-                  <EventCodeAccess 
-                    eventId={eventId} 
-                    accessCode={eventData.private.code}
-                  />
                   
-                  {/* Hidden content to be displayed once unlocked */}
-                  <div id="event-private-content" className="hidden space-y-6">
-                    <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg my-4">
-                      <h3 className="font-bold text-gray-800 dark:text-white mb-2">
-                        Detailed Location
-                      </h3>
-                      <p className="text-gray-700 dark:text-gray-300">
-                        {eventData.private.location}
+                  {/* Private Event Content (Unlocked with Code) */}
+                  <div className="mt-8">
+                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Event Details & Poll</h2>
+                    
+                    <div className="mb-6">
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Additional event details will be sent to your email after registration. 
+                        If you&apos;ve already registered, you&apos;ll receive a code to access these details.
                       </p>
                     </div>
                     
-                    {/* Hidden poll data to be accessed by the client component */}
-                    <div 
-                      id="event-polls-container"
-                      data-polls={JSON.stringify(eventData.private.polls)}
-                      className="hidden"
-                    ></div>
-                    
-                    {/* Hidden datahash to be used for fetching stored responses */}
-                    <div 
-                      id="event-datahash-container"
-                      data-hash={eventData.private.datahash}
-                      className="hidden"
-                    ></div>
+                    {/* Code Input Form (Client Component) */}
+                    <div className="space-y-4">
+                      <div className="border border-gray-300 dark:border-gray-600 p-6 rounded-lg">
+                        {/* Client component for code access */}
+                        <EventCodeAccess 
+                          eventId={eventId} 
+                          accessCode={eventData.private.code}
+                        />
+                        
+                        {/* Hidden content to be displayed once unlocked */}
+                        <div id="event-private-content" className="hidden space-y-6">
+                          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg my-4">
+                            <h3 className="font-bold text-gray-800 dark:text-white mb-2">
+                              Detailed Location
+                            </h3>
+                            <p className="text-gray-700 dark:text-gray-300">
+                              {eventData.private.location}
+                            </p>
+                          </div>
+                          
+                          {/* Hidden poll data to be accessed by the client component */}
+                          <div 
+                            id="event-polls-container"
+                            data-polls={JSON.stringify(eventData.private.polls)}
+                            className="hidden"
+                          ></div>
+                          
+                          {/* Hidden datahash to be used for fetching stored responses */}
+                          <div 
+                            id="event-datahash-container"
+                            data-hash={eventData.private.datahash}
+                            className="hidden"
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </div>
           
-          <div>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 sticky top-8">
-              <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Register for This Event</h2>
-              <EventRegistrationForm 
-                eventId={eventId}
-                eventTitle={eventData.public.title}
-                sendEventRegistration={sendEventRegistration}
-              />
+          {!hasMaterials && (
+            <div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 sticky top-8">
+                <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Register for This Event</h2>
+                <EventRegistrationForm 
+                  eventId={eventId}
+                  eventTitle={eventData.public.title}
+                  sendEventRegistration={sendEventRegistration}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
       

@@ -1,10 +1,7 @@
 **/venv/**
+.venv
 .venv/**
 .github/**
 website/node_modules/**
 website/.next/**
 **/credentials.json
-**/credentials.json.key
-**/credentials.json.json
-**/credentials.json.json.key
-**/credentials.json.json.key.json

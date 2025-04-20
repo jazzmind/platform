@@ -1,6 +1,6 @@
 ---
 description: When creating a new architecture document
-globs: docs/architecture.md
+globs: 
 alwaysApply: false
 ---
 # Architecture Document Template

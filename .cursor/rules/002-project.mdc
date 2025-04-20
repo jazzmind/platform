@@ -1,6 +1,6 @@
 ---
 description: When writing or editing code
-globs: **/*.{js,ts,tsx},website/*
+globs: website/**/*.js,website/**/*.ts,website/**/*.tsx,website/**/*.md
 alwaysApply: false
 ---
 # Project Rules

@@ -5,25 +5,27 @@ import path from "path";
 // Function to get all event data
 async function getEvents() {
   const eventsDirectory = path.join(process.cwd(), "src/data/events");
-  const eventFiles = fs.readdirSync(eventsDirectory);
-  
-  // Filter for JSON files
-  const jsonEventFiles = eventFiles.filter(file => file.endsWith(".json"));
+  const eventDirs = fs.readdirSync(eventsDirectory, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
   
   // Load and parse each event file
-  const events = jsonEventFiles.map(file => {
-    const filePath = path.join(eventsDirectory, file);
-    const fileContents = fs.readFileSync(filePath, "utf8");
+  const events = eventDirs.map(dirName => {
+    const eventJsonPath = path.join(eventsDirectory, dirName, "event.json");
+    
+    // Skip if event.json doesn't exist
+    if (!fs.existsSync(eventJsonPath)) {
+      return null;
+    }
+    
+    const fileContents = fs.readFileSync(eventJsonPath, "utf8");
     const eventData = JSON.parse(fileContents);
     
-    // Get event ID from filename (remove .json extension)
-    const eventId = file.replace(/\.json$/, "");
-    
     return {
-      id: eventId,
+      id: dirName,
       ...eventData.public
     };
-  });
+  }).filter(Boolean); // Filter out null values
   
   // Sort events by date (most recent first)
   return events.sort((a, b) => {

@@ -1,6 +1,6 @@
 ---
 description: Use when creating or modifying coaching, mentoring, career, educational and other life advice presentations to ensure consistent structure and delivery
-globs: coach/**/*.{md,html}
+globs: 
 alwaysApply: false
 ---
 

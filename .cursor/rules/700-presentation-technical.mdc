@@ -1,6 +1,6 @@
 ---
 description: Use when creating or modifying technical presentations to ensure consistent structure and delivery
-globs: technical/**/*.{md,html,css,js}
+globs: 
 alwaysApply: false
 ---
 

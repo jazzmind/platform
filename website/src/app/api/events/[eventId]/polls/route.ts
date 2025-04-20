@@ -105,6 +105,7 @@ export async function POST(
       await put(csvFileName, csvContent, {
         contentType: 'text/csv',
         access: 'public',
+        addRandomSuffix: false,
       });
       
       return NextResponse.json({ 
@@ -231,7 +232,9 @@ async function acquireLock(lockFileName: string, lockId: string): Promise<boolea
     await put(lockFileName, lockId, {
       contentType: 'text/plain',
       access: 'public',
+      addRandomSuffix: false,
     });
+
     
     return true;
   } catch (error) {

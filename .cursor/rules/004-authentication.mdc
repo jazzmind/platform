@@ -1,6 +1,6 @@
 ---
 description: Use when working with authentication, authorization, or user sessions
-globs: **/*.{ts,tsx,js}
+globs: website/src/**/*
 alwaysApply: false
 ---
 # Authentication Implementation Rules

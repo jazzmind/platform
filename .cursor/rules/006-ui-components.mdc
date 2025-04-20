@@ -1,6 +1,6 @@
 ---
 description: Use when working with UI components, layouts, or styling
-globs: **/*.{tsx,css}
+globs: website/src/**/*.tsx
 alwaysApply: false
 ---
 # UI Component Implementation Rules

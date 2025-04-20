@@ -19,3 +19,157 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Improved Markdown Styling */
+.markdown-improved {
+  /* Basic Typography */
+  line-height: 1.7;
+  
+  /* Headings */
+  & h1, & h2, & h3, & h4, & h5, & h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 700;
+  }
+  
+  & h1 {
+    font-size: 2em;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.3em;
+  }
+  
+  & h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3em;
+  }
+  
+  & h3 {
+    font-size: 1.25em;
+  }
+  
+  /* Lists */
+  & ul, & ol {
+    padding-left: 2em;
+    margin: 1em 0;
+  }
+  
+  & ul {
+    list-style-type: disc;
+  }
+  
+  & ol {
+    list-style-type: decimal;
+  }
+  
+  & li {
+    margin-bottom: 0.5em;
+  }
+  
+  & li > ul, & li > ol {
+    margin: 0.5em 0;
+  }
+  
+  /* Table Styling */
+  & table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    overflow-x: auto;
+    display: block;
+  }
+  
+  & table th, & table td {
+    border: 1px solid #ddd;
+    padding: 0.75em;
+    text-align: left;
+  }
+  
+  & table th {
+    background-color: rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+  }
+  
+  & table tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.025);
+  }
+  
+  /* Dark mode table adjustments */
+  @media (prefers-color-scheme: dark) {
+    & table th, & table td {
+      border-color: #444;
+    }
+    
+    & table th {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    & table tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+  
+  /* Code blocks */
+  & pre, & code {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+    font-family: monospace;
+  }
+  
+  & pre {
+    padding: 1em;
+    overflow-x: auto;
+    margin: 1em 0;
+  }
+  
+  & code {
+    padding: 0.2em 0.4em;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    & pre, & code {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+  
+  /* Blockquotes */
+  & blockquote {
+    border-left: 4px solid #ddd;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: rgba(0, 0, 0, 0.7);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    & blockquote {
+      border-left-color: #555;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+  
+  /* Images */
+  & img {
+    max-width: 100%;
+    height: auto;
+    margin: 1em 0;
+  }
+  
+  /* Paragraphs and spacing */
+  & p {
+    margin: 1em 0;
+  }
+  
+  /* Horizontal rule */
+  & hr {
+    height: 1px;
+    background-color: #ddd;
+    border: none;
+    margin: 2em 0;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    & hr {
+      background-color: #444;
+    }
+  }
+}

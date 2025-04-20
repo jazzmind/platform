@@ -1,6 +1,7 @@
 ---
 description: Use when working with API integrations, especially OpenAI
-globs: src/app/api/**/*.ts
+globs: website/src/app/api/**/*.ts
+alwaysApply: false
 ---
 
 # API Integration Rules

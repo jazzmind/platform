@@ -1,6 +1,6 @@
 ---
 description: Use when creating reveal.js presentations to ensure consistent structure and professional delivery
-globs: **/*.{html,md,css,js}
+globs: 
 alwaysApply: false
 ---
 
