@@ -1,11 +1,12 @@
 "use client";
 
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { Suspense } from 'react';
 import Link from 'next/link';
 
 export default function AuthErrorPage() {
-  const searchParams = useSearchParams();
-  const error = searchParams.get('error') || 'unknown_error';
+  const params = useParams();
+  const error = params.error || 'unknown_error';
 
   // Map error codes to user-friendly messages
   const errorMessages: Record<string, string> = {
@@ -19,9 +20,10 @@ export default function AuthErrorPage() {
     unknown_error: 'An unknown error occurred during authentication.'
   };
 
-  const errorMessage = errorMessages[error] || errorMessages.unknown_error;
+  const errorMessage = errorMessages[error as keyof typeof errorMessages] || errorMessages.unknown_error;
 
   return (
+    <Suspense fallback={<div>Loading...</div>}>
     <div className="min-h-screen bg-white dark:bg-gray-900">
       <div className="container mx-auto px-4 py-16">
         <Link href="/scheduler" className="inline-flex items-center text-red-600 hover:text-red-800 mb-8">
@@ -60,5 +62,6 @@ export default function AuthErrorPage() {
         </div>
       </div>
     </div>
+    </Suspense>
   );
 } 

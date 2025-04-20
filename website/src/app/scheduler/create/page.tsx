@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function CreateSchedulerPage() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     objective: "",
@@ -193,7 +191,8 @@ export default function CreateSchedulerPage() {
           message: data.message || "Failed to create scheduler event"
         });
       }
-    } catch (_error) {
+    } catch (error) {
+      console.error("Error creating scheduler event:", error);
       setSubmitResult({
         success: false,
         message: "An error occurred while creating the event"

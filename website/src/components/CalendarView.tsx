@@ -25,6 +25,8 @@ interface CalendarViewProps {
   onRemoveTimeRange: (dateIndex: number, rangeIndex: number) => void;
   onTimeRangeChange: (dateIndex: number, rangeIndex: number, field: 'start' | 'end', value: string) => void;
 }
+// Group events by date
+const eventsByDate: Record<string, CalendarEvent[]> = {};
 
 const CalendarView: React.FC<CalendarViewProps> = ({
   dates,
@@ -39,8 +41,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     console.log('CalendarView received events:', events);
   }, [dates, events]);
 
-  // Group events by date
-  const eventsByDate: Record<string, CalendarEvent[]> = {};
   
   events.forEach(event => {
     // Make sure we have a valid date from the ISO string
@@ -60,11 +60,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({
     }
   });
   
-  // Log the grouped events to debug
-  useEffect(() => {
-    console.log('Events grouped by date:', eventsByDate);
-  }, [eventsByDate]);
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 

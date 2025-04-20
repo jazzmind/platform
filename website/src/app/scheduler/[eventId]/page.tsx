@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -51,6 +51,233 @@ export default function SchedulerEventPage() {
   const [earliestStartTime, setEarliestStartTime] = useState<string>("08:00"); // Default earliest start time
   const [latestEndTime, setLatestEndTime] = useState<string>("21:00"); // Default latest end time
   
+    // Function to populate availability from calendar events
+    const populateAvailabilityFromCalendar = useCallback((events: GoogleCalendarEvent[]) => {
+      if (!event) return;
+      
+      console.log(`Populating availability from ${events.length} calendar events`);
+      
+      // Ensure we have dates to work with - if availableDates is empty
+      // but we have events, generate dates based on the events
+      if (availableDates.length === 0 && events.length > 0) {
+        console.log("No available dates found, generating from events");
+        // Extract unique dates from events
+        const uniqueDates = new Set<string>();
+        
+        events.forEach(calEvent => {
+          try {
+            const startDate = new Date(calEvent.start);
+            uniqueDates.add(startDate.toISOString().split('T')[0]);
+            
+            // Add a few days before and after to give context
+            for (let i = -3; i <= 3; i++) {
+              const contextDate = new Date(startDate);
+              contextDate.setDate(contextDate.getDate() + i);
+              uniqueDates.add(contextDate.toISOString().split('T')[0]);
+            }
+          } catch (error) {
+            console.error("Error parsing event date:", calEvent.start, error);
+          }
+        });
+        
+        // Convert the set to an array and sort
+        const dateArray = Array.from(uniqueDates).sort();
+        
+        // Create availableDates array
+        const newDates: AvailabilityDate[] = dateArray.map(date => ({
+          date,
+          timeRanges: []
+        }));
+        
+        console.log(`Generated ${newDates.length} dates from events`);
+        setAvailableDates(newDates);
+        
+        // Return early since we just updated availableDates
+        // The effect will trigger another call to this function
+        return;
+      }
+      
+      // Create a new array of availability dates using calendar events
+      const newAvailableDates = [...availableDates];
+      
+      // Create a map of busy times by date
+      const busyTimesByDate: Record<string, Array<{start: string, end: string}>> = {};
+      
+      // Process each event and mark the time as unavailable
+      events.forEach(calEvent => {
+        let startDateTime: Date;
+        let endDateTime: Date;
+        
+        if (calEvent.allDay) {
+          // For all-day events, mark the entire day as busy
+          startDateTime = new Date(`${calEvent.start}T00:00:00`);
+          endDateTime = new Date(`${calEvent.end}T23:59:59`);
+        } else {
+          startDateTime = new Date(calEvent.start);
+          endDateTime = new Date(calEvent.end);
+        }
+        
+        // Get date strings for each day that the event spans
+        const currentDate = new Date(startDateTime);
+        while (currentDate <= endDateTime) {
+          const dateString = currentDate.toISOString().split('T')[0];
+          
+          if (!busyTimesByDate[dateString]) {
+            busyTimesByDate[dateString] = [];
+          }
+          
+          // Add the busy time for this day
+          const dayStart = new Date(currentDate);
+          dayStart.setHours(0, 0, 0, 0);
+          
+          const dayEnd = new Date(currentDate);
+          dayEnd.setHours(23, 59, 59, 999);
+          
+          const eventStart = new Date(
+            Math.max(startDateTime.getTime(), dayStart.getTime())
+          );
+          const eventEnd = new Date(
+            Math.min(endDateTime.getTime(), dayEnd.getTime())
+          );
+          
+          busyTimesByDate[dateString].push({
+            start: eventStart.toTimeString().substring(0, 5),
+            end: eventEnd.toTimeString().substring(0, 5)
+          });
+          
+          // Move to the next day
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      });
+      
+      console.log('Busy times by date:', busyTimesByDate);
+      
+      // Define time preferences based on the event settings
+      let preferredStartHour = 9; // Default to 9 AM
+      let preferredEndHour = 17; // Default to 5 PM
+      
+      if (event.timePreferences.partOfDay.includes('morning')) {
+        preferredStartHour = 8;
+        preferredEndHour = 12;
+      } else if (event.timePreferences.partOfDay.includes('afternoon')) {
+        preferredStartHour = 12;
+        preferredEndHour = 17;
+      } else if (event.timePreferences.partOfDay.includes('evening')) {
+        preferredStartHour = 17;
+        preferredEndHour = 21;
+      }
+      
+      // Adjust for early/late preference
+      if (event.timePreferences.earlyLate === 'early') {
+        preferredStartHour = Math.max(preferredStartHour - 1, 6);
+        preferredEndHour = Math.max(preferredEndHour - 1, preferredStartHour + 2);
+      } else if (event.timePreferences.earlyLate === 'late') {
+        preferredStartHour = Math.min(preferredStartHour + 1, 22 - 2);
+        preferredEndHour = Math.min(preferredEndHour + 1, 22);
+      }
+      
+      // Format hours as strings with leading zeros
+      const formatHour = (hour: number): string => {
+        return hour.toString().padStart(2, '0') + ':00';
+      };
+      
+      // For each date in our available dates
+      newAvailableDates.forEach((dateItem, dateIndex) => {
+        const dateString = dateItem.date;
+        const busyTimes = busyTimesByDate[dateString] || [];
+        
+        if (busyTimes.length === 0) {
+          // If no busy times, the entire preferred time range is available
+          newAvailableDates[dateIndex].timeRanges = [{
+            start: formatHour(preferredStartHour),
+            end: formatHour(preferredEndHour)
+          }];
+        } else {
+          // If there are busy times, we need to find available slots
+          // This is a simplified version that adds available times between busy periods
+          
+          // Sort busy times by start time
+          const busyTimesArray = busyTimes as Array<{start: string, end: string}>;
+          busyTimesArray.sort((a: {start: string, end: string}, b: {start: string, end: string}) => a.start.localeCompare(b.start));
+          
+          // Start with the preferred start time
+          let currentStart = formatHour(preferredStartHour);
+          const availableSlots: AvailabilityTimeRange[] = [];
+          
+          // Check each busy period and add available slots between them
+          for (const busyPeriod of busyTimesArray) {
+            if (busyPeriod.start > currentStart && busyPeriod.start <= formatHour(preferredEndHour)) {
+              availableSlots.push({
+                start: currentStart,
+                end: busyPeriod.start
+              });
+            }
+            
+            // Update current start to after this busy period
+            if (busyPeriod.end > currentStart) {
+              currentStart = busyPeriod.end;
+            }
+          }
+          
+          // Add a final slot if there's time after the last busy period
+          if (currentStart < formatHour(preferredEndHour)) {
+            availableSlots.push({
+              start: currentStart,
+              end: formatHour(preferredEndHour)
+            });
+          }
+          
+          // Filter out very short slots (less than event duration)
+          const eventDurationHours = Math.max(1, Math.ceil(event.duration / 60));
+          const filteredSlots = availableSlots.filter(slot => {
+            const startHours = parseInt(slot.start.split(':')[0]);
+            const endHours = parseInt(slot.end.split(':')[0]);
+            return (endHours - startHours) >= eventDurationHours;
+          });
+          
+          newAvailableDates[dateIndex].timeRanges = filteredSlots;
+        }
+      });
+      
+      setAvailableDates(newAvailableDates);
+    }, [event, availableDates]);
+  
+    // Function to fetch Google Calendar events
+  const fetchGoogleCalendarEvents = useCallback(async (uid: string) => {
+      if (!event) return;
+      
+      setCalendarLoading(true);
+      try {
+        console.log(`Fetching calendar events for userId: ${uid}`);
+        const response = await fetch(
+          `/api/scheduler/calendar/google?` +
+          `eventId=${eventId}&` +
+          `userId=${uid}&` +
+          `startDate=${event.dateRangeStart}&` +
+          `endDate=${event.dateRangeEnd}`
+        );
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch calendar events: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log(`Received ${data.events ? data.events.length : 0} calendar events`);
+        console.log('Calendar events:', data.events);
+        
+        // Set the calendar events state first
+        setCalendarEvents(data.events);
+        
+        // Then pass the actual data to the function instead of using the state variable
+        populateAvailabilityFromCalendar(data.events);
+      } catch (err) {
+        console.error("Error fetching calendar events:", err);
+        alert(`Failed to fetch calendar events: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      } finally {
+        setCalendarLoading(false);
+      }
+    }, [event, eventId, populateAvailabilityFromCalendar]);
+    
   // Load event data
   useEffect(() => {
     // Reset submitSuccess to false on component mount to ensure form is visible
@@ -174,234 +401,10 @@ export default function SchedulerEventPage() {
       // We've just returned from a successful Google auth
       fetchGoogleCalendarEvents(userId);
     }
-  }, [authSuccess, authProvider, userId, event, eventId]);
+  }, [authSuccess, authProvider, userId, event, eventId, fetchGoogleCalendarEvents]);
 
-  // Function to fetch Google Calendar events
-  const fetchGoogleCalendarEvents = async (uid: string) => {
-    if (!event) return;
-    
-    setCalendarLoading(true);
-    try {
-      console.log(`Fetching calendar events for userId: ${uid}`);
-      const response = await fetch(
-        `/api/scheduler/calendar/google?` +
-        `eventId=${eventId}&` +
-        `userId=${uid}&` +
-        `startDate=${event.dateRangeStart}&` +
-        `endDate=${event.dateRangeEnd}`
-      );
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch calendar events: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log(`Received ${data.events ? data.events.length : 0} calendar events`);
-      console.log('Calendar events:', data.events);
-      
-      // Set the calendar events state first
-      setCalendarEvents(data.events);
-      
-      // Then pass the actual data to the function instead of using the state variable
-      populateAvailabilityFromCalendar(data.events);
-    } catch (err) {
-      console.error("Error fetching calendar events:", err);
-      alert(`Failed to fetch calendar events: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setCalendarLoading(false);
-    }
-  };
+
   
-  // Function to populate availability from calendar events
-  const populateAvailabilityFromCalendar = (events: GoogleCalendarEvent[]) => {
-    if (!event) return;
-    
-    console.log(`Populating availability from ${events.length} calendar events`);
-    
-    // Ensure we have dates to work with - if availableDates is empty
-    // but we have events, generate dates based on the events
-    if (availableDates.length === 0 && events.length > 0) {
-      console.log("No available dates found, generating from events");
-      // Extract unique dates from events
-      const uniqueDates = new Set<string>();
-      
-      events.forEach(calEvent => {
-        try {
-          const startDate = new Date(calEvent.start);
-          uniqueDates.add(startDate.toISOString().split('T')[0]);
-          
-          // Add a few days before and after to give context
-          for (let i = -3; i <= 3; i++) {
-            const contextDate = new Date(startDate);
-            contextDate.setDate(contextDate.getDate() + i);
-            uniqueDates.add(contextDate.toISOString().split('T')[0]);
-          }
-        } catch (error) {
-          console.error("Error parsing event date:", calEvent.start, error);
-        }
-      });
-      
-      // Convert the set to an array and sort
-      const dateArray = Array.from(uniqueDates).sort();
-      
-      // Create availableDates array
-      const newDates: AvailabilityDate[] = dateArray.map(date => ({
-        date,
-        timeRanges: []
-      }));
-      
-      console.log(`Generated ${newDates.length} dates from events`);
-      setAvailableDates(newDates);
-      
-      // Return early since we just updated availableDates
-      // The effect will trigger another call to this function
-      return;
-    }
-    
-    // Create a new array of availability dates using calendar events
-    const newAvailableDates = [...availableDates];
-    
-    // Create a map of busy times by date
-    const busyTimesByDate: Record<string, Array<{start: string, end: string}>> = {};
-    
-    // Process each event and mark the time as unavailable
-    events.forEach(calEvent => {
-      let startDateTime: Date;
-      let endDateTime: Date;
-      
-      if (calEvent.allDay) {
-        // For all-day events, mark the entire day as busy
-        startDateTime = new Date(`${calEvent.start}T00:00:00`);
-        endDateTime = new Date(`${calEvent.end}T23:59:59`);
-      } else {
-        startDateTime = new Date(calEvent.start);
-        endDateTime = new Date(calEvent.end);
-      }
-      
-      // Get date strings for each day that the event spans
-      const currentDate = new Date(startDateTime);
-      while (currentDate <= endDateTime) {
-        const dateString = currentDate.toISOString().split('T')[0];
-        
-        if (!busyTimesByDate[dateString]) {
-          busyTimesByDate[dateString] = [];
-        }
-        
-        // Add the busy time for this day
-        const dayStart = new Date(currentDate);
-        dayStart.setHours(0, 0, 0, 0);
-        
-        const dayEnd = new Date(currentDate);
-        dayEnd.setHours(23, 59, 59, 999);
-        
-        const eventStart = new Date(
-          Math.max(startDateTime.getTime(), dayStart.getTime())
-        );
-        const eventEnd = new Date(
-          Math.min(endDateTime.getTime(), dayEnd.getTime())
-        );
-        
-        busyTimesByDate[dateString].push({
-          start: eventStart.toTimeString().substring(0, 5),
-          end: eventEnd.toTimeString().substring(0, 5)
-        });
-        
-        // Move to the next day
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-    });
-    
-    console.log('Busy times by date:', busyTimesByDate);
-    
-    // Define time preferences based on the event settings
-    let preferredStartHour = 9; // Default to 9 AM
-    let preferredEndHour = 17; // Default to 5 PM
-    
-    if (event.timePreferences.partOfDay.includes('morning')) {
-      preferredStartHour = 8;
-      preferredEndHour = 12;
-    } else if (event.timePreferences.partOfDay.includes('afternoon')) {
-      preferredStartHour = 12;
-      preferredEndHour = 17;
-    } else if (event.timePreferences.partOfDay.includes('evening')) {
-      preferredStartHour = 17;
-      preferredEndHour = 21;
-    }
-    
-    // Adjust for early/late preference
-    if (event.timePreferences.earlyLate === 'early') {
-      preferredStartHour = Math.max(preferredStartHour - 1, 6);
-      preferredEndHour = Math.max(preferredEndHour - 1, preferredStartHour + 2);
-    } else if (event.timePreferences.earlyLate === 'late') {
-      preferredStartHour = Math.min(preferredStartHour + 1, 22 - 2);
-      preferredEndHour = Math.min(preferredEndHour + 1, 22);
-    }
-    
-    // Format hours as strings with leading zeros
-    const formatHour = (hour: number): string => {
-      return hour.toString().padStart(2, '0') + ':00';
-    };
-    
-    // For each date in our available dates
-    newAvailableDates.forEach((dateItem, dateIndex) => {
-      const dateString = dateItem.date;
-      const busyTimes = busyTimesByDate[dateString] || [];
-      
-      if (busyTimes.length === 0) {
-        // If no busy times, the entire preferred time range is available
-        newAvailableDates[dateIndex].timeRanges = [{
-          start: formatHour(preferredStartHour),
-          end: formatHour(preferredEndHour)
-        }];
-      } else {
-        // If there are busy times, we need to find available slots
-        // This is a simplified version that adds available times between busy periods
-        
-        // Sort busy times by start time
-        const busyTimesArray = busyTimes as Array<{start: string, end: string}>;
-        busyTimesArray.sort((a: {start: string, end: string}, b: {start: string, end: string}) => a.start.localeCompare(b.start));
-        
-        // Start with the preferred start time
-        let currentStart = formatHour(preferredStartHour);
-        const availableSlots: AvailabilityTimeRange[] = [];
-        
-        // Check each busy period and add available slots between them
-        for (const busyPeriod of busyTimesArray) {
-          if (busyPeriod.start > currentStart && busyPeriod.start <= formatHour(preferredEndHour)) {
-            availableSlots.push({
-              start: currentStart,
-              end: busyPeriod.start
-            });
-          }
-          
-          // Update current start to after this busy period
-          if (busyPeriod.end > currentStart) {
-            currentStart = busyPeriod.end;
-          }
-        }
-        
-        // Add a final slot if there's time after the last busy period
-        if (currentStart < formatHour(preferredEndHour)) {
-          availableSlots.push({
-            start: currentStart,
-            end: formatHour(preferredEndHour)
-          });
-        }
-        
-        // Filter out very short slots (less than event duration)
-        const eventDurationHours = Math.max(1, Math.ceil(event.duration / 60));
-        const filteredSlots = availableSlots.filter(slot => {
-          const startHours = parseInt(slot.start.split(':')[0]);
-          const endHours = parseInt(slot.end.split(':')[0]);
-          return (endHours - startHours) >= eventDurationHours;
-        });
-        
-        newAvailableDates[dateIndex].timeRanges = filteredSlots;
-      }
-    });
-    
-    setAvailableDates(newAvailableDates);
-  };
 
   // Function to initiate Google OAuth
   const connectGoogleCalendar = () => {

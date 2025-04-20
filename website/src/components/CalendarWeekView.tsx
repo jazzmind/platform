@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { format, addDays, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 
 interface CalendarEvent {
@@ -102,7 +102,7 @@ const CalendarWeekView: React.FC<CalendarWeekViewProps> = ({
   };
   
   // Check if a slot is within the preferred time ranges
-  const isPreferredTime = (hour: number): boolean => {
+  const isPreferredTime = useCallback((hour: number): boolean => {
     const { partOfDay, earlyLate } = eventPreferences.timePreferences;
     
     // Base time preferences
@@ -124,7 +124,7 @@ const CalendarWeekView: React.FC<CalendarWeekViewProps> = ({
     }
     
     return isPreferred;
-  };
+  }, [eventPreferences.timePreferences]);
   
   // Initialize calendar days based on current week
   useEffect(() => {
@@ -291,7 +291,7 @@ const CalendarWeekView: React.FC<CalendarWeekViewProps> = ({
     });
     
     setPotentialTimeSlots(newPotentialSlots);
-  }, [calendarDays, events, eventPreferences.duration, eventPreferences.timePreferences, dates, earliestStartTime, latestEndTime, travelBuffer]);
+  }, [calendarDays, events, eventPreferences.duration, eventPreferences.timePreferences, dates, earliestStartTime, latestEndTime, travelBuffer, isPreferredTime]);
   
   // Handle clicking on a potential time slot
   const handleTimeSlotClick = (day: string, startTime: string, endTime: string) => {
