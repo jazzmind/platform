@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { askQuestion as defaultAskQuestion } from "./actions";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 interface Message {
   role: "user" | "assistant";
@@ -142,7 +143,13 @@ export default function ChatPanel({
                     : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white rounded-tl-none"
                 }`}
               >
-                {message.content}
+                {message.role === "assistant" ? (
+                  <div className="prose dark:prose-invert max-w-none">
+                    <MarkdownRenderer content={message.content} />
+                  </div>
+                ) : (
+                  message.content
+                )}
               </div>
             </div>
           ))

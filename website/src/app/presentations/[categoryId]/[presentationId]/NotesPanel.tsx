@@ -67,7 +67,7 @@ export default function NotesPanel({ categoryId, presentationId }: NotesPanelPro
   }
 
   return (
-    <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none dark:prose-invert prose-headings:text-gray-800 dark:prose-headings:text-white prose-p:text-gray-600 dark:prose-p:text-gray-300 prose-a:text-red-600 dark:prose-a:text-red-400 prose-a:no-underline hover:prose-a:underline prose-code:bg-gray-100 dark:prose-code:bg-gray-700 prose-code:p-1 prose-code:rounded">
+    <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none dark:prose-invert prose-headings:text-gray-800 dark:prose-headings:text-white prose-p:text-gray-600 dark:prose-p:text-gray-300 prose-a:text-red-600 dark:prose-a:text-red-400 prose-a:no-underline hover:prose-a:underline prose-code:bg-gray-100 dark:prose-code:bg-gray-700 prose-code:p-1 prose-code:rounded p-4">
       <Markdown 
         remarkPlugins={[remarkGfm]} 
         rehypePlugins={[rehypeRaw, rehypeSanitize]}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import NotesPanel from "./NotesPanel";
 import dynamic from "next/dynamic";
-import ToggleableChatPanel from "../../../../components/ToggleableChatPanel";
+import ToggleableChatPanel from "@/components/ToggleableChatPanel";
 import { askQuestion } from "./actions";
 
 // Dynamically import the DynamicTab component with no SSR

@@ -6,7 +6,7 @@ import {
   PresentationsBackground, 
   SpeakingTopicsBackground,
   TestimonialsBackground 
-} from "./components/Backgrounds";
+} from "@/components/Backgrounds";
 
 export default function Home() {
   const categories = [

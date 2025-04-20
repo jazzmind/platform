@@ -74,7 +74,7 @@ export default function ToggleableChatPanel({
 
       {/* Sliding chat panel */}
       <div 
-        className={`fixed right-0 top-0 bottom-0 w-full md:w-96 bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-16 bottom-0 w-full md:w-120 bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         style={{ display: isVisible || isOpen ? 'block' : 'none' }}
