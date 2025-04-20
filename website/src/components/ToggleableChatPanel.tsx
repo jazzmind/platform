@@ -81,7 +81,7 @@ export default function ToggleableChatPanel({
       >
         <div className="h-full">
           {/* Only render the ChatPanel when visible for performance */}
-          {(isVisible || isOpen) && <ChatPanel {...chatPanelProps} />}
+          {(isVisible || isOpen) && <ChatPanel {...chatPanelProps} onClose={() => setIsOpen(false)} />}
         </div>
       </div>
     </>

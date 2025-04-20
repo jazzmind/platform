@@ -15,6 +15,7 @@ export interface ChatPanelProps {
   secondaryId?: string;
   title?: string;
   icon?: React.ReactNode;
+  onClose?: () => void;
   askQuestion?: (contentType: string, contentId: string, secondaryId: string | undefined, question: string) => Promise<string>;
 }
 
@@ -24,6 +25,7 @@ export default function ChatPanel({
   secondaryId,
   title = "Chat",
   icon,
+  onClose,
   askQuestion = defaultAskQuestion
 }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -105,11 +107,33 @@ export default function ChatPanel({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex justify-between items-center">
         <h2 className="text-lg font-semibold flex items-center text-gray-800 dark:text-white">
           {icon || defaultIcon}
           {title}
         </h2>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-red-500 focus:outline-none md:hidden"
+            aria-label="Close chat"
+          >
+            <svg 
+              className="w-6 h-6" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M6 18L18 6M6 6l12 12" 
+              />
+            </svg>
+          </button>
+        )}
       </div>
       
       {/* Messages container with fixed height and scrolling */}

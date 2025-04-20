@@ -81,6 +81,7 @@ export default function Navbar() {
             <div className="flex flex-col space-y-2">
               <NavLink href="/" onClick={closeMenu} isMobile>Home</NavLink>
               <NavLink href="/#about" onClick={closeMenu} isMobile>About</NavLink>
+              <NavLink href="/events" onClick={closeMenu} isMobile>Events</NavLink>
               <NavLink href="/presentations" onClick={closeMenu} isMobile>Presentations</NavLink>
               <NavLink href="/publications" onClick={closeMenu} isMobile>Publications</NavLink>
               <NavLink href="/contact" onClick={closeMenu} isMobile>Contact</NavLink>
