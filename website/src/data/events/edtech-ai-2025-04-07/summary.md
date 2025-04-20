@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-**Boston | 7 April 2025 | 5 tables, 40+ edtech executives, AI experts, educators and researchers**
+**Boston | 17 April 2025 | 5 tables, 40+ edtech executives, AI experts, educators and researchers**
 
 ---
 
@@ -13,7 +13,7 @@
   3. ROI for AI in EdTech → Skills/Strategic Vision 
   4. Burnout → Strategic Vision 
   5. Free-form discussion 
-- Chatham House Rule let founders and educators speak candidly about what is—and isn't—working inside their organisations.
+- The Chatham House Rule lets founders and educators speak candidly about what is—and isn't—working inside their organisations.
 
 ---
 
@@ -58,17 +58,17 @@
 ---
 
 ### Five Actionable Take-Aways for CEOs & Academic Leaders
-1. **Publish the unknowns.** Map your AI "known-unknowns" publicly; it buys you trust and recruits collaborators.
-2. **Design for connection first, automation second.** If a feature displaces human interaction, reinvest the saved minutes back into community-building.
-3. **Sequence adoption.** Run dual road-maps—sandbox (fast, experimental) and core (measured, value-validated)—to avoid binary all-in / all-out traps.
-4. **Instrument burnout.** Track tool-switches per week, self-reported efficacy and sense of purpose with the same rigour as NPS or ARR.
-5. **Level the conversation.** Create forums where late adopters & skeptics set the agenda at least 30% of the time; the early-adopter echo-chamber skews product-market fit.
+1. **Acknowledge the unknowns.** Map your AI "known-unknowns" and share with your team and stakeholders; we're still discovering the problem-statements.
+2. **Design for connection first, automation second.** When we eliminate jobs through automation, we are also changing the jobs of the remaining workers. Is it isolating our workers or giving them more time to connect with customers / collaborators? 
+3. **Sequence adoption.** Run dual road-maps—sandbox (fast, experimental) and core (measured, value-validated) to avoid binary all-in / all-out traps.
+4. **Monitor burnout.** This is a marathon, not a sprint. There's no point in burning out a team by racing to adopt a technology that will be obsolete in 6 months.
+5. **Level the conversation.** Create forums where late adopters & skeptics can help set the agenda too; the early-adopter echo-chamber skews our perception of how people are adopting and being impacted by AI.
 
 ---
 
 ## Detailed Analysis
 
-The EdTech AI Roundtable brought together leaders from education, technology, and business to explore the complex intersection of artificial intelligence and education. Through structured discussions organized around four distinct lenses—Strategy, Skills, ROI, and Burnout—participants engaged in candid conversation under Chatham House Rules.
+The EdTech AI Roundtable brought together leaders from education, technology, and business to explore the complex intersection of artificial intelligence and education. Through structured discussions organized around four distinct lenses—Strategy, Skills, ROI, and Burnout—participants engaged in candid conversation under the Chatham House Rule.
 
 What emerged was not a clear roadmap, but rather a sophisticated understanding of the current landscape: one characterized by rapid change, competing priorities, and profound questions about the future of learning. This analysis captures the key insights and tensions revealed during our discussions.
 
