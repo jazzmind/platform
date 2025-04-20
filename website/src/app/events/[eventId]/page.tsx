@@ -6,7 +6,7 @@ import EventRegistrationForm from "../EventRegistrationForm";
 import { sendEventRegistration } from "../actions";
 import EventCodeAccess from "../EventCodeAccess";
 import { PollQuestion } from "../../lib/types";
-import EventTabs from "../../components/EventTabs";
+import EventTabs from "../../../components/EventTabs";
 
 // Define Topic interface
 interface Topic {
@@ -160,116 +160,114 @@ export default async function EventPage({
           </div>
         </header>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className={hasMaterials ? "col-span-full" : "lg:col-span-2"}>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
-              {hasMaterials ? (
-                <EventTabs 
-                  summary={eventFiles.summary}
-                  notes={eventFiles.notes}
-                  eventData={eventData}
+        {/* Content layout - full width for all content */}
+        <div className="w-full">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-8">
+            {hasMaterials ? (
+              <EventTabs 
+                summary={eventFiles.summary}
+                notes={eventFiles.notes}
+                eventData={eventData}
+              />
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">About This Event</h2>
+                <div 
+                  className="prose prose-lg dark:prose-invert max-w-none" 
+                  dangerouslySetInnerHTML={{ __html: eventData.public.description }}
                 />
-              ) : (
-                <>
-                  <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">About This Event</h2>
-                  <div 
-                    className="prose prose-lg dark:prose-invert max-w-none" 
-                    dangerouslySetInnerHTML={{ __html: eventData.public.description }}
-                  />
-                  
-                  {/* Topics section */}
-                  <div className="mt-8">
-                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Discussion Topics</h2>
-                    <div className="space-y-8">
-                      {eventData.public.topics.map((topic, index) => (
-                        <div key={index} className="mb-8">
-                          <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white">
-                            {topic.title}
-                          </h3>
-                          <p className="text-gray-600 dark:text-gray-300 mb-4"
-                            dangerouslySetInnerHTML={{ __html: topic.description }}
-                          />
-                          <div className="space-y-2 ml-4">
-                            {topic.questions.map((question, qIndex) => (
-                              <div key={qIndex} className="flex items-start">
-                                <div className="text-red-600 mr-2">•</div>
-                                <div 
-                                  className="text-gray-700 dark:text-gray-300"
-                                  dangerouslySetInnerHTML={{ __html: question }}
-                                />
-                              </div>
-                            ))}
-                          </div>
+                
+                {/* Topics section */}
+                <div className="mt-8">
+                  <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Discussion Topics</h2>
+                  <div className="space-y-8">
+                    {eventData.public.topics.map((topic, index) => (
+                      <div key={index} className="mb-8">
+                        <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white">
+                          {topic.title}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-300 mb-4"
+                          dangerouslySetInnerHTML={{ __html: topic.description }}
+                        />
+                        <div className="space-y-2 ml-4">
+                          {topic.questions.map((question, qIndex) => (
+                            <div key={qIndex} className="flex items-start">
+                              <div className="text-red-600 mr-2">•</div>
+                              <div 
+                                className="text-gray-700 dark:text-gray-300"
+                                dangerouslySetInnerHTML={{ __html: question }}
+                              />
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Registration Form */}
+                {!hasMaterials && (
+                  <div className="mt-12 max-w-md mx-auto">
+                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Register for This Event</h2>
+                    <EventRegistrationForm 
+                      eventId={eventId}
+                      eventTitle={eventData.public.title}
+                      sendEventRegistration={sendEventRegistration}
+                    />
+                  </div>
+                )}
+                
+                {/* Private Event Content (Unlocked with Code) */}
+                <div className="mt-8">
+                  <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Event Details & Poll</h2>
+                  
+                  <div className="mb-6">
+                    <p className="text-gray-600 dark:text-gray-300">
+                      Additional event details will be sent to your email after registration. 
+                      If you&apos;ve already registered, you&apos;ll receive a code to access these details.
+                    </p>
                   </div>
                   
-                  {/* Private Event Content (Unlocked with Code) */}
-                  <div className="mt-8">
-                    <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Event Details & Poll</h2>
-                    
-                    <div className="mb-6">
-                      <p className="text-gray-600 dark:text-gray-300">
-                        Additional event details will be sent to your email after registration. 
-                        If you&apos;ve already registered, you&apos;ll receive a code to access these details.
-                      </p>
-                    </div>
-                    
-                    {/* Code Input Form (Client Component) */}
-                    <div className="space-y-4">
-                      <div className="border border-gray-300 dark:border-gray-600 p-6 rounded-lg">
-                        {/* Client component for code access */}
-                        <EventCodeAccess 
-                          eventId={eventId} 
-                          accessCode={eventData.private.code}
-                        />
-                        
-                        {/* Hidden content to be displayed once unlocked */}
-                        <div id="event-private-content" className="hidden space-y-6">
-                          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg my-4">
-                            <h3 className="font-bold text-gray-800 dark:text-white mb-2">
-                              Detailed Location
-                            </h3>
-                            <p className="text-gray-700 dark:text-gray-300">
-                              {eventData.private.location}
-                            </p>
-                          </div>
-                          
-                          {/* Hidden poll data to be accessed by the client component */}
-                          <div 
-                            id="event-polls-container"
-                            data-polls={JSON.stringify(eventData.private.polls)}
-                            className="hidden"
-                          ></div>
-                          
-                          {/* Hidden datahash to be used for fetching stored responses */}
-                          <div 
-                            id="event-datahash-container"
-                            data-hash={eventData.private.datahash}
-                            className="hidden"
-                          ></div>
+                  {/* Code Input Form (Client Component) */}
+                  <div className="space-y-4">
+                    <div className="border border-gray-300 dark:border-gray-600 p-6 rounded-lg">
+                      {/* Client component for code access */}
+                      <EventCodeAccess 
+                        eventId={eventId} 
+                        accessCode={eventData.private.code}
+                      />
+                      
+                      {/* Hidden content to be displayed once unlocked */}
+                      <div id="event-private-content" className="hidden space-y-6">
+                        <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg my-4">
+                          <h3 className="font-bold text-gray-800 dark:text-white mb-2">
+                            Detailed Location
+                          </h3>
+                          <p className="text-gray-700 dark:text-gray-300">
+                            {eventData.private.location}
+                          </p>
                         </div>
+                        
+                        {/* Hidden poll data to be accessed by the client component */}
+                        <div 
+                          id="event-polls-container"
+                          data-polls={JSON.stringify(eventData.private.polls)}
+                          className="hidden"
+                        ></div>
+                        
+                        {/* Hidden datahash to be used for fetching stored responses */}
+                        <div 
+                          id="event-datahash-container"
+                          data-hash={eventData.private.datahash}
+                          className="hidden"
+                        ></div>
                       </div>
                     </div>
                   </div>
-                </>
-              )}
-            </div>
+                </div>
+              </>
+            )}
           </div>
-          
-          {!hasMaterials && (
-            <div>
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 sticky top-8">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Register for This Event</h2>
-                <EventRegistrationForm 
-                  eventId={eventId}
-                  eventTitle={eventData.public.title}
-                  sendEventRegistration={sendEventRegistration}
-                />
-              </div>
-            </div>
-          )}
         </div>
       </div>
       

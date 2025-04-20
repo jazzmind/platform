@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPresentation } from "../../../getPresentation";
 import TabsContainer from "./TabsContainer";
-import ChatPanel from "./ChatPanel";
 
 // Define types for our category data
 type CategoryInfo = {
@@ -92,7 +91,7 @@ export default async function PresentationPage({
 
         <div className="flex flex-col lg:flex-row gap-4">
           {/* Main content - presentation iframe */}
-          <div className="lg:w-2/3">
+          <div className="w-full">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
               <TabsContainer 
                 presentationUrl={presentationUrl}
@@ -101,13 +100,6 @@ export default async function PresentationPage({
                 presentationId={presentationId}
                 hasNotes={presentation.hasNotes}
               />
-            </div>
-          </div>
-          
-          {/* Sidebar - chat with presentation - pinned to top right and matching height */}
-          <div className="lg:w-1/3 lg:sticky lg:top-2 lg:self-start">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-              <ChatPanel categoryId={categoryId} presentationId={presentationId} />
             </div>
           </div>
         </div>

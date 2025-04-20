@@ -1,20 +1,30 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { askQuestion } from "./actions";
+import { askQuestion as defaultAskQuestion } from "./actions";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
+export interface ChatPanelProps {
+  contentType: string;
+  contentId: string; 
+  secondaryId?: string;
+  title?: string;
+  icon?: React.ReactNode;
+  askQuestion?: (contentType: string, contentId: string, secondaryId: string | undefined, question: string) => Promise<string>;
+}
+
 export default function ChatPanel({ 
-  categoryId, 
-  presentationId 
-}: { 
-  categoryId: string; 
-  presentationId: string;
-}) {
+  contentType,
+  contentId,
+  secondaryId,
+  title = "Chat",
+  icon,
+  askQuestion = defaultAskQuestion
+}: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -60,13 +70,13 @@ export default function ChatPanel({
     
     try {
       // Call API to get response
-      const response = await askQuestion(categoryId, presentationId, input);
+      const response = await askQuestion(contentType, contentId, secondaryId, input);
       
       // Add assistant message
       const assistantMessage: Message = { role: "assistant", content: response };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error("Error asking question:", error);
+      console.error(`Error asking question about ${contentType}:`, error);
       // Add error message
       const errorMessage: Message = { 
         role: "assistant", 
@@ -85,14 +95,19 @@ export default function ChatPanel({
     }
   };
 
+  // Default chat icon if none provided
+  const defaultIcon = (
+    <svg className="w-5 h-5 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+    </svg>
+  );
+
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
         <h2 className="text-lg font-semibold flex items-center text-gray-800 dark:text-white">
-          <svg className="w-5 h-5 mr-2 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-          </svg>
-          Chat with Presentation
+          {icon || defaultIcon}
+          {title}
         </h2>
       </div>
       
@@ -110,7 +125,7 @@ export default function ChatPanel({
               </svg>
             </div>
             <div>
-              <h3 className="font-medium text-gray-700 dark:text-gray-300">Ask about this presentation</h3>
+              <h3 className="font-medium text-gray-700 dark:text-gray-300">Ask about this {contentType}</h3>
               <p className="mt-1">Get answers about content, context, or related topics</p>
             </div>
           </div>
@@ -154,7 +169,7 @@ export default function ChatPanel({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a question about this presentation..."
+              placeholder={`Ask a question about this ${contentType}...`}
               className="w-full border border-gray-300 dark:border-gray-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white resize-none"
               rows={1}
               style={{ minHeight: "2.5rem", maxHeight: "6rem" }}

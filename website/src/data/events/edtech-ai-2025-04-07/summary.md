@@ -1,19 +1,19 @@
-# EdTech AI Roundtable 2025: Navigating the New Frontier
+# AI and EdTech Roundtable April 2025
 
-## Executive Summary – AI & EdTech Roundtable
+## Executive Summary
 
-**Boston | 7 April 2025 | 5 tables, 40+ operators, investors & academics**
+**Boston | 7 April 2025 | 5 tables, 40+ edtech executives, AI experts, educators and researchers**
 
 ---
 
-### A swift pulse-check
-- Five simultaneous round-tables looked at:
-  - Strategy → Skills (Table 1)
-  - Skills → Strategy (Table 2)
-  - ROI → Skills/Strategy (Table 3)
-  - Burnout → Strategy (Table 4)
-  - Overflow synthesis (Table 5)
-- Chatham House Rule let founders, provosts and CLOs speak candidly about what is—and isn't—working inside their organisations.
+### Discussion Format
+- Five simultaneous table discussions explored how AI is changing education by looking at it from five distinct perspectives, then changing the focus of the discussion to look at it from a related perspective:
+  1. Strategic Vision → Skills 
+  2. Skills → Strategic Vision 
+  3. ROI for AI in EdTech → Skills/Strategic Vision 
+  4. Burnout → Strategic Vision 
+  5. Free-form discussion 
+- Chatham House Rule let founders and educators speak candidly about what is—and isn't—working inside their organisations.
 
 ---
 
@@ -31,27 +31,27 @@
 
 ### Lens-by-Lens Highlights
 
-#### 1 ➜ Strategy → Skills (Table 1, Ashley Chiampo)
+#### Strategy → Skills (Table 1, Ashley Chiampo)
 - **Vision (2/5/10 yrs)**: Personal AI "copilots" everywhere, professors morph into learning orchestrators, parents pay premiums for "low-AI" schooling.
 - **Strategic tension**: Who owns the learner-data & the agent?
 - **Skills flagged**: Creativity, critical thinking, contextual judgment. Measuring them remains the open challenge.
 
-#### 2 ➜ Skills → Strategy (Table 2, Dr. Patrice Prusko)
+#### Skills → Strategy (Table 2, Dr. Patrice Torcivia Prusko)
 - **Critical skills rising**: Curiosity, agility, large-scale collaboration, systems thinking, AI-fluency & bias literacy.
 - **Institutional response**: Shift from "teaching occupations" to building problem-solvers; invest in consumer + builder learning communities.
 - **Gap**: New graduates strong on tools, weak on communication & team execution.
 
-#### 3 ➜ ROI → Skills/Strategy (Table 3, Wes Sonnenreich)
+#### ROI for AI in EdTech → Skills/Strategy (Table 3, Wes Sonnenreich)
 - **Metrics drift**: Conversion-rate & reach trump robust learning impact measures. "We rent AI until the moat is clear."
 - **Drivers of value**: Data quality > data volume; self-disruption > incrementalism.
 - **Investment dilemma**: Quick wins demanded, but foundational models consume budget before ROI manifests.
 
-#### 4 ➜ Burnout → Strategy (Table 4, Tim Connors)
+#### Burnout → Strategy (Table 4, Tim Connors)
 - **Symptoms**: Cognitive overload, "AI tool-sprawl", purpose anxiety.
 - **Strategic antidotes**: Set pacing thresholds, rotate AI "sprint teams", bake mental-health metrics into OKRs.
 - **Competitive upside**: Institutions that manage human energy outperform in sustained innovation.
 
-#### 5 ➜ Overflow Synthesis (Table 5)
+#### Free-form discussion (Table 5)
 - Confirmed that policy, ethics & equitable access are lagging the tech curve.
 - Called for multi-tier playbooks: early adopters experiment in sandboxes; mainstream players follow validated patterns.
 
