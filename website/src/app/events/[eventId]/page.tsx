@@ -36,7 +36,7 @@ interface EventData {
 interface EventFiles {
   event: EventData;
   summary: string | null;
-  notes: string | null;
+  hasFiles: boolean;
 }
 
 // Function to get event data and related files
@@ -45,7 +45,8 @@ async function getEventFiles(eventId: string): Promise<EventFiles | null> {
   const eventDirectory = path.join(eventsDirectory, eventId);
   const eventJsonPath = path.join(eventDirectory, "event.json");
   const summaryPath = path.join(eventDirectory, "summary.md");
-  const notesPath = path.join(eventDirectory, "notes.md");
+  const filesDirectory = path.join(eventDirectory, "files");
+  const manifestPath = path.join(filesDirectory, "manifest.json");
   
   try {
     // Check if event directory exists
@@ -68,11 +69,9 @@ async function getEventFiles(eventId: string): Promise<EventFiles | null> {
       summary = fs.readFileSync(summaryPath, "utf8");
     }
     
-    // Check for notes.md
-    let notes = null;
-    if (fs.existsSync(notesPath)) {
-      notes = fs.readFileSync(notesPath, "utf8");
-    }
+ 
+    // Check if files directory exists with a valid manifest.json
+    const hasFiles = fs.existsSync(filesDirectory) && fs.existsSync(manifestPath);
     
     return {
       event: {
@@ -80,7 +79,7 @@ async function getEventFiles(eventId: string): Promise<EventFiles | null> {
         ...eventData
       },
       summary,
-      notes
+      hasFiles
     };
   } catch (error) {
     console.error(`Error reading event files: ${error}`);
@@ -113,7 +112,7 @@ export default async function EventPage({
   }
   
   const eventData = eventFiles.event;
-  const hasMaterials = eventFiles.summary !== null || eventFiles.notes !== null;
+  const hasMaterials = eventFiles.summary !== null ||  eventFiles.hasFiles;
   
   // Format the date
   const formattedDate = new Date(eventData.public.date).toLocaleDateString("en-US", {
@@ -166,8 +165,8 @@ export default async function EventPage({
             {hasMaterials ? (
               <EventTabs 
                 summary={eventFiles.summary}
-                notes={eventFiles.notes}
                 eventData={eventData}
+                hasFiles={eventFiles.hasFiles}
               />
             ) : (
               <>

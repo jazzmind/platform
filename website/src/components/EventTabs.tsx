@@ -5,10 +5,10 @@ import { PollQuestion } from "@/app/lib/types";
 import ToggleableChatPanel from "./ToggleableChatPanel";
 import { askEventQuestion } from "@/app/events/[eventId]/actions";
 import MarkdownRenderer from "./MarkdownRenderer";
+import EventFiles from "./EventFiles";
 
 interface EventTabsProps {
   summary: string | null;
-  notes: string | null;
   eventData: {
     id: string;
     public: {
@@ -24,9 +24,10 @@ interface EventTabsProps {
       polls?: PollQuestion[];
     };
   };
+  hasFiles: boolean;
 }
 
-export default function EventTabs({ summary, notes, eventData }: EventTabsProps) {
+export default function EventTabs({ summary, eventData, hasFiles }: EventTabsProps) {
   const [activeTab, setActiveTab] = useState("summary");
   
   // Custom icon for event chat
@@ -51,17 +52,16 @@ export default function EventTabs({ summary, notes, eventData }: EventTabsProps)
             >
               Summary
             </button>
-            
-            {notes && (
+            {hasFiles && (
               <button
-                onClick={() => setActiveTab("notes")}
+                onClick={() => setActiveTab("files")}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === "notes"
+                  activeTab === "files"
                     ? "border-red-600 text-red-600 dark:text-red-400 dark:border-red-400"
                     : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 }`}
               >
-                Notes
+                Documents
               </button>
             )}
             
@@ -106,18 +106,11 @@ export default function EventTabs({ summary, notes, eventData }: EventTabsProps)
           </div>
         )}
         
-        {/* Notes Tab Content */}
-        {activeTab === "notes" && (
+     
+        {/* Files Tab Content */}
+        {activeTab === "files" && (
           <div>
-            {notes ? (
-              <div className="prose prose-lg dark:prose-invert max-w-none markdown-improved">
-                <MarkdownRenderer content={notes} />
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                No detailed notes available for this event.
-              </div>
-            )}
+            <EventFiles eventId={eventData.id} />
           </div>
         )}
         

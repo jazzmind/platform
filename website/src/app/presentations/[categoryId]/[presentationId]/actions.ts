@@ -3,6 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
+import { checkRateLimit, cleanupRateLimits } from '@/app/lib/rate-limit';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -37,6 +38,21 @@ export async function askQuestion(
   question: string
 ): Promise<string> {
   try {
+    // Clean up expired rate limits occasionally
+    if (Math.random() < 0.05) { // 5% chance to run cleanup
+      cleanupRateLimits().catch(err => 
+        console.error("Error cleaning up rate limits:", err)
+      );
+    }
+    
+    // Check rate limit (using presentation ID as identifier)
+    const rateId = secondaryId ? `${contentId}-${secondaryId}` : contentId;
+    const { isRateLimited } = await checkRateLimit(rateId);
+    
+    if (isRateLimited) {
+      return "You've reached the daily limit for AI-powered chat (20 messages per day). Please try again tomorrow.";
+    }
+    
     // For presentation content type
     if (contentType === 'presentation' && secondaryId) {
       const categoryId = contentId;
@@ -63,7 +79,7 @@ export async function askQuestion(
       
       // Call OpenAI API
       const response = await openai.chat.completions.create({
-        model: "o3-mini",
+        model: "gpt-4.1-mini",
         messages: [
           {
             role: "system",

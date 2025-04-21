@@ -3,6 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
+import { checkRateLimit, cleanupRateLimits } from '@/app/lib/rate-limit';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -37,6 +38,20 @@ export async function askEventQuestion(
   question: string
 ): Promise<string> {
   try {
+    // Clean up expired rate limits occasionally
+    if (Math.random() < 0.05) { // 5% chance to run cleanup
+      cleanupRateLimits().catch(err => 
+        console.error("Error cleaning up rate limits:", err)
+      );
+    }
+    
+    // Check rate limit (using user's content ID as identifier)
+    const { isRateLimited } = await checkRateLimit(contentId);
+    
+    if (isRateLimited) {
+      return "You've reached the daily limit for AI-powered chat (20 messages per day). Please try again tomorrow.";
+    }
+    
     // Ensure we're handling an event
     if (contentType !== 'event') {
       return "I can only answer questions about events with this function.";
@@ -46,8 +61,18 @@ export async function askEventQuestion(
     
     // Load event data
     const summaryContent = await loadEventFile(eventId, "summary.md");
-    const notesContent = await loadEventFile(eventId, "notes.md");
-    const outcomesContent = await loadEventFile(eventId, "outcomes.md");
+    // files are in the files directory
+    const filesDirectory = path.join(process.cwd(), 'src/data/events', eventId, 'files');
+    const files = fs.readdirSync(filesDirectory);
+
+    // load the files
+    const filesContent = await Promise.all(files.map(async (file) => {
+      // only append .md files
+      if (file.endsWith('.md')) {
+        return await loadEventFile(eventId, `files/${file}`);
+      }
+    }));
+    
     
     // Combine content for context
     let context = "";
@@ -56,21 +81,17 @@ export async function askEventQuestion(
       context += `# Event Summary\n${summaryContent}\n\n`;
     }
     
-    if (notesContent) {
-      context += `# Event Notes\n${notesContent}\n\n`;
+    if (filesContent) {
+      context += `# Event Documents\n${filesContent}\n\n`;
     }
-    
-    if (outcomesContent) {
-      context += `# Event Outcomes\n${outcomesContent}\n\n`;
-    }
-    
+        
     if (!context) {
       return "I don't have any information about this event to answer your question.";
     }
-    
+ 
     // Call OpenAI API
     const response = await openai.chat.completions.create({
-      model: "o3-mini",
+      model: "gpt-4.1-mini",
       messages: [
         {
           role: "system",

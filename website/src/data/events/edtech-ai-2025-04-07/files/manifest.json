@@ -1,0 +1,34 @@
+{
+  "files": [
+    {
+        "filename": "notes.md",
+        "description": "Notes from the event",
+        "type": "markdown",
+        "size": "10KB"
+    },
+    {
+        "filename": "whitepaper.md",
+        "description": "Position paper on the current state and future directions of AI in education",
+        "type": "markdown",
+        "size": "38KB"
+      },
+      {
+      "filename": "policy-edtech.md",
+      "description": "Policy discussion for EdTech companies implementing AI solutions",
+      "type": "markdown",
+      "size": "25KB"
+    },
+    {
+      "filename": "policy-institutions.md",
+      "description": "Policy discussion for educational institutions adopting AI technologies",
+      "type": "markdown",
+      "size": "25KB"
+    },
+    {
+        "filename": "policy-regulators.md",
+        "description": "Policy discussion for regulatory bodies regarding AI in education",
+        "type": "markdown",
+        "size": "33KB"
+    }
+  ]
+}
