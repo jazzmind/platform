@@ -1,333 +1,338 @@
-# Using AI to build multi-tenant SaaS apps
-## Accelerating Development with NextJS Templates
+# Present Presentations
+## The AI-Powered Real-Time Dynamic Presentation Tool
+
+Wes Sonnenreich
+
+https://sonnenreich.com
+
+https://linkedin.com/in/sonnenreich
 
 ---
 ## Overview
 
-- The current state of Cursor
-- Cursor Rules - the secret weapon
-- 00SaaS template walkthrough
-- Demo of an app built with a few prompts
-- Challenges and lessons learned
+- Introduction to Present
+- OpenAI Realtime API: Conversation vs Transcription
+- Architecture and Implementation
+- Tool Design and Prompt Engineering
+- Challenges and Solutions
+- Demo and Lessons Learned
 
 <aside class="notes">
-I'll show how I've been building 00SaaS, an open source NextJS template that accelerates development of multi-tenant "personal" SaaS applications.
+This presentation will cover how I built Present Presentations, an AI-powered presentation assistant that updates slides in real-time as you speak. I'll explain the technical implementation, design decisions, and challenges faced.
 </aside>
 
 ---
-## The Current State of Cursor
+## What was I thinking?
 
-### Cursor v0.46: A Mixed Bag
+- Traditional presentations are static
+- Presenters often forget important points
+- AI could help augment presentations in real-time
+- Create a more dynamic, responsive presentation experience
+- Challenge: How to make AI a silent partner in presentations?
+
+<aside class="notes">
+"Don't talk to your slides, they're not listening." I took that advice and solved the main problem - that the slides aren't listening!</aside>
+
+---
+## How it works
 
 <div class="r-stack">
   <div class="r-hstack">
     <div style="width: 45%;">
-      <h3>Benefits</h3>
+      <h3>OpenAI Realtime API</h3>
       <ul>
-        <li>Access to all latest LLMs for one price</li>
-        <li>Pay-as-you-go for additional usage</li>
-        <li>Agent mode + rules is powerful</li>
+        <li>WebRTC-based audio streaming</li>
+        <li>Bidirectional communication</li>
+        <li>Tool calling for UI updates</li>
+        <li>Custom VAD settings</li>
       </ul>
     </div>
     <div style="width: 45%;">
-      <h3>Drawbacks</h3>
+      <h3>Present Architecture</h3>
       <ul>
-        <li>Cursor Rules are poorly documented</li>
-        <li>Agent mode has issues</li>
-        <li>VS Code implementing similar features</li>
-        <li>Vibe coders disappointed</li>
+        <li>RevealJS for presentation</li>
+        <li>NextJS/React components</li>
+        <li>Presentation-within-presentation model</li>
+        <li>Audio muting and fullscreen control</li>
       </ul>
     </div>
   </div>
 </div>
 
 <aside class="notes">
-If you haven't used Cursor, think of it as VS Code with specific AI coding features. The pricing is reasonable, but there are some significant challenges with the current version.
+The system uses OpenAI's Realtime API to stream audio to GPT-4o-realtime. The AI processes this audio, extracts key points, and uses tools to update the presentation in real-time. We're using RevealJS inside a React component to create a dynamic presentation experience.
 </aside>
 
 ---
-## PSA: Vibe Coding is BS
+## OpenAI Realtime API
 
-<div class="demo">
-  <p>Vibe coder: <span class="highlight">"I cloned hubspot in 1 hour!"</span> (I'm a 1000x dev!!)</p>
-  <p>vs.</p>
-  <p>Real coder: <span class="highlight">"I spent several hours/days understanding the problem I'm trying to solve, using AI to test ideas, iterate and build a solution that addresses the problem."</span></p>
-</div>
+### Conversation vs. Transcription Mode
 
-### Don't be fooled by the hype
-
-<aside class="notes">
-The reality of coding with AI is much more nuanced than what the hype suggests. It's about understanding problems and using AI as a tool, not expecting magic.
-</aside>
-
----
-## Why I Still Use Cursor
-
-- Cursor Rules are powerful when used right
-- I don't want AI to do everything for me
-  - I want it to work WITH me
-- Better cost control
-
-<aside class="notes">
-Despite its issues, Cursor still offers unique advantages, especially if you approach it with the right mindset.
-</aside>
-
----
-## Cursor Rules Setup
-
-```bash
-# First fix a common bug with rules editing:
-# In VS Code settings, search for "Workbench: editor associations" and add:
-# key: *.mdc  value: default
-```
-
-### The Secret Weapon
-
-- Rules let you codify your patterns and preferences
-- They guide the AI to follow your standards
-- Dramatically improves consistency
-
-<aside class="notes">
-This simple setup step prevents issues when editing rules. The real power comes from creating rules that guide your AI assistant.
-</aside>
-
----
-## 00SaaS Core Rules
-
-### 000-core.mdc
-<pre><code class="language-markdown">
-&#45;&#45;&#45;
-description: Use ALWAYS when asked to CREATE A RULE or UPDATE A RULE
-globs: .cursor/rules/*.mdc
-&#45;&#45;&#45;
-
-# Cursor Rules Format
-
-## Core Structure
-- ACTION when TRIGGER to OUTCOME description
-- Glob patterns for targeted files
-- Clear requirements and examples
-
-## Required Fields
-- Frontmatter (description, globs)
-- Context (when to apply)
-- Requirements (actionable items)
-- Examples (valid and invalid)
-</code></pre>
-
-<aside class="notes">
-This is the foundation for all rules. It establishes the format, structure, and requirements for creating effective rules.
-</aside>
-
----
-## Architect Rules
-
-### 001-architect.mdc
-<pre><code class="language-markdown">
-&#45;&#45;&#45;
-description: Use when designing system architecture for multi-tenant SaaS
-globs: **/{architecture,design}/*.{md,mdx,mdc}
-&#45;&#45;&#45;
-
-# System Architecture Guidelines
-
-## Context
-- Applied when designing multi-tenant systems
-- Ensures scalable, secure tenant isolation
-
-## Requirements
-- Database-per-tenant OR schema-per-tenant approach
-- Edge-compatible authentication flow
-- Serverless-first design principles
-- Cache-aware data access patterns
-</code></pre>
-
-<aside class="notes">
-The architect rule establishes how our system should be designed. It guides the AI to follow best practices for multi-tenant architectures.
-</aside>
-
----
-## Project Structure Rules
-
-### 002-project.mdc
-<pre><code class="language-markdown">
-&#45;&#45;&#45;
-description: Use when organizing NextJS project files and directories
-globs: **/*.{ts,tsx,js,jsx}
-&#45;&#45;&#45;
-
-# NextJS Project Structure
-
-## Context
-- Applied when creating or refactoring project structure
-- Ensures maintainable organization of code
-
-## Requirements
-- Domain-driven folder structure
-- Feature-first component organization
-- Separation of UI and business logic
-- Proper API route organization
-
-## Examples
-<example>
-✅ Good:
-app/
-  (auth)/
-  (dashboard)/
-  api/
-    [tenant]/
-      route.ts
-  components/
-    ui/
-    forms/
-</example>
-</code></pre>
-
-<aside class="notes">
-The project rule defines how our codebase should be organized. It helps maintain consistency across the project.
-</aside>
-
----
-## Database Rules
-
-### 003-database.mdc
-<pre><code class="language-markdown">
-&#45;&#45;&#45;
-description: Use when designing database schemas and queries for multi-tenant apps
-globs: **/{prisma,db,database}/**/*.{ts,js,prisma,sql}
-&#45;&#45;&#45;
-
-# Multi-tenant Database Design
-
-## Context
-- Applied when modeling data or writing queries
-- Ensures proper tenant isolation and security
-
-## Requirements
-- Every table must have a tenant_id column
-- All queries must filter by tenant_id
-- No cross-tenant data access in standard queries
-- Row-level security when using PostgreSQL
-
-## Examples
-<example>
-✅ Good query:
 ```typescript
-const data = await prisma.resource.findMany({
-  where: {
-    tenant_id: ctx.tenant.id,
-    // other filters...
+// Conversation mode configuration
+client.updateSession({
+  instructions,
+  voice: 'coral',
+  temperature: 0.8,
+  input_audio_noise_reduction: {
+    type: 'far_field',
   }
 });
+
+// Voice Activity Detection (VAD) settings
+const vadSettings = {
+  type: 'semantic_vad',  // 'semantic_vad' or 'server_vad'
+  eagerness: 'high',     // 'low', 'medium', 'high', or 'auto'
+  interrupt_response: false
+};
 ```
-</example>
-</code></pre>
 
 <aside class="notes">
-The database rule is critical for security and tenant isolation. It ensures that data is properly segregated between tenants.
+OpenAI's Realtime API offers two modes: Conversation (what we're using) and Transcription. Conversation mode is built for interactive back-and-forth, while Transcription is just for converting speech to text. We had to modify the conversation mode to work for our one-sided use case, where we just want the AI to listen but not respond audibly.
 </aside>
 
 ---
-## 00SaaS Template
+## WebRTC Connection Setup
 
-### A Foundation for Multi-tenant SaaS Apps
-
-- Built with modern technologies:
-  - NextJS
-  - TailwindCSS
-  - TypeScript
-
-### Goals
-- Modern, secure architecture
-- Edge friendly deployment
-- Rapid development cycle
+```typescript
+async connect(audioElement: HTMLAudioElement): Promise<void> {
+  // Get microphone access
+  this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  
+  // Create peer connection
+  this.pc = new RTCPeerConnection();
+  
+  // Add data channel for messaging
+  this.dc = this.pc.createDataChannel('oai-events');
+  
+  // Add local audio track
+  this.pc.addTrack(this.audioTrack, this.mediaStream);
+  
+  // Create and set local description (offer)
+  await this.pc.setLocalDescription();
+  
+  // Send offer to OpenAI via our server
+  const response = await fetch(`${this.apiEndpoint}?model=${encodeURIComponent(this.model)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/sdp' },
+    body: this.pc.localDescription.sdp,
+  });
+  
+  // Get answer SDP and set remote description
+  const answerSdp = await response.text();
+  await this.pc.setRemoteDescription({ type: 'answer', sdp: answerSdp });
+}
+```
 
 <aside class="notes">
-00SaaS provides the foundation to quickly build applications that can support multiple tenants with isolated data.
+Here's how we establish the WebRTC connection to OpenAI's servers. WebRTC is complex but powerful, allowing real-time audio streaming with low latency. We create a peer connection, set up a data channel for messages, add our microphone audio track, then exchange SDP information to establish the connection.
 </aside>
 
 ---
-## Key Challenges
+## Technical Challenges
 
-### Edge Runtime
-- Increasingly important for performance
-- Limited runtime APIs
-- Requires different architecture choices
+### Voice Activity Detection (VAD)
 
-### Authentication
-- Many moving pieces
-- Security requirements
-- Multi-tenancy complexity
+```typescript
+// Semantic VAD (context-aware turn detection)
+updateVadSettings({
+  type: 'semantic_vad',
+  eagerness: 'high',  // How quickly AI responds
+});
 
-### Version Control
-- LLMs get confused by complex repos
-- Need strategies to keep AI focused
+// Server VAD (simple pause detection)
+updateVadSettings({
+  type: 'server_vad',
+  threshold: 0.5,            // Energy threshold
+  prefix_padding_ms: 300,    // Add silence before speech
+  silence_duration_ms: 500,  // Time of silence to end turn
+});
+```
 
 <aside class="notes">
-These challenges need to be addressed carefully when building multi-tenant SaaS applications.
+One of the biggest challenges was getting the Voice Activity Detection (VAD) settings right. These control when the AI thinks you've stopped talking and it should respond. Semantic VAD uses AI to understand natural pauses in conversation, while Server VAD uses simple audio energy thresholds. I've found Semantic VAD with high eagerness works best for presentations.
+</aside>
+
+---
+## Tool Definition for Slide Updates
+
+```typescript
+client.addTool(
+  {
+    type: 'function',
+    name: 'updateSlide',
+    description: 'Update the slide content with new information',
+    parameters: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'The title of the slide'
+        },
+        bullets: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Bullet points for the slide'
+        },
+        bulletAnimations: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              text: { type: 'string' },
+              animation: {
+                type: 'string',
+                description: 'Animation type (fade, slide, bounce, emphasis)'
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  callbacks.onUpdateSlide
+);
+```
+
+<aside class="notes">
+This is how we define tools that the AI can use to update the presentation. The key tool is updateSlide, which lets the AI add bullet points with different animation styles. The AI really loves the bounce animation - it uses it constantly unless instructed otherwise!
+</aside>
+
+---
+## Instruction Prompting
+
+```typescript
+let instructions = `You are a silent AI presentation assistant that updates the slides in real time as the presenter speaks. Your audio is likely muted by the user, so focus on visual updates. Listen carefully to the presenter and follow these rules:
+1. Use the "updateSlide" function to update the slide with each new bullet point while the presenter is talking.
+2. Keep bullets concise and relevant to what the presenter is currently talking about
+3. Use the bulletAnimations parameter to animate each bullet with an effect like 'fade', 'slide', 'bounce', or 'emphasis'
+4. Don't respond verbally or interrupt the presenter unless they say "hey, presentation assistant"
+5. Remember that the system will send you slide context information when slides change
+6. Since your audio is likely muted, focus on visual slide updates rather than verbal responses`;
+
+client.updateSession({ instructions, voice, temperature });
+```
+
+<aside class="notes">
+The instruction prompt is crucial to guiding the AI's behavior. We tell it to be a silent assistant, focus on creating concise bullet points, and only respond verbally when explicitly addressed. We also remind it that its audio is likely muted, so it should focus on visual updates.
+</aside>
+
+---
+## Learning journey
+
+### RevealJS Nested Presentation Pattern
+
+```tsx
+// RealtimePresentationSlide Component
+<div className="realtime-presentation-slide">
+  {/* Controls and Settings Panel */}
+  <div className="mb-4 p-4 bg-gray-100 rounded-lg">
+    {/* VAD Settings, Start/Stop buttons */}
+  </div>
+  
+  {/* Main presentation content area */}
+  <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-lg p-8 overflow-auto">
+    {slideContent.title && (
+      <h2 className="text-3xl font-bold mb-6 text-center text-red-400">
+        {slideContent.title}
+      </h2>
+    )}
+    
+    {slideContent.bullets && slideContent.bullets.length > 0 ? (
+      <ul className="space-y-4 mb-6 max-w-3xl mx-auto">
+        {slideContent.bullets.map((bullet, index) => (
+          <li key={`bullet-${index}`} className={`flex items-start ${animationClass}`}>
+            <span className="text-red-400 mr-2">•</span>
+            <span className="text-xl">{bullet}</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p className="text-xl mb-6 text-center">{slideContent.content}</p>
+    )}
+  </div>
+  
+  {/* Hidden audio element for WebRTC audio playback */}
+  <audio ref={audioRef} className="hidden" autoPlay />
+</div>
+```
+
+<aside class="notes">
+RevealJS wasn't designed for dynamic content updates, so I created a presentation-within-presentation architecture. Each RevealJS slide contains a React component that can be dynamically updated by the AI. This lets us maintain the overall presentation structure while allowing individual slides to be updated in real-time.
+</aside>
+
+---
+## WebRTC Mute Control
+
+```typescript
+// Toggle mute state
+const toggleMute = () => {
+  const newMuteState = !isMuted;
+  setIsMuted(newMuteState);
+  
+  if (audioRef.current) {
+    audioRef.current.muted = newMuteState;
+  }
+  
+  // Inform the AI about the mute state change
+  if (clientRef.current && clientRef.current.isConnected()) {
+    clientRef.current.sendMuteStateUpdate(newMuteState);
+  }
+};
+
+// Inform AI about mute state
+sendMuteStateUpdate(isMuted: boolean): void {
+  let instructions = '';
+  if (isMuted) {
+    instructions = `Your audio has been muted by the user. The user will not hear your verbal responses, so focus entirely on visual updates to the slides.`;
+  } else {
+    instructions = `Your audio has been unmuted by the user. You can now respond verbally when addressed directly.`;
+  }
+  this.createResponse(instructions);
+}
+```
+
+<aside class="notes">
+Since the OpenAI Realtime API is designed for conversations, I needed a way to mute the AI's voice responses while still allowing it to receive audio and update the slides. This code not only mutes the audio but also sends instructions to the AI to focus on visual updates when muted.
+</aside>
+
+---
+## What's next?
+
+- Remote control capabilities 
+- Recording and playback options
+- Better handling of complex code examples
+- More animation styles
+- Templates for different presentation types
+- Fine-tuning the VAD settings
+
+<aside class="notes">
+I'm still improving Present with remote control capabilities, so a presenter can use it from their phone. I'm also adding recording/playback of presentations, improving code display, and continuously tweaking the VAD settings for better responsiveness.
 </aside>
 
 ---
 ## Lessons Learned
 
-- Get comfortable with the forums
-  - Issues are common, solutions exist
-- Revert freely
-  - Don't be afraid to start over
-- It's okay to get frustrated!
-  - AI tools are still evolving
+- AI coding is helpful but has limitations
+- Even with perfect prompts, behavior can be unpredictable
+- WebRTC is complex - nobody really understands it fully
+- Balance between AI autonomy and presenter control
+- Testing in real presentations reveals unexpected issues
+- Mute functionality is essential for presentation context
 
 <aside class="notes">
-The journey with AI tools isn't always smooth, but having the right mindset makes a big difference.
+Working with cutting-edge AI APIs means accepting some limitations and unpredictability. WebRTC in particular is challenging - even experts struggle with it. The key is finding the right balance between AI assistance and presenter control, and continuously testing in real-world scenarios.
 </aside>
 
 ---
-## Cursor Rules Ecosystem
+## Thank You!
 
-<div class="r-stack">
-  <div class="r-hstack">
-    <div style="width: 45%;">
-      <h3>Rule Interaction Flow</h3>
-      <pre><code class="language-mermaid">
-graph TD
-    A[000-core.mdc] --> B[001-architect.mdc]
-    A --> C[002-project.mdc]
-    A --> D[003-database.mdc]
-    B --> E[004-auth.mdc]
-    B --> F[005-api.mdc]
-    C --> G[006-components.mdc]
-    D --> H[007-testing.mdc]
-      </code></pre>
-    </div>
-    <div style="width: 45%;">
-      <h3>Getting All Rules</h3>
-      <ul>
-        <li>GitHub: <a href="https://github.com/00saas/cursor-rules">00saas/cursor-rules</a></li>
-        <li>Core Rules (Shown Today):</li>
-        <ul>
-          <li>000-core.mdc</li>
-          <li>001-architect.mdc</li>
-          <li>002-project.mdc</li>
-          <li>003-database.mdc</li>
-        </ul>
-        <li>Additional domain-specific rules available</li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<aside class="notes">
-Share this link with attendees so they can access all the rules we've discussed today. The diagram shows how the rules build on each other to create a complete system.
-</aside>
-
----
-## Thanks To
-
-- [hao-ji-xing](https://github.com/hao-ji-xing) for detailed Cursor Rules explanations
-- [bmadcode](https://github.com/bmadcode) for templates
+Wes Sonnenreich
+https://sonnenreich.com
+https://linkedin.com/in/sonnenreich
 
 ### Questions?
 
 <aside class="notes">
-Special thanks to the community contributors who have made this work possible.
+Thanks for your attention! I'd be happy to answer any questions or demonstrate the system further.
 </aside> 
