@@ -67,6 +67,7 @@ export class RealtimeClient extends EventEmitter {
   private sessionParams: SessionUpdateParams = {};
   private tools: Map<string, { definition: ToolDefinition; callback: ToolCallback }> = new Map();
   private connectionState: 'disconnected' | 'connecting' | 'connected' | 'closed' = 'disconnected';
+  private hasActiveResponse: boolean = false;
 
   constructor(options: RealtimeClientOptions = {}) {
     super();
@@ -306,6 +307,12 @@ export class RealtimeClient extends EventEmitter {
       throw error;
     }
     
+    // Check if there is already an active response
+    if (this.hasActiveResponse) {
+      console.warn('Cannot create response: conversation already has an active response');
+      return;
+    }
+    
     const message: ResponseCreateMessage = {
       type: 'response.create',
       response: {
@@ -319,6 +326,7 @@ export class RealtimeClient extends EventEmitter {
     
     try {
       this.dc!.send(JSON.stringify(message));
+      this.hasActiveResponse = true;
     } catch (error) {
       console.error('Error sending response.create message:', error);
       this.emit('error', error);
@@ -457,6 +465,18 @@ export class RealtimeClient extends EventEmitter {
         
         // Try to parse the JSON message
         const message = JSON.parse(rawData) as Record<string, unknown>;
+        
+        // Track response state from specific message types
+        if (message.type === 'response.created') {
+          this.hasActiveResponse = true;
+        } else if (message.type === 'response.done') {
+          this.hasActiveResponse = false;
+        } else if (message.type === 'error' && typeof message.error === 'object' && message.error !== null) {
+          const errorObj = message.error as { code?: string; message?: string; type?: string };
+          if (errorObj.code === 'conversation_already_has_active_response') {
+            this.hasActiveResponse = true;
+          }
+        }
         
         // Check for error messages from server
         if (message.type === 'error') {
@@ -712,6 +732,12 @@ export class RealtimeClient extends EventEmitter {
    */
   sendCurrentSlideContext(title: string, prompt: string): void {
     if (!this.isConnected()) {
+      return;
+    }
+    
+    // Check if there is already an active response
+    if (this.hasActiveResponse) {
+      console.warn('Skipping slide context update: conversation already has an active response');
       return;
     }
     

@@ -75,6 +75,9 @@ export default function RealtimePresentationSlide({
   // Add ref to track initial render for slide context
   const isInitialRender = useRef(true);
   
+  // Add ref to track last slide context update time
+  const lastContextUpdateRef = useRef<number>(0);
+  
   // CSS for animations
   const animationStyles = `
     @keyframes fadeIn {
@@ -229,15 +232,25 @@ export default function RealtimePresentationSlide({
     
     // Only send context if client is connected and it's not the initial render
     if (clientRef.current && clientRef.current.isConnected()) {
-      console.log('📝 SLIDE CHANGE: Sending new slide context to AI', { 
-        title: initialTitle, 
-        content: initialContent,
-        reminders: 'Remain silent unless addressed, use animated bullets (fade, slide, bounce, emphasis)' 
-      });
-      try {
-        clientRef.current.sendCurrentSlideContext(initialTitle, initialContent);
-      } catch (err) {
-        console.error('Error sending slide context:', err);
+      const now = Date.now();
+      const timeSinceLastUpdate = now - lastContextUpdateRef.current;
+      const MIN_UPDATE_DELAY = 1500; // Minimum 1.5 seconds between context updates
+      
+      if (timeSinceLastUpdate >= MIN_UPDATE_DELAY) {
+        console.log('📝 SLIDE CHANGE: Sending new slide context to AI', { 
+          title: initialTitle, 
+          content: initialContent,
+          reminders: 'Remain silent unless addressed, use animated bullets (fade, slide, bounce, emphasis)' 
+        });
+        
+        try {
+          clientRef.current.sendCurrentSlideContext(initialTitle, initialContent);
+          lastContextUpdateRef.current = now;
+        } catch (err) {
+          console.error('Error sending slide context:', err);
+        }
+      } else {
+        console.log(`Skipping slide context update - too soon (${timeSinceLastUpdate}ms since last update)`);
       }
     }
     
