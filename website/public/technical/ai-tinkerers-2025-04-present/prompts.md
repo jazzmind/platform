@@ -10,7 +10,7 @@
 - Duration: 45
 - Notes: How we use OpenAI's real-time API plus tool calling to make this work
 
-## 
+## Technical Challenges
 - Prompt: "Technical Challenges"
 - Duration: 40
 - Notes: Debunk myths about "vibe coding" and set realistic expectations

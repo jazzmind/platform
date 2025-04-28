@@ -28,6 +28,9 @@ interface SessionUpdateParams {
   tools?: ToolDefinition[];
   tool_choice?: 'auto' | 'none';
   temperature?: number;
+  input_audio_noise_reduction?: {
+    type: 'far_field' | 'near_field';
+  };
   input_audio_transcription?: {
     model: string;
     language?: string;
@@ -913,7 +916,7 @@ export function setupPresentationInstructions(
 ): RealtimeClient {
   const {
     voice = 'coral',
-    temperature = 0.7,
+    temperature = 0.8,
     role = 'silent'
   } = options;
   
@@ -949,7 +952,10 @@ Respond verbally when asked a direct question or when clarification is needed, b
   client.updateSession({
     instructions,
     voice,
-    temperature
+    temperature,
+    input_audio_noise_reduction: {
+      type: 'far_field',
+    }
   });
     
   return client;

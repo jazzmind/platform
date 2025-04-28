@@ -5,6 +5,7 @@ import NotesPanel from "./NotesPanel";
 import dynamic from "next/dynamic";
 import ToggleableChatPanel from "@/components/ToggleableChatPanel";
 import { askQuestion } from "./actions";
+import { Laptop, Smartphone, Info } from "lucide-react";
 
 // Dynamically import the presentation components with no SSR
 const RealtimePresentationContainer = dynamic(() => import('@/components/PresentPresentation/RealtimePresentationContainer'), { ssr: false });
@@ -222,7 +223,7 @@ export default function TabsContainer({
               {/* Screen Option */}
               <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition-shadow">
                 <div className="w-20 h-20 mb-4 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
-                  <span className="material-icons text-4xl text-blue-600 dark:text-blue-400">Laptop/Desktop</span>
+                  <Laptop className="w-12 h-12 text-blue-600 dark:text-blue-400" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Screen</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
@@ -239,7 +240,7 @@ export default function TabsContainer({
               {/* Controller Option */}
               <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition-shadow">
                 <div className="w-20 h-20 mb-4 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center">
-                  <span className="material-icons text-4xl text-red-600 dark:text-red-400">Phone/Tablet</span>
+                  <Smartphone className="w-12 h-12 text-red-600 dark:text-red-400" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Controller</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
@@ -258,7 +259,7 @@ export default function TabsContainer({
             
             <div className="mt-12 text-gray-600 dark:text-gray-400 max-w-2xl text-center">
               <p>
-                <span className="material-icons align-middle mr-2 text-yellow-500">info</span>
+                <Info className="inline h-5 w-5 text-yellow-500 mr-2 align-text-bottom" />
                 The Controller and Screen modes will pair automatically using a 4-digit code.
                 Start the Screen mode first, then enter the displayed code into your Controller device.
               </p>
