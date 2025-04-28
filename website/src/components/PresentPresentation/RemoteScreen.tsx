@@ -63,7 +63,145 @@ export default function RemoteScreen({ prompts, presentationId, categoryId = '' 
       setIsRetrying(false);
     }
   };
+
+    
+  // Update slide content based on the current prompt index
+  const updateSlideContent = useCallback((index: number) => {
+    if (index >= 0 && index < prompts.length) {
+      const prompt = prompts[index];
+      
+      const processedContent: ProcessedContent = {
+        title: prompt.text || '',
+        content: prompt.notes || '',
+        bullets: [],
+        codeBlocks: []
+      };
+      
+      // If notes contain bullet points, extract them
+      if (prompt.notes) {
+        const bulletMatches = prompt.notes.match(/^[•\-*]\s.+$/gm);
+        if (bulletMatches && bulletMatches.length > 0) {
+          processedContent.bullets = bulletMatches.map(b => b.replace(/^[•\-*]\s/, ''));
+          
+          // Remove bullet points from content to avoid duplication
+          processedContent.content = prompt.notes
+            .split('\n')
+            .filter(line => !line.match(/^[•\-*]\s.+$/))
+            .join('\n')
+            .trim();
+        }
+        
+        // Extract code blocks
+        const codeMatches = prompt.notes.match(/```(?:\w+)?\n([\s\S]*?)```/g);
+        if (codeMatches && codeMatches.length > 0) {
+          processedContent.codeBlocks = codeMatches.map(c => {
+            return c.replace(/```(?:\w+)?\n/, '').replace(/```$/, '');
+          });
+          
+          // Remove code blocks from content to avoid duplication
+          let tempContent = processedContent.content;
+          codeMatches.forEach(code => {
+            tempContent = tempContent.replace(code, '');
+          });
+          processedContent.content = tempContent.trim();
+        }
+      }
+      
+      setSlideContent(processedContent);
+    }
+  }, [prompts]);
   
+   // Process commands from the controller via WebRTC
+   const processCommand = useCallback((message: RTCMessage) => {
+    const { type, data } = message;
+    
+    switch (type) {
+      case 'next':
+        if (currentPromptIndex < prompts.length - 1) {
+          setCurrentPromptIndex(prev => prev + 1);
+          updateSlideContent(currentPromptIndex + 1);
+        }
+        break;
+        
+      case 'previous':
+        if (currentPromptIndex > 0) {
+          setCurrentPromptIndex(prev => prev - 1);
+          updateSlideContent(currentPromptIndex - 1);
+        }
+        break;
+        
+      case 'goto':
+        if (data?.index !== undefined && 
+            typeof data.index === 'number' && 
+            data.index >= 0 && 
+            data.index < prompts.length) {
+          setCurrentPromptIndex(data.index as number);
+          updateSlideContent(data.index as number);
+        }
+        break;
+        
+      case 'startTimer':
+        if (data?.minutes !== undefined && typeof data.minutes === 'number') {
+          setTimeLeft((data.minutes as number) * 60);
+          setStartTime(Date.now());
+        }
+        break;
+        
+      case 'pauseTimer':
+        setStartTime(null);
+        break;
+        
+      case 'resumeTimer':
+        if (timeLeft) {
+          setStartTime(Date.now());
+        }
+        break;
+        
+      case 'resetTimer':
+        setTimeLeft(null);
+        setStartTime(null);
+        break;
+        
+      case 'updateSlide':
+        if (data?.content) {
+          const content = data.content as Record<string, unknown>;
+          
+          // Update slide with provided content
+          const processedContent: ProcessedContent = {
+            title: content.title as string || '',
+            content: content.content as string || '',
+            bullets: content.bullets as string[] || [],
+            codeBlocks: content.code ? [content.code as string] : []
+          };
+          
+          setSlideContent(processedContent);
+        }
+        break;
+        
+      case 'updateVoiceTranscript':
+        if (data?.transcript) {
+          setVoiceTranscript(data.transcript as string);
+          setIsVoiceTranscriptFinal(!!data.isFinal);
+          
+          // If final, clear after 5 seconds
+          if (data.isFinal) {
+            setTimeout(() => {
+              setVoiceTranscript('');
+              setIsVoiceTranscriptFinal(false);
+            }, 5000);
+          }
+        }
+        break;
+        
+      case 'disconnect':
+        setIsPaired(false);
+        if (webrtcRef.current) {
+          webrtcRef.current.disconnect();
+        }
+        break;
+    }
+  }, [currentPromptIndex, prompts.length, timeLeft, updateSlideContent]);
+
   // Create a pairing code when the component mounts
   useEffect(() => {
     // Prevent the effect from running if already paired or initialized
@@ -238,145 +376,9 @@ export default function RemoteScreen({ prompts, presentationId, categoryId = '' 
       hasInitialized.current = false;
       pairingCallInProgress.current = false;
     };
-  }, [presentationId, categoryId, isRetrying]); // Add isRetrying as a dependency
+  }, [presentationId, categoryId, isRetrying, currentPromptIndex, isPaired, pairingCode, updateSlideContent, processCommand]); // Add isRetrying as a dependency
   
-  // Process commands from the controller via WebRTC
-  const processCommand = (message: RTCMessage) => {
-    const { type, data } = message;
-    
-    switch (type) {
-      case 'next':
-        if (currentPromptIndex < prompts.length - 1) {
-          setCurrentPromptIndex(prev => prev + 1);
-          updateSlideContent(currentPromptIndex + 1);
-        }
-        break;
-        
-      case 'previous':
-        if (currentPromptIndex > 0) {
-          setCurrentPromptIndex(prev => prev - 1);
-          updateSlideContent(currentPromptIndex - 1);
-        }
-        break;
-        
-      case 'goto':
-        if (data?.index !== undefined && 
-            typeof data.index === 'number' && 
-            data.index >= 0 && 
-            data.index < prompts.length) {
-          setCurrentPromptIndex(data.index as number);
-          updateSlideContent(data.index as number);
-        }
-        break;
-        
-      case 'startTimer':
-        if (data?.minutes !== undefined && typeof data.minutes === 'number') {
-          setTimeLeft((data.minutes as number) * 60);
-          setStartTime(Date.now());
-        }
-        break;
-        
-      case 'pauseTimer':
-        setStartTime(null);
-        break;
-        
-      case 'resumeTimer':
-        if (timeLeft) {
-          setStartTime(Date.now());
-        }
-        break;
-        
-      case 'resetTimer':
-        setTimeLeft(null);
-        setStartTime(null);
-        break;
-        
-      case 'updateSlide':
-        if (data?.content) {
-          const content = data.content as Record<string, unknown>;
-          
-          // Update slide with provided content
-          const processedContent: ProcessedContent = {
-            title: content.title as string || '',
-            content: content.content as string || '',
-            bullets: content.bullets as string[] || [],
-            codeBlocks: content.code ? [content.code as string] : []
-          };
-          
-          setSlideContent(processedContent);
-        }
-        break;
-        
-      case 'updateVoiceTranscript':
-        if (data?.transcript) {
-          setVoiceTranscript(data.transcript as string);
-          setIsVoiceTranscriptFinal(!!data.isFinal);
-          
-          // If final, clear after 5 seconds
-          if (data.isFinal) {
-            setTimeout(() => {
-              setVoiceTranscript('');
-              setIsVoiceTranscriptFinal(false);
-            }, 5000);
-          }
-        }
-        break;
-        
-      case 'disconnect':
-        setIsPaired(false);
-        if (webrtcRef.current) {
-          webrtcRef.current.disconnect();
-        }
-        break;
-    }
-  };
-  
-  // Update slide content based on the current prompt index
-  const updateSlideContent = (index: number) => {
-    if (index >= 0 && index < prompts.length) {
-      const prompt = prompts[index];
-      
-      const processedContent: ProcessedContent = {
-        title: prompt.text || '',
-        content: prompt.notes || '',
-        bullets: [],
-        codeBlocks: []
-      };
-      
-      // If notes contain bullet points, extract them
-      if (prompt.notes) {
-        const bulletMatches = prompt.notes.match(/^[•\-*]\s.+$/gm);
-        if (bulletMatches && bulletMatches.length > 0) {
-          processedContent.bullets = bulletMatches.map(b => b.replace(/^[•\-*]\s/, ''));
-          
-          // Remove bullet points from content to avoid duplication
-          processedContent.content = prompt.notes
-            .split('\n')
-            .filter(line => !line.match(/^[•\-*]\s.+$/))
-            .join('\n')
-            .trim();
-        }
-        
-        // Extract code blocks
-        const codeMatches = prompt.notes.match(/```(?:\w+)?\n([\s\S]*?)```/g);
-        if (codeMatches && codeMatches.length > 0) {
-          processedContent.codeBlocks = codeMatches.map(c => {
-            return c.replace(/```(?:\w+)?\n/, '').replace(/```$/, '');
-          });
-          
-          // Remove code blocks from content to avoid duplication
-          let tempContent = processedContent.content;
-          codeMatches.forEach(code => {
-            tempContent = tempContent.replace(code, '');
-          });
-          processedContent.content = tempContent.trim();
-        }
-      }
-      
-      setSlideContent(processedContent);
-    }
-  };
-  
+ 
   // Clean up WebRTC connection on unmount
   useEffect(() => {
     return () => {

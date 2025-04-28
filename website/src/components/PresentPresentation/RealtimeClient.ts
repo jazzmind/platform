@@ -489,7 +489,7 @@ export class RealtimeClient extends EventEmitter {
               try {
                 parsedArgs = JSON.parse(fixedArgs) as Record<string, unknown>;
                 console.log('Successfully parsed arguments after fixing JSON');
-              } catch (/* eslint-disable-next-line @typescript-eslint/no-unused-vars */ _fixError) {
+              } catch (_fixError) {
                 // Still failed, use empty object
                 console.error('Failed to fix and parse arguments, using empty object instead:', _fixError);
                 parsedArgs = {};
