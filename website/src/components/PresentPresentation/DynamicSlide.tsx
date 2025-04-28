@@ -1,22 +1,26 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { ProcessedContent, CodeBlock } from './SpeechProcessor';
+import { ProcessedContent, CodeBlock } from './types';
 
 interface DynamicSlideProps {
   content: ProcessedContent | null;
-  isVisible: boolean;
+  isVisible?: boolean;
   isTransitioning?: boolean;
   transitionDirection?: 'next' | 'previous';
   transitionPhase?: 'out' | 'in';
+  voiceTranscript?: string;
+  isTranscriptFinal?: boolean;
 }
 
 export default function DynamicSlide({ 
   content, 
-  isVisible, 
+  isVisible = true, 
   isTransitioning = false, 
   transitionDirection = 'next',
-  transitionPhase = 'out'
+  transitionPhase = 'out',
+  voiceTranscript = '',
+  isTranscriptFinal = false
 }: DynamicSlideProps) {
   const [initialLoad, setInitialLoad] = useState(true);
   const [slideContent, setSlideContent] = useState<ProcessedContent | null>(null);
@@ -34,6 +38,7 @@ export default function DynamicSlide({
   const lastTransitionPhaseRef = useRef<'out' | 'in'>('out');
   
   // Handle content changes with animation
+ 
   useEffect(() => {
     console.log('DynamicSlide received content update:', content);
     console.log('DynamicSlide visibility:', isVisible);
@@ -147,6 +152,7 @@ export default function DynamicSlide({
     }
   }, [content, isVisible, initialLoad, isTransitioning, transitionDirection, transitionPhase]);
   
+  console.debug('[DynamicSlide] rendering', { slideContent, isVisible, isTransitioning, transitionDirection, transitionPhase });
   if (!slideContent) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -248,9 +254,7 @@ export default function DynamicSlide({
                 className="bg-gray-800 p-4 rounded-lg overflow-auto text-sm text-gray-300 font-mono"
                 style={{ 
                   animationDelay: `${index * 0.2}s`,
-                  animation: isNew ? 'slideInBottom 0.6s ease forwards' : 'none',
-                  opacity: isNew ? 0 : 1, // Start invisible if new
-                  transform: isNew ? 'translateY(20px)' : 'none' // Start below final position if new
+                  animation: isNew ? 'fadeIn 0.8s ease forwards' : 'none'
                 }}
               >
                 <code>{codeContent}</code>
@@ -273,107 +277,60 @@ export default function DynamicSlide({
         </div>
       )}
       
+      {/* Voice transcript overlay */}
+      {voiceTranscript && (
+        <div className={`fixed bottom-8 left-0 right-0 mx-auto max-w-4xl bg-black/70 text-white p-4 rounded-lg transition-opacity ${isTranscriptFinal ? 'opacity-50' : 'opacity-90'}`}>
+          <p className="text-lg">
+            {isTranscriptFinal ? '✓ ' : '🎤 '}
+            {voiceTranscript}
+          </p>
+        </div>
+      )}
+      
       <style jsx>{`
-        @keyframes slideInRight {
-          0% {
-            transform: translateX(30px);
-            opacity: 0;
-          }
-          100% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes slideInBottom {
-          0% {
-            transform: translateY(20px);
-            opacity: 0;
-          }
-          100% {
-            transform: translateY(0);
-            opacity: 1;
-          }
-        }
-        
         @keyframes fadeIn {
-          0% {
-            opacity: 0;
-          }
-          100% {
-            opacity: 1;
-          }
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
-        
+        @keyframes slideInRight {
+          from { transform: translateX(30px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInLeft {
+          from { transform: translateX(-30px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
         @keyframes titleFadeIn {
-          0% {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { transform: translateY(-20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
         }
-        
-        @keyframes slide-out-left {
-          0% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(-50px);
-            opacity: 0;
-          }
-        }
-        
-        @keyframes slide-out-right {
-          0% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(50px);
-            opacity: 0;
-          }
-        }
-        
-        @keyframes slide-in-right {
-          0% {
-            transform: translateX(50px);
-            opacity: 0;
-          }
-          100% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-        
-        @keyframes slide-in-left {
-          0% {
-            transform: translateX(-50px);
-            opacity: 0;
-          }
-          100% {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-        
         .animate-slide-out-left {
-          animation: slide-out-left 0.3s ease-in-out forwards;
+          animation: slideOutLeft 0.4s ease forwards;
         }
-        
         .animate-slide-out-right {
-          animation: slide-out-right 0.3s ease-in-out forwards;
+          animation: slideOutRight 0.4s ease forwards;
         }
-        
         .animate-slide-in-right {
-          animation: slide-in-right 0.4s ease-in-out forwards;
+          animation: slideInFromRight 0.4s ease forwards;
         }
-        
         .animate-slide-in-left {
-          animation: slide-in-left 0.4s ease-in-out forwards;
+          animation: slideInFromLeft 0.4s ease forwards;
+        }
+        @keyframes slideOutLeft {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(-50px); opacity: 0; }
+        }
+        @keyframes slideOutRight {
+          from { transform: translateX(0); opacity: 1; }
+          to { transform: translateX(50px); opacity: 0; }
+        }
+        @keyframes slideInFromRight {
+          from { transform: translateX(50px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInFromLeft {
+          from { transform: translateX(-50px); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
         }
       `}</style>
     </div>

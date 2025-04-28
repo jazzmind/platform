@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
-import { checkRateLimit, cleanupRateLimits } from '@/app/lib/rate-limit';
+import { checkRateLimit, cleanupRateLimits } from '@/lib/rate-limit';
 
 // Initialize OpenAI client
 const openai = new OpenAI({

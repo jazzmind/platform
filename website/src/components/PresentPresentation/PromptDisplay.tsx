@@ -53,6 +53,7 @@ export default function PromptDisplay({
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
   
+  console.debug('[PromptDisplay] rendering', { prompt, isPaused, timeRemaining });
   return (
     <div className="prompt-display bg-gray-800 p-4 rounded-lg text-center">
       <div className="mb-4">

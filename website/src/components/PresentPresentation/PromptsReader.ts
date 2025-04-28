@@ -20,6 +20,7 @@ export interface DynamicPresentation {
  * Parses a prompts.md file to extract prompts for dynamic presentation
  */
 export async function readPromptsFile(categoryId: string, presentationId: string): Promise<Prompt[]> {
+  console.debug('[PromptsReader] readPromptsFile called', { categoryId, presentationId });
   try {
     // First check in the public directory
     const publicDirPath = path.join(process.cwd(), "public", categoryId, presentationId);
@@ -43,6 +44,7 @@ export async function readPromptsFile(categoryId: string, presentationId: string
     }
 
     // Parse the markdown content to extract prompts
+    console.debug('[PromptsReader] parsing prompts markdown', { promptsPath });
     const prompts = parsePromptsMarkdown(content);
     return prompts;
   } catch (error) {
@@ -55,6 +57,7 @@ export async function readPromptsFile(categoryId: string, presentationId: string
  * Parse the markdown content to extract prompts
  */
 function parsePromptsMarkdown(content: string): Prompt[] {
+  console.debug('[PromptsReader] parsePromptsMarkdown called', { content });
   const lines = content.split('\n');
   const prompts: Prompt[] = [];
   
@@ -127,6 +130,7 @@ function generateId(text: string): string {
  * Create default prompts if no prompts.md file is found
  */
 function createDefaultPrompts(): Prompt[] {
+  console.debug('[PromptsReader] createDefaultPrompts called');
   return [
     {
       id: 'introduction',

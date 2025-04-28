@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import EventRegistrationForm from "../EventRegistrationForm";
 import { sendEventRegistration } from "../actions";
 import EventCodeAccess from "../EventCodeAccess";
-import { PollQuestion } from "@/app/lib/types";
+import { PollQuestion } from "@/lib/types";
 import EventTabs from "@/components/EventTabs";
 
 // Define Topic interface

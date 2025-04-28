@@ -6,8 +6,10 @@ import dynamic from "next/dynamic";
 import ToggleableChatPanel from "@/components/ToggleableChatPanel";
 import { askQuestion } from "./actions";
 
-// Dynamically import the DynamicTab component with no SSR
-const DynamicTab = dynamic(() => import('./DynamicTab/DynamicTab'), { ssr: false });
+// Dynamically import the presentation components with no SSR
+const RealtimePresentationContainer = dynamic(() => import('@/components/PresentPresentation/RealtimePresentationContainer'), { ssr: false });
+const RemoteScreen = dynamic(() => import('@/components/PresentPresentation/RemoteScreen'), { ssr: false });
+const RemoteController = dynamic(() => import('@/components/PresentPresentation/RemoteController'), { ssr: false });
 
 // Component to render the iframe
 function PresentationIframe({ url, title }: { url: string; title: string }) {
@@ -38,13 +40,50 @@ export default function TabsContainer({
 }: TabsContainerProps) {
   const [activeTab, setActiveTab] = useState("presentation");
   const [iframeHeight, setIframeHeight] = useState("600px");
+  const [prompts, setPrompts] = useState([]);
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [remoteMode, setRemoteMode] = useState<"controller" | "screen" | null>(null);
+  
+  // Load prompts and content for the realtime presentation
+  useEffect(() => {
+    async function loadPresentationData() {
+      try {
+        setIsLoading(true);
+        // Fetch prompts
+        const response = await fetch(`/api/presentations/${categoryId}/${presentationId}/prompts`);
+        if (response.ok) {
+          const promptsData = await response.json();
+          setPrompts(promptsData);
+        }
+        
+        // Fetch content
+        const contentResponse = await fetch(`/api/presentations/${categoryId}/${presentationId}/content`);
+        if (contentResponse.ok) {
+          const contentData = await contentResponse.json();
+          setContent(contentData.content || "");
+        }
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error loading presentation data:", error);
+        setIsLoading(false);
+      }
+    }
+    
+    // Load data when needed for remote modes or dynamic presentation
+    if (activeTab === "dynamic" || activeTab === "remote") {
+      loadPresentationData();
+    }
+  }, [activeTab, categoryId, presentationId]);
   
   // Update iframe height on window resize and initial load
   useEffect(() => {
     const updateHeight = () => {
       // Calculate height based on viewport
-      const height = Math.max(window.innerHeight - 250, 400);
-      setIframeHeight(`${height}px`);
+      //const height = Math.max(window.innerHeight - 250, 400);
+      setIframeHeight(`70vh`);
+      //  setIframeHeight(`${height}px`);
     };
     
     // Set initial height
@@ -93,6 +132,29 @@ export default function TabsContainer({
               Notes
             </button>
           )}
+
+          <button
+            onClick={() => setActiveTab("dynamic")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "dynamic" 
+                ? "border-red-600 text-red-600 dark:text-red-400 dark:border-red-400" 
+                : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            }`}
+          >
+            AI Presentation
+          </button>
+          
+          {/* New Remote option */}
+          <button
+            onClick={() => setActiveTab("remote")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "remote" 
+                ? "border-red-600 text-red-600 dark:text-red-400 dark:border-red-400" 
+                : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            }`}
+          >
+            Remote Mode
+          </button>
         </div>
         
         <div className="flex items-center">
@@ -122,7 +184,7 @@ export default function TabsContainer({
         </div>
       </div>
       
-      <div style={{ height: iframeHeight }}>
+      <div style={{ height: iframeHeight, overflow: 'scroll' }}>
         {activeTab === "presentation" && (
           <div className="h-full">
             <PresentationIframe url={presentationUrl} title={presentationTitle} />
@@ -137,7 +199,126 @@ export default function TabsContainer({
         
         {activeTab === "dynamic" && (
           <div className="h-full">
-            <DynamicTab categoryId={categoryId} presentationId={presentationId} />
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-600"></div>
+                <p className="ml-4 text-gray-600 dark:text-gray-300">Loading presentation data...</p>
+              </div>
+            ) : (
+              <RealtimePresentationContainer 
+                prompts={prompts} 
+                referenceContent={content} 
+              />
+            )}
+          </div>
+        )}
+        
+        {activeTab === "remote" && remoteMode === null && (
+          <div className="h-full flex flex-col items-center justify-center p-8">
+            <h2 className="text-2xl font-bold mb-8 text-gray-800 dark:text-white">Remote Presentation Mode</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+
+              {/* Screen Option */}
+              <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition-shadow">
+                <div className="w-20 h-20 mb-4 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+                  <span className="material-icons text-4xl text-blue-600 dark:text-blue-400">Laptop/Desktop</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Screen</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
+                  Display this on your main screen or projector to show the presentation.
+                </p>
+                <button 
+                  onClick={() => setRemoteMode("screen")}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  Start Screen
+                </button>
+              </div>
+
+              {/* Controller Option */}
+              <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-6 flex flex-col items-center text-center hover:shadow-xl transition-shadow">
+                <div className="w-20 h-20 mb-4 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                  <span className="material-icons text-4xl text-red-600 dark:text-red-400">Phone/Tablet</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Controller</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
+                  Use your phone or tablet to control the presentation, see notes, and manage the timer.
+                </p>
+                <button 
+                  onClick={() => setRemoteMode("controller")}
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors"
+                >
+                  Start Controller
+                </button>
+              </div>
+              
+
+            </div>
+            
+            <div className="mt-12 text-gray-600 dark:text-gray-400 max-w-2xl text-center">
+              <p>
+                <span className="material-icons align-middle mr-2 text-yellow-500">info</span>
+                The Controller and Screen modes will pair automatically using a 4-digit code.
+                Start the Screen mode first, then enter the displayed code into your Controller device.
+              </p>
+            </div>
+          </div>
+        )}
+        
+        {activeTab === "remote" && remoteMode === "screen" && (
+          <div className="h-full">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+                <p className="ml-4 text-gray-600 dark:text-gray-300">Loading presentation data...</p>
+              </div>
+            ) : prompts.length === 0 ? (
+              <div className="flex items-center justify-center h-full flex-col">
+                <p className="text-gray-600 dark:text-gray-300 text-xl mb-4">No presentation prompts found</p>
+                <button 
+                  onClick={() => setRemoteMode(null)} 
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                >
+                  Go Back
+                </button>
+              </div>
+            ) : (
+              <RemoteScreen 
+                prompts={prompts} 
+                referenceContent={content}
+                onExit={() => setRemoteMode(null)}
+                categoryId={categoryId}
+                presentationId={presentationId}
+              />
+            )}
+          </div>
+        )}
+        
+        {activeTab === "remote" && remoteMode === "controller" && (
+          <div className="h-full">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-600"></div>
+                <p className="ml-4 text-gray-600 dark:text-gray-300">Loading presentation data...</p>
+              </div>
+            ) : prompts.length === 0 ? (
+              <div className="flex items-center justify-center h-full flex-col">
+                <p className="text-gray-600 dark:text-gray-300 text-xl mb-4">No presentation prompts found</p>
+                <button 
+                  onClick={() => setRemoteMode(null)} 
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                >
+                  Go Back
+                </button>
+              </div>
+            ) : (
+              <RemoteController 
+                prompts={prompts} 
+                onExit={() => setRemoteMode(null)}
+                presentationId={presentationId}
+              />
+            )}
           </div>
         )}
       </div>

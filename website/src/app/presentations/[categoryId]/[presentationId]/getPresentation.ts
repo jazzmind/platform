@@ -141,3 +141,26 @@ function extractDateFromId(id: string): string | null {
   
   return null;
 } 
+
+
+// async function loadPresentationContent(categoryId: string, presentationId: string) {
+//   try {
+//     // Load prompts
+//     const prompts = await readPromptsFile(categoryId, presentationId);
+    
+//     // Load presentation content
+//     const contentPath = `${categoryId}/${presentationId}/presentation.md`;
+//     const content = await readFileContent(contentPath);
+    
+//     return {
+//       prompts,
+//       content: content || ""
+//     };
+//   } catch (error) {
+//     console.error('Error loading presentation content:', error);
+//     return {
+//       prompts: [],
+//       content: ""
+//     };
+//   }
+// }

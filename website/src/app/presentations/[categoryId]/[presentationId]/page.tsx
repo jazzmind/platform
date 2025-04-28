@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPresentation } from "../../../getPresentation";
+import { getPresentation } from "./getPresentation";
 import TabsContainer from "./TabsContainer";
 
 // Define types for our category data
@@ -28,6 +28,7 @@ const categories: Record<string, CategoryInfo> = {
     icon: "🎓",
   },
 };
+
 
 export default async function PresentationPage({ 
   params: paramsPromise 
@@ -59,7 +60,6 @@ export default async function PresentationPage({
 
   // Use the URL from the presentation object
   const presentationUrl = presentation.url;
-  console.log("Loading presentation from URL:", presentationUrl);
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">

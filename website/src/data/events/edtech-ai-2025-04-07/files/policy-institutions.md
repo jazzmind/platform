@@ -2,6 +2,9 @@
 
 In April 2025, a roundtable of 40+ educators, EdTech executives, AI experts, and academic leaders convened in Boston under the Chatham House Rule to discuss how AI is changing education. The following document synthesizes insights from that event with recent academic research (2022–2025) and conference proceedings, offering guidance for educational leaders and institutions.
 
+> *AI Usage Statement*
+> This paper was generated using AI at several stages. First, we used AI to transcribe handwritten notes. Then we combined the notes with the moderator guides and questions and used AI to expand on the notes, filling in gaps and interpolating difficult to read or understand notes. These were human reviewed and edited. Next, we used AI to generate a summary of the discussion, which was also human revieed and edited. Based on the notes and summary we used deep research models to build this policy document. These are currently in the process of getting human reviewed and validated.
+
 ## Policy Paper for Education Leaders (Institutions)
 
 ### Overview and Context 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PollQuestion } from "@/app/lib/types";
+import { PollQuestion } from "@/lib/types";
 
 interface EventCodeAccessProps {
   eventId: string;

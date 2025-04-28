@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PollQuestion } from "@/app/lib/types";
+import { PollQuestion } from "@/lib/types";
 import ToggleableChatPanel from "./ToggleableChatPanel";
 import { askEventQuestion } from "@/app/events/[eventId]/actions";
 import MarkdownRenderer from "./MarkdownRenderer";

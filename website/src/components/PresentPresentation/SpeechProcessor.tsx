@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { ProcessedContent } from './types';
 
 interface SpeechProcessorProps {
   onSpeechResult: (text: string) => void;
@@ -11,24 +12,6 @@ interface SpeechProcessorProps {
   currentSlide?: ProcessedContent;
   talkingPoint?: string;
   talkingPointNotes?: string;
-}
-
-export interface CodeBlock {
-  language?: string;
-  code: string;
-}
-
-export interface ProcessedContent {
-  title?: string;
-  content: string;
-  bullets?: string[];
-  codeBlocks?: (string | CodeBlock)[];
-  imagePrompt?: string;
-  animationDirections?: {
-    new?: string[];
-    keep?: string[];
-    remove?: string[];
-  };
 }
 
 // Define types for Speech Recognition
@@ -172,7 +155,8 @@ export default function SpeechProcessor({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          text: 'This is a test of the speech process API. It should generate a simple slide.', 
+          recentText: 'This is a test of the speech process API. It should generate a simple slide.', 
+          currentSlideText: 'This is a test of the speech process API. It should generate a simple slide.',
           referenceContent: '' 
         }),
       });
@@ -190,9 +174,16 @@ export default function SpeechProcessor({
     }
   }, []);
   
-  // Run API test on component mount
+  // Use a ref to track whether API test has been run
+  const hasTestedApiRef = useRef(false);
+  
+  // Run API test only once on component mount
   useEffect(() => {
-    testApiConnection();
+    if (!hasTestedApiRef.current) {
+      console.log('Running API test once');
+      testApiConnection();
+      hasTestedApiRef.current = true;
+    }
   }, [testApiConnection]);
 
   // Process transcript with OpenAI to extract meaningful content

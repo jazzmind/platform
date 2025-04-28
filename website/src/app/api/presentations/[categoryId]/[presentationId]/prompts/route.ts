@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readPromptsFile } from '../../../../../presentations/[categoryId]/[presentationId]/DynamicTab/PromptsReader';
+import { readPromptsFile } from '@/components/PresentPresentation/PromptsReader';
 
 export async function GET(
   request: NextRequest,

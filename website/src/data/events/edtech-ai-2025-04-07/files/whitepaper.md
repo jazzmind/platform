@@ -4,6 +4,9 @@ In April 2025, a roundtable of 40+ educators, EdTech executives, AI experts, and
 
 ## White Paper: AI's Impact on Education – Current State and Future Directions
 
+> *AI Usage Statement*
+> This whitepaper was generated using AI at several stages. First, we used AI to transcribe handwritten notes. Then we combined the notes with the moderator guides and questions and used AI to expand on the notes, filling in gaps and interpolating difficult to read or understand notes. These were human reviewed and edited. Next, we used AI to generate a summary of the discussion, which was also human revieed and edited. Based on the notes and summary we used deep research models to build the whitepaper and policy documents. These are currently in the process of getting human reviewed and validated.
+
 ### Introduction 
 Artificial Intelligence has swiftly moved from the periphery of education to its center stage. In just the past few years, we have witnessed AI-driven tutoring systems, smart content generators, automated grading tools, and even AI teaching assistants become reality in classrooms and online learning platforms. The release of accessible large language models (such as OpenAI's GPT series) in 2022–2023 marked a tipping point, introducing millions of students and teachers to AI through tools that can write essays, solve problems, or generate lesson plans. This white paper provides a comprehensive overview of how AI is impacting education today, drawing on key themes from an April 2025 EdTech AI Roundtable in Boston and the latest research and conference insights. We explore the transformations underway in teaching and learning, the challenges and concerns arising, and the directions for future development that can ensure AI contributes positively to the educational landscape.
 
