@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Prompt } from './PromptsReader';
 import RealtimePresentationSlide from './RealtimePresentationSlide';
 import { ProcessedContent } from './types';
@@ -16,6 +16,7 @@ export default function RealtimePresentationContainer({
   referenceContent
 }: RealtimePresentationContainerProps) {
   console.debug('[RealtimePresentationContainer] mounted', { prompts, referenceContent });
+  const isInitialRender = useRef(true);
   const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
   const [slideContent, setSlideContent] = useState<ProcessedContent | null>(null);
   const [connectionError, setConnectionError] = useState<string | null>(null);
@@ -33,8 +34,9 @@ export default function RealtimePresentationContainer({
   const [slideHistory, setSlideHistory] = useState<Map<number, ProcessedContent>>(new Map());
   
   // Create an initial slide from a prompt
-  const createInitialSlide = (prompt: Prompt): ProcessedContent => {
+  const createInitialSlide = (prompt: Prompt, id?: string): ProcessedContent => {
     return {
+      id: id || currentPromptIndex.toString(),
       title: prompt.text,
       content: prompt.notes || 'Start speaking to add content to this slide',
       bullets: [], // Start with empty bullets
@@ -48,10 +50,24 @@ export default function RealtimePresentationContainer({
     };
   };
   
+  // Handle content updates from the realtime presentation
+  const handleContentChange = useCallback((content: ProcessedContent) => {
+    setSlideContent(content);
+    
+    // Also update the slide history
+    setSlideHistory(prev => {
+      const newMap = new Map(prev);
+      newMap.set(currentPromptIndex, content);
+      return newMap;
+    });
+  }, [currentPromptIndex]);
+  
   // Set initial slide content when prompts change
   useEffect(() => {
-    if (prompts.length > 0 && !slideContent) {
-      const initialSlide = createInitialSlide(prompts[0]);
+    // Only run this effect once on initial render
+    if (isInitialRender.current && prompts.length > 0 && !slideContent) {
+      isInitialRender.current = false;
+      const initialSlide = createInitialSlide(prompts[0], '0');
       setSlideContent(initialSlide);
     }
   }, [prompts, slideContent]);
@@ -171,12 +187,25 @@ export default function RealtimePresentationContainer({
       return;
     }
     
+    // Don't update if the slide content already matches what we expect for this prompt index
+    // This prevents unnecessary re-renders
+    const currentPromptId = currentPromptIndex.toString();
+    if (slideContent && slideContent.id === currentPromptId) {
+      console.log('Slide content already matches current prompt index, skipping update');
+      return;
+    }
+    
     // Check if we have a stored slide for this prompt
     if (slideHistory.has(currentPromptIndex)) {
       console.log('Loading saved slide for talking point', currentPromptIndex);
       const savedSlide = slideHistory.get(currentPromptIndex);
       console.log('Saved slide content:', savedSlide);
-      setSlideContent(savedSlide || null);
+      
+      // Add ID to the saved slide to help with optimization
+      if (savedSlide) {
+        savedSlide.id = currentPromptId;
+        setSlideContent(savedSlide);
+      }
     } else {
       // Otherwise create an initial slide for this talking point
       if (prompts.length > 0 && currentPromptIndex < prompts.length) {
@@ -185,23 +214,12 @@ export default function RealtimePresentationContainer({
         // Get the current prompt
         const prompt = prompts[currentPromptIndex];
         
-        // Create an initial slide for this prompt
-        setSlideContent(createInitialSlide(prompt));
+        // Create an initial slide for this prompt with ID
+        const newSlide = createInitialSlide(prompt, currentPromptId);
+        setSlideContent(newSlide);
       }
     }
   }, [currentPromptIndex, prompts, slideHistory, transitionState]);
-  
-  // Handle content updates from the realtime presentation
-  const handleContentChange = (content: ProcessedContent) => {
-    setSlideContent(content);
-    
-    // Also update the slide history
-    setSlideHistory(prev => {
-      const newMap = new Map(prev);
-      newMap.set(currentPromptIndex, content);
-      return newMap;
-    });
-  };
   
   // Get the current prompt data
   const getCurrentPrompt = (): Prompt | null => {

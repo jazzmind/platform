@@ -4,6 +4,7 @@ export interface CodeBlock {
   }
   
 export interface ProcessedContent {
+id?: string;
 title?: string;
 content: string;
 bullets?: string[];

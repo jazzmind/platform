@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { RealtimeClient, setupPresentationTools, setupPresentationInstructions } from './RealtimeClient';
 import { ProcessedContent, CodeBlock } from './types';
 import { Info, AlertCircle, Minimize2, Volume2, VolumeX } from 'lucide-react';
@@ -175,8 +175,15 @@ export default function RealtimePresentationSlide({
     };
   }, [isActive, isMuted]);
   
-  // Add handler for next slide that resets timer
-  const handleNextSlide = () => {
+  // Use callback to prevent recreation of the handler on each render
+  const handleContentChange = useCallback((content: ProcessedContent) => {
+    if (onContentChange) {
+      onContentChange(content);
+    }
+  }, [onContentChange]);
+
+  // Use callback for the next slide handler to prevent unnecessary re-renders
+  const handleNextSlideCallback = useCallback(() => {
     // Reset the timer for the next slide
     setTimeRemaining(maxTime);
     
@@ -184,7 +191,10 @@ export default function RealtimePresentationSlide({
     if (onNextSlide) {
       onNextSlide();
     }
-  };
+  }, [maxTime, onNextSlide]);
+
+  // Add handler for next slide that resets timer
+  const handleNextSlide = handleNextSlideCallback;
 
   // Update VAD settings during active presentation
   const updateVadSettings = (newSettings: Partial<typeof vadSettings>) => {
@@ -233,7 +243,6 @@ export default function RealtimePresentationSlide({
     
     // Always update UI when props change - COMPLETELY RESET bullets for new slides
     const newContent = {
-      ...slideContent,
       title: initialTitle,
       content: initialContent,
       bullets: [], // Reset bullets when moving to a new slide
@@ -250,7 +259,7 @@ export default function RealtimePresentationSlide({
       
       return () => clearTimeout(timeoutId);
     }
-  }, [initialTitle, initialContent, onContentChange, isActive, isMuted, slideContent]);
+  }, [initialTitle, initialContent, onContentChange, isActive, isMuted]);
 
   // --- MODIFIED: Append bullets and clear if too many ---
   const setupTools = (client: RealtimeClient) => {
@@ -259,10 +268,10 @@ export default function RealtimePresentationSlide({
         // Update local state first
         const updatedContent = updateSlideContent(args);
         
-        // Then notify parent in a safe way
+        // Then notify parent in a safe way using the memoized callback
         if (onContentChange) {
           setTimeout(() => {
-            onContentChange(updatedContent);
+            handleContentChange(updatedContent);
           }, 0);
         }
         
@@ -280,9 +289,11 @@ export default function RealtimePresentationSlide({
         // Update local state
         setSlideContent(emptyContent);
         
-        // Notify parent component if needed
+        // Notify parent component if needed using the memoized callback
         if (onContentChange) {
-          onContentChange(emptyContent);
+          setTimeout(() => {
+            handleContentChange(emptyContent);
+          }, 0);
         }
         
         return { success: true };
@@ -310,93 +321,90 @@ export default function RealtimePresentationSlide({
       animation: string; 
     }[];
   }) => {
-    let newContent: ProcessedContent = { ...slideContent };
+    // Create new content object based on current state without setState
+    const newContent: ProcessedContent = { ...slideContent };
     
-    setSlideContent((prev) => {
-      // Title: update only if prev title is empty 
-      const title = prev.title ? prev.title : args.title !== undefined ? args.title : '';
-      // Content: append if new and not empty
-      let content = prev.content;
-      if (args.content && args.content !== prev.content) {
-        content = prev.content ? prev.content + '\n' + args.content : args.content;
+    // Title: update only if prev title is empty 
+    newContent.title = newContent.title ? newContent.title : args.title !== undefined ? args.title : '';
+    
+    // Content: append if new and not empty
+    if (args.content && args.content !== newContent.content) {
+      newContent.content = newContent.content ? newContent.content + '\n' + args.content : args.content;
+    }
+    
+    // Process animation information first
+    let bulletAnimations = newContent.bulletAnimations || {};
+    if (!(bulletAnimations instanceof Map)) {
+      // Convert to Map if it's an object
+      bulletAnimations = new Map(Object.entries(bulletAnimations));
+    }
+    
+    // If bulletAnimations array is provided, process it
+    if (Array.isArray(args.bulletAnimations)) {
+      for (const bulletAnim of args.bulletAnimations) {
+        if (bulletAnim.text && bulletAnim.animation) {
+          bulletAnimations.set(bulletAnim.text, bulletAnim.animation);
+        }
       }
-      
-      // Process animation information first
-      let bulletAnimations = prev.bulletAnimations || {};
-      if (!(bulletAnimations instanceof Map)) {
-        // Convert to Map if it's an object
-        bulletAnimations = new Map(Object.entries(bulletAnimations));
-      }
-      
-      // If bulletAnimations array is provided, process it
-      if (Array.isArray(args.bulletAnimations)) {
-        for (const bulletAnim of args.bulletAnimations) {
-          if (bulletAnim.text && bulletAnim.animation) {
-            bulletAnimations.set(bulletAnim.text, bulletAnim.animation);
+    }
+    
+    // Bullets: append new bullets, avoid duplicates
+    let bullets = newContent.bullets ? [...newContent.bullets] : [];
+    
+    // Process both regular bullets and animated bullets
+    const newBullets: string[] = [];
+    
+    if (Array.isArray(args.bullets)) {
+      for (const bullet of args.bullets) {
+        if (bullet && !bullets.includes(bullet)) {
+          newBullets.push(bullet);
+          bullets.push(bullet);
+          // Default animation if not specified
+          if (!bulletAnimations.has(bullet)) {
+            bulletAnimations.set(bullet, 'fade');
           }
         }
       }
-      
-      // Bullets: append new bullets, avoid duplicates
-      let bullets = prev.bullets ? [...prev.bullets] : [];
-      
-      // Process both regular bullets and animated bullets
-      const newBullets: string[] = [];
-      
-      if (Array.isArray(args.bullets)) {
-        for (const bullet of args.bullets) {
-          if (bullet && !bullets.includes(bullet)) {
-            newBullets.push(bullet);
-            bullets.push(bullet);
-            // Default animation if not specified
-            if (!bulletAnimations.has(bullet)) {
-              bulletAnimations.set(bullet, 'fade');
-            }
-          }
+    }
+    
+    if (Array.isArray(args.bulletAnimations)) {
+      for (const bulletAnim of args.bulletAnimations) {
+        if (bulletAnim.text && !bullets.includes(bulletAnim.text)) {
+          newBullets.push(bulletAnim.text);
+          bullets.push(bulletAnim.text);
         }
       }
-      
-      if (Array.isArray(args.bulletAnimations)) {
-        for (const bulletAnim of args.bulletAnimations) {
-          if (bulletAnim.text && !bullets.includes(bulletAnim.text)) {
-            newBullets.push(bulletAnim.text);
-            bullets.push(bulletAnim.text);
-          }
+    }
+    
+    // If too many bullets, clear all except the title
+    const MAX_BULLETS = 5;
+    if (bullets.length > MAX_BULLETS) {
+      bullets = [];
+      // Don't modify content when clearing bullets
+      // content = newContent.content; - this was causing issues
+    }
+    
+    // Code blocks: append new code blocks, avoid duplicates
+    const codeBlocks = newContent.codeBlocks ? [...newContent.codeBlocks] : [];
+    if (Array.isArray(args.codeBlocks)) {
+      for (const code of args.codeBlocks) {
+        if (code && !codeBlocks.includes(code)) {
+          codeBlocks.push(code);
         }
       }
-      
-      // If too many bullets, clear all except the title
-      const MAX_BULLETS = 5;
-      if (bullets.length > MAX_BULLETS) {
-        bullets = [];
-        content = prev.content; // Optionally keep content
-        bulletAnimations = new Map(); // Clear animations too
-      }
-      
-      // Code blocks: append new code blocks, avoid duplicates
-      const codeBlocks = prev.codeBlocks ? [...prev.codeBlocks] : [];
-      if (Array.isArray(args.codeBlocks)) {
-        for (const code of args.codeBlocks) {
-          if (code && !codeBlocks.includes(code)) {
-            codeBlocks.push(code);
-          }
-        }
-      }
-      
-      // Image prompt: use latest if provided
-      const imagePrompt = args.imagePrompt !== undefined ? args.imagePrompt : prev.imagePrompt;
-      
-      newContent = {
-        title,
-        content,
-        bullets,
-        codeBlocks,
-        imagePrompt,
-        bulletAnimations
-      };
-      
-      return newContent;
-    });
+    }
+    
+    // Image prompt: use latest if provided
+    const imagePrompt = args.imagePrompt !== undefined ? args.imagePrompt : newContent.imagePrompt;
+    
+    // Update the newContent object with all the changes
+    newContent.bullets = bullets;
+    newContent.codeBlocks = codeBlocks;
+    newContent.imagePrompt = imagePrompt;
+    newContent.bulletAnimations = bulletAnimations;
+    
+    // Set state once at the end
+    setSlideContent(newContent);
     
     return newContent;
   };
@@ -423,13 +431,6 @@ export default function RealtimePresentationSlide({
       audioRef.current.muted = isMuted;
     }
   }, [isMuted]);
-
-  // When audio element is created, apply mute state
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.muted = isMuted;
-    }
-  }, [audioRef, isMuted]);
   
   // Start the presentation
   const startPresentation = async () => {

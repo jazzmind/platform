@@ -94,7 +94,7 @@ export class RealtimeClient extends EventEmitter {
     
     // Initialize session params with VAD options
     if (this.vadOptions) {
-      this.sessionParams.turn_detection = this.vadOptions;
+      // this.sessionParams.turn_detection = this.vadOptions;
     }
   }
 
@@ -701,7 +701,7 @@ export class RealtimeClient extends EventEmitter {
     
     // Update session parameters with new VAD settings
     this.updateSession({
-      turn_detection: this.vadOptions
+      // turn_detection: this.vadOptions
     });
     
     console.log('Updated VAD settings:', this.vadOptions);
