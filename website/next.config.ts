@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   serverRuntimeConfig: {
     projectRoot: process.cwd(),
   },
+  
+  // Add transpilePackages for the shared and feature packages
+  transpilePackages: [
+    "@sonnenreich/shared",
+    "@sonnenreich/presentation-feature"
+  ],
 };
 
 export default nextConfig;
