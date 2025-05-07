@@ -1,0 +1,51 @@
+id,email,gender,age,location,company_stage,sector
+1,founder1@example.com,Female,32,San Francisco,Early,FinTech
+2,founder2@example.com,Male,45,New York,Mid,HealthTech
+3,founder3@example.com,Female,28,Austin,Early,EdTech
+4,founder4@example.com,Male,39,Boston,Late,AI/ML
+5,founder5@example.com,Non-Binary,33,Seattle,Mid,Sustainability
+6,founder6@example.com,Female,41,Chicago,Early,E-Commerce
+7,founder7@example.com,Male,27,Los Angeles,Early,Media
+8,founder8@example.com,Female,36,Denver,Mid,SaaS
+9,founder9@example.com,Male,44,Miami,Late,Biotech
+10,founder10@example.com,Female,31,Portland,Early,Cybersecurity
+11,founder11@example.com,Male,38,Atlanta,Mid,Logistics
+12,founder12@example.com,Female,29,Dallas,Early,PropTech
+13,founder13@example.com,Non-Binary,42,Seattle,Late,AR/VR
+14,founder14@example.com,Male,30,San Francisco,Early,E-Commerce
+15,founder15@example.com,Female,35,New York,Mid,FinTech
+16,founder16@example.com,Male,47,Boston,Late,HealthTech
+17,founder17@example.com,Female,33,Austin,Early,SaaS
+18,founder18@example.com,Male,28,Los Angeles,Early,Media
+19,founder19@example.com,Female,40,Chicago,Mid,Sustainability
+20,founder20@example.com,Male,36,San Francisco,Late,AI/ML
+21,founder21@example.com,Non-Binary,31,Denver,Early,EdTech
+22,founder22@example.com,Female,43,Miami,Mid,Logistics
+23,founder23@example.com,Male,34,Portland,Early,Cybersecurity
+24,founder24@example.com,Female,39,Atlanta,Mid,Biotech
+25,founder25@example.com,Male,29,Dallas,Early,PropTech
+26,founder26@example.com,Female,37,San Francisco,Late,SaaS
+27,founder27@example.com,Male,32,New York,Early,AR/VR
+28,founder28@example.com,Female,44,Austin,Mid,FinTech
+29,founder29@example.com,Male,30,Boston,Early,Media
+30,founder30@example.com,Non-Binary,41,Seattle,Late,HealthTech
+31,founder31@example.com,Female,35,Chicago,Mid,AI/ML
+32,founder32@example.com,Male,28,Los Angeles,Early,E-Commerce
+33,founder33@example.com,Female,47,Denver,Late,Sustainability
+34,founder34@example.com,Male,33,Miami,Early,EdTech
+35,founder35@example.com,Female,36,Portland,Mid,Cybersecurity
+36,founder36@example.com,Male,42,Atlanta,Late,Logistics
+37,founder37@example.com,Female,29,Dallas,Early,Biotech
+38,founder38@example.com,Male,38,San Francisco,Mid,PropTech
+39,founder39@example.com,Non-Binary,34,New York,Early,SaaS
+40,founder40@example.com,Female,43,Austin,Late,AR/VR
+41,founder41@example.com,Male,31,Boston,Early,Media
+42,founder42@example.com,Female,39,Seattle,Mid,FinTech
+43,founder43@example.com,Male,28,Chicago,Early,HealthTech
+44,founder44@example.com,Female,35,Los Angeles,Mid,AI/ML
+45,founder45@example.com,Male,46,Denver,Late,E-Commerce
+46,founder46@example.com,Female,32,Miami,Early,Sustainability
+47,founder47@example.com,Male,37,Portland,Mid,EdTech
+48,founder48@example.com,Non-Binary,40,Atlanta,Late,Cybersecurity
+49,founder49@example.com,Female,29,Dallas,Early,Logistics
+50,founder50@example.com,Male,44,San Francisco,Mid,Biotech 
