@@ -43,6 +43,10 @@ export default function TeamingPage() {
   const [draggedMember, setDraggedMember] = useState<{member: Record<string, string>, teamId: string} | null>(null);
   const [dragOverTeamId, setDragOverTeamId] = useState<string | null>(null);
   const [pinnedMembers, setPinnedMembers] = useState<{[memberId: string]: string}>({});
+  const [namingTheme, setNamingTheme] = useState('');
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
+  const [editingTeamName, setEditingTeamName] = useState('');
+  const [generatingNameForTeamId, setGeneratingNameForTeamId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -444,6 +448,94 @@ export default function TeamingPage() {
     return 'bg-red-300';
   };
 
+  const handleEditTeamName = (teamId: string, currentName: string) => {
+    setEditingTeamId(teamId);
+    setEditingTeamName(currentName);
+  };
+
+  const saveTeamName = (teamId: string) => {
+    if (editingTeamName.trim() === '') return;
+    
+    setTeams(prevTeams => 
+      prevTeams.map(team => 
+        team.id === teamId ? { ...team, name: editingTeamName } : team
+      )
+    );
+    setEditingTeamId(null);
+    setEditingTeamName('');
+  };
+
+  const cancelEditTeamName = () => {
+    setEditingTeamId(null);
+    setEditingTeamName('');
+  };
+
+  const generateTeamName = async (teamId: string) => {
+    if (!namingTheme.trim()) {
+      setError("Please enter a naming theme first");
+      return;
+    }
+    
+    setGeneratingNameForTeamId(teamId);
+    
+    try {
+      // Find the team
+      const team = teams.find(t => t.id === teamId);
+      if (!team) return;
+      
+      // Find factors where team has a high score (which means they have common values)
+      const commonFactors: string[] = [];
+      Object.entries(team.factorScores).forEach(([factor, score]) => {
+        const factorConfig = config.factors.find(f => f.name === factor);
+        
+        // If diversity is low (< 0.5) or it's a match factor with high score, it means common values
+        if ((factorConfig && factorConfig.diversity < 0.5 && score > 0.7) || 
+            (factorConfig?.isMatch && score > 0.85)) {
+          // Find the common value for this factor
+          const values = new Set(team.members.map(member => member[factor]));
+          if (values.size === 1) {
+            // If all members have the same value, include it
+            const value = team.members[0][factor];
+            commonFactors.push(`${factor}: ${value}`);
+          } else if (values.size <= 3) {
+            // If only a few values, list them all
+            commonFactors.push(`${factor}: ${Array.from(values).join(', ')}`);
+          }
+        }
+      });
+      
+      const response = await fetch('/api/teaming/generate-name', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          theme: namingTheme,
+          commonFactors
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate team name');
+      }
+      
+      const data = await response.json();
+      
+      if (data.teamName) {
+        // Update the team with the new name
+        setTeams(prevTeams => 
+          prevTeams.map(team => 
+            team.id === teamId ? { ...team, name: data.teamName } : team
+          )
+        );
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      setGeneratingNameForTeamId(null);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Team Formation Tool</h1>
@@ -619,6 +711,21 @@ export default function TeamingPage() {
             </div>
           </div>
           
+          {/* Team Naming Theme Input */}
+          <div className="mb-6 flex items-center">
+            <label className="mr-3 font-medium">Team Naming Theme:</label>
+            <input
+              type="text"
+              value={namingTheme}
+              onChange={(e) => setNamingTheme(e.target.value)}
+              placeholder="e.g., Space, Animals, Colors, Superheroes"
+              className="px-3 py-2 border border-gray-300 rounded flex-grow mr-2"
+            />
+            <span className="text-sm text-gray-500">
+              Enter a theme for AI-generated team names
+            </span>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {teams.map((team) => (
               <div 
@@ -630,21 +737,87 @@ export default function TeamingPage() {
                 onDragLeave={handleDragLeave}
                 onDrop={(e) => handleDrop(e, team.id)}
               >
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="text-lg font-bold">{team.name}</h3>
-                  <button 
-                    onClick={() => togglePinTeam(team.id)}
-                    className={`p-1 rounded-full ${
-                      team.isPinned 
-                        ? 'bg-purple-100 text-purple-600' 
-                        : 'bg-gray-100 text-gray-600'
-                    }`}
-                    title={team.isPinned ? "Unpin Team" : "Pin Team"}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                  </button>
+                <div className="flex justify-between items-start mb-3">
+                  {editingTeamId === team.id ? (
+                    <div className="flex flex-grow mr-2">
+                      <input
+                        type="text"
+                        value={editingTeamName}
+                        onChange={(e) => setEditingTeamName(e.target.value)}
+                        className="w-full p-1 border rounded text-lg font-bold"
+                        autoFocus
+                        onKeyDown={(e) => e.key === 'Enter' && saveTeamName(team.id)}
+                      />
+                      <div className="flex">
+                        <button 
+                          onClick={() => saveTeamName(team.id)}
+                          className="p-1 text-green-600 hover:text-green-800"
+                          title="Save"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </button>
+                        <button 
+                          onClick={cancelEditTeamName}
+                          className="p-1 text-red-600 hover:text-red-800"
+                          title="Cancel"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <h3 className="text-lg font-bold">{team.name}</h3>
+                      <button 
+                        onClick={() => handleEditTeamName(team.id, team.name)}
+                        className="ml-2 p-1 text-gray-500 hover:text-gray-700"
+                        title="Edit Team Name"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center">
+                    <button 
+                      onClick={() => generateTeamName(team.id)}
+                      className={`p-1 mr-1 rounded-full ${
+                        namingTheme ? 'bg-blue-100 text-blue-600 hover:bg-blue-200' : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }`}
+                      title={namingTheme ? "Generate AI Team Name" : "Enter a theme first"}
+                      disabled={!namingTheme || generatingNameForTeamId === team.id}
+                    >
+                      {generatingNameForTeamId === team.id ? (
+                        <svg className="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      )}
+                    </button>
+                    <button 
+                      onClick={() => togglePinTeam(team.id)}
+                      className={`p-1 rounded-full ${
+                        team.isPinned 
+                          ? 'bg-purple-100 text-purple-600' 
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                      title={team.isPinned ? "Unpin Team" : "Pin Team"}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
                 
                 {/* Team Members */}
