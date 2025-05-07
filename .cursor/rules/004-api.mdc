@@ -8,7 +8,7 @@ alwaysApply: false
 
 ## OpenAI Model Usage
 - **NEVER** change OpenAI models unless explicitly requested by the user
-- Use `o3-mini` as the default model for all OpenAI API calls
+- Use `o4-mini` as the default model for all OpenAI API calls
 - Maintain model consistency across the application
 - Document model choices in comments for future reference
 
