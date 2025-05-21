@@ -9,6 +9,8 @@ interface Factor {
   diversity: number;
   priority: 'high' | 'medium' | 'low' | 'required';
   isMatch?: boolean;
+  ignored?: boolean;
+  order?: number;
 }
 
 interface CSVData {
@@ -409,10 +411,10 @@ export default function TeamingPage() {
     if (!teams.length) return;
 
     // Create CSV content
-    const headers = 'id,email,team_name\n';
+    const headers = 'id,team_name\n';
     const rows = teams.flatMap(team => 
       team.members.map(member => 
-        `${member.id},${member.email},"${team.name}"`
+        `${member.id},"${team.name}"`
       )
     ).join('\n');
     
@@ -611,7 +613,7 @@ export default function TeamingPage() {
             <h3 className="font-medium text-lg mb-3">Factor Settings</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {config.factors.map((factor) => (
+              {config.factors.map((factor, idx) => (
                 <div key={factor.name} className={`border rounded-md p-4 ${factor.isMatch ? 'bg-purple-50 border-purple-200' : ''}`}>
                   <div className="flex justify-between items-center mb-2">
                     <h4 className="font-semibold">{factor.name}</h4>
@@ -670,6 +672,48 @@ export default function TeamingPage() {
                         </button>
                       ))}
                     </div>
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <label className="mr-2 text-sm">Ignore</label>
+                    <input
+                      type="checkbox"
+                      checked={!!factor.ignored}
+                      onChange={() => setConfig(prev => ({
+                        ...prev,
+                        factors: prev.factors.map(f =>
+                          f.name === factor.name ? { ...f, ignored: !f.ignored } : f
+                        ),
+                      }))}
+                    />
+                    <span className="ml-4 text-sm">Order</span>
+                    <button
+                      className="ml-1 px-2 py-0.5 border rounded"
+                      onClick={() => setConfig(prev => ({
+                        ...prev,
+                        factors: prev.factors.map(f =>
+                          f.name === factor.name && (f.order ?? idx) > 0
+                            ? { ...f, order: (f.order ?? idx) - 1 }
+                            : f.name !== factor.name && (f.order ?? prev.factors.findIndex(ff => ff.name === f.name)) === (f.order ?? idx) - 1
+                              ? { ...f, order: (f.order ?? idx) }
+                              : f
+                        ),
+                      }))}
+                      disabled={(factor.order ?? idx) === 0}
+                    >↑</button>
+                    <button
+                      className="ml-1 px-2 py-0.5 border rounded"
+                      onClick={() => setConfig(prev => ({
+                        ...prev,
+                        factors: prev.factors.map(f =>
+                          f.name === factor.name && (f.order ?? idx) < prev.factors.length - 1
+                            ? { ...f, order: (f.order ?? idx) + 1 }
+                            : f.name !== factor.name && (f.order ?? prev.factors.findIndex(ff => ff.name === f.name)) === (f.order ?? idx) + 1
+                              ? { ...f, order: (f.order ?? idx) }
+                              : f
+                        ),
+                      }))}
+                      disabled={(factor.order ?? idx) === config.factors.length - 1}
+                    >↓</button>
                   </div>
                 </div>
               ))}
@@ -838,7 +882,7 @@ export default function TeamingPage() {
                         onDragStart={(e) => handleDragStart(e, member, team.id)}
                       >
                         <div className="flex justify-between items-center">
-                          <span>{member.email}</span>
+                          <span>{member.id}</span>
                           <button
                             onClick={() => togglePinMember(member, team.id)}
                             className={`p-1 rounded-full ${

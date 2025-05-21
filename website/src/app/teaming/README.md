@@ -23,6 +23,13 @@ The Team Formation Tool is a utility that helps create balanced teams from a lis
   - Drag and drop members between teams
 - **CSV Export**: Export team assignments in CSV format for easy distribution
 
+## New Features (2024)
+
+- **Ignore Factors**: You can now ignore any factor so it does not affect team formation.
+- **Factor Order**: You can set the order in which factors are considered during team formation.
+- **Unteamed Pool**: If some participants cannot be assigned to a team within ±1 of the ideal size, they will appear in an "Unteamed" pool.
+- **ID Display**: Team lists now show the participant's ID instead of their email.
+
 ## How to Use
 
 1. **Prepare Your CSV File**
@@ -134,4 +141,16 @@ The implementation includes comprehensive tests that verify:
 - Team size balancing
 - Diversity scoring for different factor types
 - Priority weighting and team optimization
-- Exact match factor enforcement 
+- Exact match factor enforcement
+
+### How to Ignore Factors
+- In the configuration step, use the "Ignore" toggle for any factor you want to exclude from team formation.
+
+### How to Set Factor Order
+- Use the up/down arrows next to each factor to set the order in which they are matched. Factors at the top are matched first.
+
+### Unteamed Pool
+- After generating teams, any participants who could not be assigned to a team within the allowed size range will be listed in the "Unteamed Participants" section.
+
+### Team List Shows ID
+- The team member list and CSV export now show the participant's `id` field instead of their email. 
