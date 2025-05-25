@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { put, list } from '@vercel/blob';
 import { SchedulerEvent, UserAvailability, ScheduledMeeting } from '@/models/scheduler';
-import OpenAI from 'openai';
+import OpenAI from 'openai/index.mjs';
 
 // Initialize OpenAI client
 const openai = new OpenAI({

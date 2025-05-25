@@ -10,8 +10,13 @@ The project is organized as a monorepo using Turborepo with the following struct
 sonnenreich-platforms/
 ├── packages/
 │   ├── shared/            # Shared utilities, components, and types
-│   ├── presentation-feature/  # Presentation functionality package
-│   └── [other-features]/  # Other feature packages
+│   ├── presentations/     # Presentation functionality package
+│   ├── contact/           # Contact package
+│   ├── events/            # Events package
+│   ├── meetings/          # Meetings package
+│   ├── teams/             # Teams package
+│   ├── template/          # Template package
+│   └── [other-features]/   # Other feature packages
 └── website/               # Main Next.js website
 ```
 

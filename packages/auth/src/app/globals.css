@@ -1,0 +1,290 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --animate-bounce-light: bounce 2s infinite;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+/* Custom utility classes for better auth UI */
+.auth-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-card {
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  .auth-card {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Enhanced button styles */
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+.btn-secondary {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  transition: all 0.2s ease;
+  border: 1px solid #e5e7eb;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-secondary:hover {
+  background-color: #e5e7eb;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-secondary {
+    background-color: #1f2937;
+    color: #e5e7eb;
+    border-color: #374151;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #374151;
+  }
+}
+
+/* Status indicators */
+.status-success {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.status-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.status-warning {
+  background-color: #fffbeb;
+  border: 1px solid #fed7aa;
+  color: #92400e;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-success {
+    background-color: #14532d;
+    border-color: #15803d;
+    color: #bbf7d0;
+  }
+  .status-error {
+    background-color: #7f1d1d;
+    border-color: #dc2626;
+    color: #fecaca;
+  }
+  .status-warning {
+    background-color: #78350f;
+    border-color: #d97706;
+    color: #fed7aa;
+  }
+}
+
+/* Improved Markdown Styling */
+.markdown-improved {
+  /* Basic Typography */
+  line-height: 1.7;
+  
+  /* Headings */
+  & h1, & h2, & h3, & h4, & h5, & h6 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    font-weight: 700;
+  }
+  
+  & h1 {
+    font-size: 2em;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.3em;
+  }
+  
+  & h2 {
+    font-size: 1.5em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.3em;
+  }
+  
+  & h3 {
+    font-size: 1.25em;
+  }
+  
+  /* Lists */
+  & ul, & ol {
+    padding-left: 2em;
+    margin: 1em 0;
+  }
+  
+  & ul {
+    list-style-type: disc;
+  }
+  
+  & ol {
+    list-style-type: decimal;
+  }
+  
+  & li {
+    margin-bottom: 0.5em;
+  }
+  
+  & li > ul, & li > ol {
+    margin: 0.5em 0;
+  }
+  
+  /* Table Styling */
+  & table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    overflow-x: auto;
+    display: block;
+  }
+  
+  & table th, & table td {
+    border: 1px solid #ddd;
+    padding: 0.75em;
+    text-align: left;
+  }
+  
+  & table th {
+    background-color: rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+  }
+  
+  & table tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.025);
+  }
+  
+  /* Dark mode table adjustments */
+  @media (prefers-color-scheme: dark) {
+    & table th, & table td {
+      border-color: #444;
+    }
+    
+    & table th {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    & table tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+  
+  /* Code blocks */
+  & pre, & code {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+    font-family: monospace;
+  }
+  
+  & pre {
+    padding: 1em;
+    overflow-x: auto;
+    margin: 1em 0;
+  }
+  
+  & code {
+    padding: 0.2em 0.4em;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    & pre, & code {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+  
+  /* Blockquotes */
+  & blockquote {
+    border-left: 4px solid #ddd;
+    padding-left: 1em;
+    margin: 1em 0;
+    color: rgba(0, 0, 0, 0.7);
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    & blockquote {
+      border-left-color: #555;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+  
+  /* Images */
+  & img {
+    max-width: 100%;
+    height: auto;
+    margin: 1em 0;
+  }
+  
+  /* Paragraphs and spacing */
+  & p {
+    margin: 1em 0;
+  }
+  
+  /* Horizontal rule */
+  & hr {
+    height: 1px;
+    background-color: #ddd;
+    border: none;
+    margin: 2em 0;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    & hr {
+      background-color: #444;
+    }
+  }
+}

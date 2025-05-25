@@ -1,11 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "incremental": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "tsup.config.ts"],
+  "include": ["src", "tsup.config.ts", "../presentations/src/app/presentations/[categoryId]/[presentationId]/TabsContainer.tsx"],
   "exclude": ["node_modules", "dist"]
 } 

@@ -1,55 +1,78 @@
-# Presentations Repository
+# High Point Platform
 
-This repository contains various presentations organized by category.
+This is the monorepo for High Point, a solo-entrepreneur platform for running an AI native advisory business.
 
-## Categories
+The platform is a series of NextJS packages that can be run standalone or integrated into a larger system. They are all used together as part of the High Point website, which serves as a demo for all the functionality.
 
-- **Technical** - Deep dives into technical topics, code walkthroughs, and architecture discussions.
-- **Business** - Business strategies, market analyses, and investment opportunities.
-- **Education** - Learning materials, tutorials, and educational resources.
+## Why High Point?
 
-## Viewing Presentations
+High Point is named in memory of Camp High Point, a camp in the Adirondacks that my family used to run.
 
-The presentations in this repository can be viewed through our NextJS web application, which organizes and displays them with a user-friendly interface.
+The name "High Point" also refers to the idea of a high point in a complex system - a point that is a good starting point for a business.
 
-### Running Locally
+## Vibeware
 
-To run the presentation viewer locally:
+This platform is being provide as "vibeware" - which is a modern version of "shareware" but for software built using AI. 
 
-1. Clone this repository
-2. Navigate to the website directory:
-   ```bash
-   cd website
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-5. Open your browser and navigate to `http://localhost:3000`
+If you're like me, your github is littered with 50-80% complete projects that were vibecoded. Rather than consign these to the digital dump heap, we can share them, learn from them and possibly even get them to a place where they are useful.
 
-### Contributing New Presentations
+Vibeware donations go to a specific package in the platform. The amount donated and by whom is tracked and displayed on the package's github page. This gives me an indication of how much the community cares about the package and helps to prioritize development.
 
-To add a new presentation:
+There is no guarantee of any kind that a donation will result in any kind of feature being added. It's just a way to say "thank you" for the platform and to help support future development.
 
-1. Create a directory for your presentation in the appropriate category folder (technical, business, education)
-2. Place your presentation files in the directory
-3. If your presentation is a standalone HTML presentation, make sure there's an `index.html` file
-4. The presentation will automatically appear in the web interface
+That said, I'm always happy to chat about what you'd like to see!
 
-## Deployment
+However, I think we're getting close to the point where a feature request can be implemented as a PR automatically by an AI agent. Once I have that capability in the system I'll set up a donation system where it estimates the cost of the feature (AI calls and human review) and then quotes the donation amount needed. 
 
-The website is automatically deployed to GitHub Pages when changes are pushed to the main branch.
 
-## License
+# Packages
 
-See the [LICENSE](LICENSE) file for details.
+## Meetings
 
-# AI Tinkerers
+This is both a Calendly/Doodle replacement and something a bit more to help with complex multi-party scheduling using AI.
 
-**Sept. 23, 2024:** [Hands on with the OpenAI Assistant API](/presentations/ai-tinkerers/sept-24) 
+## Events
 
-**Feb. 25, 2025:** [Hands on with Cursor](/presentations/ai-tinkerers/feb-25/cursor) 
+This is a simple event management system that allows you to create events and manage sign-ups / attendance.
+
+## Presentations
+
+This is the Present Presentations system, which allows you to talk and have a presentation created dynamically based on your talk.
+
+## Teaming
+
+This is a sophisticated team formation tool that takes an arbitrary set of participants forms them into a set of optimized teams based on an arbitrary set of constraints.
+
+## Expert
+
+This system allows you to build an AI Expert using prompts and documents - it's a simple RAG tool meant to be used as a starting point for more complex AI systems.
+
+It has a chat interface for asking questions interactively but also works via API.
+
+## Form
+
+This lets you create forms to collect structured data and documents from users. Given some initial context data, it can search the web and or uploaded documents to automatically populate the form.
+
+## Feedback
+
+This lets you define criteria/rubrics and collect evaluations on structured data and documents. It allows you to assign human and AI experts to collect feedback.
+
+It also has an in-document commenting/endorsing/challenging system.
+
+## Contact
+
+This is a simple web-based contact form. It might get less simple in the future.
+
+# Using multiple packages together
+
+Let's say you want to create a new event and you want to use the Expert to answer questions about the event. After the event you create a summary document and want to allow attendees to provide feedback on the event via in-document comments.
+
+You can do this by using the following packages:
+
+- Events
+- Expert
+- Feedback
+
+
+## Running the platform
+

@@ -8,13 +8,22 @@
   ],
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "dev": "turbo dev --concurrency=15",  
+    "dev:auth": "turbo dev --filter=@sonnenreich/auth",
+    "dev:meetings": "turbo dev --filter=@sonnenreich/auth --filter=@sonnenreich/meetings",
+    "dev:events": "turbo dev --filter=@sonnenreich/auth --filter=@sonnenreich/events",
+  
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
     "turbo": "latest",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0"
   },
   "packageManager": "npm@10.0.0"
 } 

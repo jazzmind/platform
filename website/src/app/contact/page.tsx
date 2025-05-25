@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { sendContactEmail } from "./actions";
-import ContactForm from "./ContactForm";
+import { sendContactEmail } from "@sonnenreich/contact/action";
+import ContactForm from "@sonnenreich/contact/form";
 
 export default function ContactPage() {
   return (

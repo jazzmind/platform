@@ -1,0 +1,46 @@
+// This is your Prisma schema file for the presentation feature plugin
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Model for remote presentation pairing
+model PresentationPairing {
+  id               String   @id @default(cuid())
+  pairingCode      String   @unique
+  presentationId   String
+  categoryId       String
+  isPaired         Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  lastUpdated      DateTime @updatedAt
+  currentPromptIndex Int    @default(0)
+  controllerCommands Json?  @default("[]")
+  
+  // Timer state
+  timerTimeLeft    Int?
+  timerIsRunning   Boolean  @default(false)
+  timerStartTime   BigInt?
+  
+  @@index([pairingCode])
+  @@index([presentationId, pairingCode])
+}
+
+// Model for WebRTC signaling messages
+model SignalingMessage {
+  id          String   @id @default(cuid())
+  sessionId   String
+  role        String
+  type        String
+  data        Json
+  processed   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId, processed])
+  @@index([sessionId, role, processed])
+} 

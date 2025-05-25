@@ -1,0 +1,91 @@
+// This is your Prisma schema file for the presentation feature plugin
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model MeetingEvent {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  objective       String?
+  location        String?
+  organizerId     String    // References User.id from the auth package
+  createdBy       String?   // Could be same as organizerId or another identifier
+  participantIds  String[]  // Stores user IDs of potential or invited participants
+  calendarIds     String[]  // IDs of calendars to check for group events
+  isGroupEvent    Boolean   @default(false)
+  duration        Int?      // Duration in minutes
+  dateRangeStart  DateTime?
+  dateRangeEnd    DateTime?
+  frequency       String?   // e.g., "weekly", "bi-weekly", or a cron string for recurring
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Potentially, link to the User model in the auth package via API, not direct relation
+  // organizer User @relation(fields: [organizerId], references: [id]) // This would require a monolithic schema
+
+  userAvailabilities UserAvailability[]
+  scheduledMeetings  ScheduledMeeting[]
+
+  @@index([organizerId])
+}
+
+model UserAvailability {
+  id             String   @id @default(cuid())
+  meetingEventId String
+  userId         String   // References User.id from the auth package
+  calendarId     String?  // Specific calendar if user has multiple
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  meetingEvent MeetingEvent @relation(fields: [meetingEventId], references: [id], onDelete: Cascade)
+  // user User @relation(fields: [userId], references: [id]) // Again, API-based link
+
+  availableSlots Json // Array of { startTime: DateTime, endTime: DateTime }
+
+  @@unique([meetingEventId, userId, calendarId])
+  @@index([meetingEventId])
+  @@index([userId])
+}
+
+model ScheduledMeeting {
+  id           String   @id @default(cuid())
+  meetingEventId String
+  title        String
+  startTime    DateTime
+  endTime      DateTime
+  location     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  meetingEvent MeetingEvent @relation(fields: [meetingEventId], references: [id], onDelete: Cascade)
+
+  participantIds String[] // Stores user IDs of confirmed participants
+  // participants User[] @relation(...) // API-based link
+
+  @@index([meetingEventId])
+}
+
+// You might also want a model for OAuth connections if meetings package directly handles them
+// However, per our strategy, this might live in the @sonnenreich/auth package primarily.
+// model CalendarConnection {
+//   id String @id @default(cuid())
+//   userId String // References User.id from the auth package
+//   provider String // e.g., "google", "outlook"
+//   accessToken String @db.Text
+//   refreshToken String? @db.Text
+//   expiresAt DateTime?
+//   scope String?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//
+//   @@unique([userId, provider])
+//   @@index([userId])
+// }

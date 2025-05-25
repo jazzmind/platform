@@ -2,7 +2,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import OpenAI from 'openai';
+import OpenAI from 'openai/index.mjs';
 import { checkRateLimit, cleanupRateLimits } from '@/lib/rate-limit';
 
 // Initialize OpenAI client

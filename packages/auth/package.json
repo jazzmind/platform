@@ -1,0 +1,35 @@
+{
+  "name": "@sonnenreich/auth",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "next lint",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.4.1",
+    "@prisma/client": "^6.6.0",
+    "@simplewebauthn/browser": "^9.0.1",
+    "@simplewebauthn/server": "^9.0.3",
+    "@sonnenreich/shared": "workspace:*",
+    "@tailwindcss/postcss": "^4.1.7",
+    "next": "^15.3.0",
+    "next-auth": "^5.0.0-beta.19",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.31",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.7",
+    "postcss": "^8",
+    "prisma": "^6.6.0",
+    "tailwindcss": "^4.1.7",
+    "typescript": "^5"
+  }
+}
