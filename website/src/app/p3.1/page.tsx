@@ -294,15 +294,15 @@ export default function P3Dashboard() {
             };
 
             return (
-              <div key={event.id} className={`flex items-center gap-3 p-3 ${colorClasses[event.color]} border-l-4 rounded transition-all duration-300`}>
-                <IconComponent className={`w-5 h-5 ${iconColorClasses[event.color]}`} />
+              <div key={event.id} className={`flex items-center gap-3 p-3 ${colorClasses[event.color as keyof typeof colorClasses]} border-l-4 rounded transition-all duration-300`}>
+                <IconComponent className={`w-5 h-5 ${iconColorClasses[event.color as keyof typeof iconColorClasses]}`} />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-slate-900">{event.title}</p>
                   <p className="text-sm text-slate-600">{event.description}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-500">{event.time}</span>
-                  <span className={`text-xs ${buttonColorClasses[event.color]} text-white px-2 py-1 rounded`}>
+                  <span className={`text-xs ${buttonColorClasses[event.color as keyof typeof buttonColorClasses]} text-white px-2 py-1 rounded`}>
                     {event.action}
                   </span>
                 </div>
