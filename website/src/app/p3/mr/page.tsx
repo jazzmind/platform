@@ -1,26 +1,8 @@
-import Link from 'next/link'
 
 export default function MRReadyPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">Practera Educator Workspace 2.0</h1>
-              <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">AI-First</span>
-            </div>
-            <nav className="flex space-x-8">
-              <Link href="/p3" className="text-gray-700 hover:text-blue-600 pb-2">Dashboard</Link>
-              <Link href="/p3/projects" className="text-gray-700 hover:text-blue-600 pb-2">Projects</Link>
-              <Link href="/p3/analytics" className="text-gray-700 hover:text-blue-600 pb-2">Analytics</Link>
-              <Link href="/p3/capture" className="text-gray-700 hover:text-blue-600 pb-2">Capture Hub</Link>
-              <Link href="/p3/mr" className="text-blue-600 border-b-2 border-blue-600 pb-2">MR Ready</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+ 
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

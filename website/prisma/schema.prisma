@@ -44,3 +44,344 @@ model SignalingMessage {
   @@index([sessionId, processed])
   @@index([sessionId, role, processed])
 } 
+
+// Model for Practera collaborators (p3 commenting system)
+model P3Collaborator {
+  id                String      @id @default(cuid())
+  email             String      @unique
+  name              String
+  verifiedAt        DateTime?
+  verificationToken String?     @unique
+  authToken         String?     @unique
+  authTokenExpiry   DateTime?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  // Relations
+  comments          P3ElementComment[]
+  
+  @@index([email])
+  @@index([verificationToken])
+  @@index([authToken])
+}
+
+// Model for element comments on p3 mockup
+model P3ElementComment {
+  id              String      @id @default(cuid())
+  pageId          String      // 'dashboard', 'projects', etc.
+  elementSelector String      // CSS selector for the element
+  elementPath     String      // Human-readable element path
+  type            P3CommentType
+  text            String
+  isAnonymous     Boolean     @default(false)
+  position        Json        // { x: number, y: number }
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Relations
+  collaboratorId  String
+  collaborator    P3Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade)
+  
+  @@index([pageId])
+  @@index([collaboratorId])
+  @@index([createdAt])
+}
+
+// Enum for comment types
+enum P3CommentType {
+  ENDORSE
+  CHALLENGE
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId]) // Index for faster queries on userId
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId]) // Index for faster queries on userId
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String?         @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  authenticators Authenticator[]
+  passkeyChallenge PasskeyChallenge?
+  
+  // Authorization relationships
+  roleAssignments   RoleAssignment[]
+  resourceAccess    ResourceAccess[]
+  grantedRoles      RoleAssignment[] @relation("GrantedRoles")
+  grantedAccess     ResourceAccess[] @relation("GrantedAccess")
+  auditLogs         AuthAuditLog[]
+  
+  // Add other global user profile fields here if necessary
+  // Example: role String? @default("user")
+}
+
+model VerificationToken {
+  id                  String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Model for WebAuthn (Passkey) authenticators
+model Authenticator {
+  id                  String   @id @default(cuid())
+  userId              String
+  credentialID        Bytes    @unique
+  credentialPublicKey Bytes
+  counter             BigInt
+  credentialDeviceType String? @default("platform")
+  credentialBackedUp   Boolean? @default(false)
+  transports          String[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasskeyChallenge {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  challenge String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// AUTHORIZATION SYSTEM MODELS
+// ============================================================================
+
+// Package registry for authorization
+model Package {
+  id                String @id @default(cuid())
+  name              String @unique  // e.g., "meetings", "presentations"
+  displayName       String          // e.g., "Meeting Scheduler"
+  description       String?
+  registrationType  RegistrationType @default(APPROVAL_REQUIRED)
+  isActive          Boolean @default(true)
+  
+  // Relationships
+  permissions       Permission[]
+  roles             Role[]
+  roleAssignments   RoleAssignment[]
+  resourceAccess    ResourceAccess[]
+  auditLogs         AuthAuditLog[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([name])
+  @@index([isActive])
+}
+
+// Flexible role system
+model Role {
+  id                String @id @default(cuid())
+  name              String                    // e.g., "meeting-owner", "viewer"
+  displayName       String                    // e.g., "Meeting Owner"
+  description       String?
+  packageId         String?                   // null for system-wide roles
+  isSystemRole      Boolean @default(false)  // true for global roles like ADMIN
+  isActive          Boolean @default(true)
+  
+  // Relationships
+  package           Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  permissions       RolePermission[]
+  assignments       RoleAssignment[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([name, packageId])
+  @@index([packageId])
+  @@index([isSystemRole])
+}
+
+// Package-specific permissions (OAuth-style scopes)
+model Permission {
+  id                String @id @default(cuid())
+  name              String              // e.g., "meeting:read", "meeting:write"
+  displayName       String              // e.g., "View Meetings"
+  description       String?
+  packageId         String
+  category          String?             // e.g., "read", "write", "admin"
+  isActive          Boolean @default(true)
+  
+  // Relationships
+  package           Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  rolePermissions   RolePermission[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([name, packageId])
+  @@index([packageId])
+  @@index([category])
+}
+
+// Many-to-many relationship between roles and permissions
+model RolePermission {
+  id          String @id @default(cuid())
+  roleId      String
+  permissionId String
+  
+  role        Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+// User role assignments with context
+model RoleAssignment {
+  id                String @id @default(cuid())
+  userId            String
+  roleId            String
+  packageId         String?             // for package-specific role assignments
+  resourceType      String?             // e.g., "meeting", "presentation"
+  resourceId        String?             // specific resource ID
+  grantedBy         String?             // who granted this role
+  expiresAt         DateTime?           // optional expiration
+  isActive          Boolean @default(true)
+  metadata          Json?               // additional context data
+  
+  // Relationships
+  user              User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role              Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  package           Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  grantedByUser     User? @relation("GrantedRoles", fields: [grantedBy], references: [id])
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([userId, roleId, packageId, resourceType, resourceId])
+  @@index([userId])
+  @@index([roleId])
+  @@index([packageId])
+  @@index([resourceType, resourceId])
+  @@index([isActive])
+}
+
+// Direct resource access control (for specific permissions like meeting ownership)
+model ResourceAccess {
+  id                String @id @default(cuid())
+  userId            String
+  packageId         String
+  resourceType      String              // e.g., "meeting", "presentation"
+  resourceId        String              // specific resource ID
+  accessType        AccessType
+  grantedBy         String?             // who granted this access
+  expiresAt         DateTime?           // optional expiration
+  isActive          Boolean @default(true)
+  metadata          Json?               // additional context data
+  
+  // Relationships
+  user              User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package           Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  grantedByUser     User? @relation("GrantedAccess", fields: [grantedBy], references: [id])
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([userId, packageId, resourceType, resourceId, accessType])
+  @@index([userId])
+  @@index([packageId])
+  @@index([resourceType, resourceId])
+  @@index([accessType])
+  @@index([isActive])
+}
+
+// Audit log for authorization changes
+model AuthAuditLog {
+  id                String @id @default(cuid())
+  userId            String?             // user who performed the action
+  targetUserId      String?             // user who was affected
+  packageId         String?
+  action            AuditAction
+  resourceType      String?
+  resourceId        String?
+  details           Json?               // additional details about the action
+  ipAddress         String?
+  userAgent         String?
+  
+  // Relationships
+  user              User? @relation(fields: [userId], references: [id])
+  package           Package? @relation(fields: [packageId], references: [id])
+  
+  createdAt         DateTime @default(now())
+  
+  @@index([userId])
+  @@index([targetUserId])
+  @@index([packageId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// AUTHORIZATION ENUMS
+// ============================================================================
+
+enum RegistrationType {
+  SELF_REGISTER      // Users can automatically get access
+  APPROVAL_REQUIRED  // Requires admin approval
+  ADMIN_ONLY         // Only admins can grant access
+}
+
+enum AccessType {
+  OWNER              // Full control over resource
+  EDITOR             // Can edit resource
+  VIEWER             // Read-only access
+  LIMITED_EDITOR     // Restricted editing (e.g., booking only)
+  COLLABORATOR       // Can contribute/comment
+  CUSTOM             // Custom access level
+}
+
+enum AuditAction {
+  ROLE_ASSIGNED
+  ROLE_REVOKED
+  PERMISSION_GRANTED
+  PERMISSION_REVOKED
+  RESOURCE_ACCESS_GRANTED
+  RESOURCE_ACCESS_REVOKED
+  PACKAGE_REGISTERED
+  PACKAGE_DEACTIVATED
+  USER_APPROVED
+  USER_DENIED
+}

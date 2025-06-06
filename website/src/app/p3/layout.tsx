@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import FloatingCommentWidget from '@/components/FloatingCommentWidget'
 
 export default function P3Layout({
   children,
@@ -67,6 +68,9 @@ export default function P3Layout({
       <main className="flex-1 overflow-auto">
         {children}
       </main>
+      
+      {/* Floating Comment Widget */}
+      <FloatingCommentWidget pageId="p3" />
     </div>
   )
 }
