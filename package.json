@@ -12,6 +12,7 @@
     "dev:auth": "turbo dev --filter=@sonnenreich/auth",
     "dev:meetings": "turbo dev --filter=@sonnenreich/auth --filter=@sonnenreich/meetings",
     "dev:events": "turbo dev --filter=@sonnenreich/auth --filter=@sonnenreich/events",
+    "dev:bgmaker": "turbo dev --filter=@sonnenreich/bgmaker",
   
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""

@@ -1,0 +1,61 @@
+{
+  "name": "@sonnenreich/bgmaker",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**",
+    "src/app/**",
+    "src/components/**",
+    "public/**",
+    "next.config.js",
+    "tailwind.config.js",
+    "postcss.config.js",
+    "tsconfig.json"
+  ],
+  "scripts": {
+    "dev": "next dev -p 3003",
+    "build:app": "next build",
+    "start": "next start -p 3003",
+    "lint": "next lint",
+    "build": "tsup",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist && rm -rf .next"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "module": "./dist/index.mjs",
+      "import": "./dist/index.js"
+    },
+    "./generator": {
+      "types": "./dist/BackgroundGenerator.d.ts",
+      "module": "./dist/BackgroundGenerator.mjs",
+      "import": "./dist/BackgroundGenerator.js"
+    }
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "lucide-react": "^0.503.0",
+    "next": "^15.3.0",
+    "openai": "^4.103.0",
+    "qrcode": "^1.5.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.31",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.0.1",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.7",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "tsup": "^8.0.0",
+    "typescript": "^5"
+  }
+}
