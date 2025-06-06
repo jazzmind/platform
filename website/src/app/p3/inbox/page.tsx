@@ -1,314 +1,274 @@
+import React from 'react';
+import { Mail, MessageSquare, Phone, Calendar, Clock, AlertTriangle, CheckCircle, Users, ArrowRight } from 'lucide-react';
+import HelpBadge from '../../../components/HelpBadge';
 
-export default function UnifiedInboxPage() {
+export default function InboxPage() {
+  const messages = [
+    {
+      id: 1,
+      type: 'email',
+      from: 'Dr. Sarah Mitchell',
+      subject: 'Team Gamma API Integration - Urgent Support Needed',
+      preview: 'Hi, our team is completely stuck on the authentication...',
+      channel: 'Email',
+      time: '2 min ago',
+      priority: 'urgent',
+      sla: '22h remaining',
+      thread: 3,
+      unread: true
+    },
+    {
+      id: 2,
+      type: 'chat',
+      from: 'Alex Chen (Team Beta)',
+      subject: 'Sprint Review Questions',
+      preview: 'Should we include the user testing results in...',
+      channel: 'Platform Chat',
+      time: '15 min ago',
+      priority: 'normal',
+      sla: '46h remaining',
+      thread: 1,
+      unread: true
+    },
+    {
+      id: 3,
+      type: 'sms',
+      from: 'Jordan Kim',
+      subject: 'Meeting Reminder',
+      preview: 'Hey, just confirming our 3pm check-in today?',
+      channel: 'SMS',
+      time: '1h ago',
+      priority: 'low',
+      sla: '70h remaining',
+      thread: 1,
+      unread: false
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Unified Communication Inbox</h2>
-            <p className="text-gray-600">All channels in one place: chat, email, SMS with threaded conversations and AI assistance</p>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-gray-900">Unified Inbox</h1>
+          <HelpBadge topic="unified-inbox" position="bottom" content="" />
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            2 urgent messages
           </div>
-          <div className="flex space-x-3">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-              Compose Message
-            </button>
-            <button className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors">
-              Bulk Actions
-            </button>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            Compose
+          </button>
+        </div>
+      </div>
+
+      {/* SLA Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-lg border shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Total Messages</p>
+              <p className="text-2xl font-bold text-gray-900">24</p>
+            </div>
+            <Mail className="w-8 h-8 text-blue-500" />
           </div>
         </div>
-
-        {/* Inbox Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Urgent Responses</p>
-                <p className="text-2xl font-semibold text-gray-900">3</p>
-                <p className="text-xs text-red-600">SLA overdue</p>
-              </div>
+        
+        <div className="bg-white p-4 rounded-lg border shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Unread</p>
+              <p className="text-2xl font-bold text-gray-900">7</p>
             </div>
+            <MessageSquare className="w-8 h-8 text-green-500" />
           </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Pending</p>
-                <p className="text-2xl font-semibold text-gray-900">12</p>
-                <p className="text-xs text-orange-600">Within 24h</p>
-              </div>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg border shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">SLA Breached</p>
+              <p className="text-2xl font-bold text-red-600">2</p>
             </div>
+            <AlertTriangle className="w-8 h-8 text-red-500" />
           </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">AI Drafts Ready</p>
-                <p className="text-2xl font-semibold text-gray-900">8</p>
-                <p className="text-xs text-blue-600">Review & send</p>
-              </div>
+        </div>
+        
+        <div className="bg-white p-4 rounded-lg border shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Avg Response</p>
+              <p className="text-2xl font-bold text-gray-900">4.2h</p>
             </div>
+            <Clock className="w-8 h-8 text-purple-500" />
           </div>
+        </div>
+      </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Resolved Today</p>
-                <p className="text-2xl font-semibold text-gray-900">24</p>
-                <p className="text-xs text-green-600">Avg 2.3h response</p>
-              </div>
+      {/* AI Draft Helper */}
+      <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">AI Reply Assistant</h2>
+          <HelpBadge topic="unified-inbox" content="**AI-Drafted Replies**
+
+The platform analyzes conversation context and suggests appropriate responses for different communication channels, maintaining the right tone and format for email vs SMS vs chat." />
+        </div>
+        <p className="text-gray-600 mb-4">
+          AI analyzes context and generates draft replies appropriate for each channel. Review, edit, and send.
+        </p>
+        <div className="flex gap-3">
+          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+            Generate Draft
+          </button>
+          <button className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50">
+            Quick Macros
+          </button>
+        </div>
+      </div>
+
+      {/* Message List */}
+      <div className="bg-white rounded-lg border shadow-sm">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-semibold text-gray-900">Messages</h2>
+              <HelpBadge 
+                topic="unified-inbox" 
+                content="**Omni-Channel Threading**
+
+All communications with a student or team are threaded together regardless of channel (email, SMS, chat). Responses automatically go back through the same channel they came from." 
+              />
+            </div>
+            <div className="flex gap-2">
+              <button className="text-sm px-3 py-1 bg-gray-100 rounded-lg hover:bg-gray-200">All</button>
+              <button className="text-sm px-3 py-1 hover:bg-gray-100 rounded-lg">Unread</button>
+              <button className="text-sm px-3 py-1 hover:bg-gray-100 rounded-lg">Urgent</button>
             </div>
           </div>
         </div>
+        
+        <div className="divide-y divide-gray-200">
+          {messages.map((message) => (
+            <div key={message.id} className={`p-6 hover:bg-gray-50 cursor-pointer ${message.unread ? 'bg-blue-50' : ''}`}>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  {message.type === 'email' && <Mail className="w-5 h-5 text-blue-600" />}
+                  {message.type === 'chat' && <MessageSquare className="w-5 h-5 text-green-600" />}
+                  {message.type === 'sms' && <Phone className="w-5 h-5 text-purple-600" />}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className={`font-medium ${message.unread ? 'text-gray-900' : 'text-gray-700'}`}>
+                      {message.from}
+                    </h3>
+                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                      {message.channel}
+                    </span>
+                    {message.thread > 1 && (
+                      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
+                        {message.thread} messages
+                      </span>
+                    )}
+                    {message.priority === 'urgent' && (
+                      <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
+                        Urgent
+                      </span>
+                    )}
+                  </div>
+                  
+                  <h4 className={`text-sm mb-2 ${message.unread ? 'font-medium text-gray-900' : 'text-gray-700'}`}>
+                    {message.subject}
+                  </h4>
+                  
+                  <p className="text-sm text-gray-600 mb-3">
+                    {message.preview}
+                  </p>
+                  
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <span>{message.time}</span>
+                    <span className={`px-2 py-1 rounded ${
+                      message.priority === 'urgent' 
+                        ? 'bg-red-100 text-red-700' 
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      SLA: {message.sla}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <button className="text-blue-600 hover:text-blue-800 text-sm">
+                    Reply
+                  </button>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-        {/* Urgent Thread - Taylor Brooks Team Issue */}
-        <div className="bg-white rounded-lg shadow mb-8 border-l-4 border-red-400">
-          <div className="px-6 py-4 border-b border-red-200 bg-red-50">
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg border shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Channel Distribution</h3>
+            <HelpBadge 
+              topic="unified-inbox" 
+              content="**Multi-Channel Analytics**
+
+Track communication patterns across all channels to understand how students and experts prefer to communicate, and ensure consistent response times regardless of channel." 
+            />
+          </div>
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-red-800 flex items-center">
-                🚨 URGENT: Team Gamma - API Integration Crisis
-                <span className="ml-2 px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full">SLA Overdue 4h</span>
-              </h3>
-              <div className="flex space-x-2">
-                <button className="bg-red-600 text-white px-3 py-1 text-sm rounded hover:bg-red-700">
-                  Send AI Response
-                </button>
-                <button className="border border-red-300 text-red-700 px-3 py-1 text-sm rounded hover:bg-red-50">
-                  Schedule Emergency Call
-                </button>
+              <div className="flex items-center gap-2">
+                <Mail size={16} className="text-blue-600" />
+                <span className="text-sm">Email</span>
               </div>
+              <span className="text-sm font-medium">45%</span>
             </div>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              {/* Latest Message */}
-              <div className="flex space-x-3">
-                <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-white font-medium text-xs">TB</span>
-                </div>
-                <div className="flex-1">
-                  <div className="bg-red-50 rounded-lg p-3 border border-red-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-gray-900">Taylor Brooks</p>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs text-gray-500">Via SMS • 2h ago</span>
-                        <div className="flex space-x-1">
-                          <span className="w-2 h-2 bg-green-400 rounded-full" title="SMS"></span>
-                          <span className="w-2 h-2 bg-blue-400 rounded-full" title="Email"></span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-900">I tried calling the number on the syllabus but no answer. Our presentation is tomorrow and we literally can&apos;t demo anything without this working. PLEASE help us!</p>
-                  </div>
-                </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageSquare size={16} className="text-green-600" />
+                <span className="text-sm">Platform Chat</span>
               </div>
-
-              {/* AI Suggested Response */}
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <div className="flex items-start space-x-2">
-                  <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                  <div className="flex-1">
-                    <h4 className="text-sm font-medium text-blue-800 mb-2">AI Drafted Response (Ready to Send)</h4>
-                    <div className="bg-white rounded p-3 text-sm text-gray-900 border">
-                      <p className="mb-2">Hi Taylor,</p>
-                      <p className="mb-2">I can see you&apos;re facing urgent API integration issues with your presentation tomorrow. I&apos;ve noticed Alex from Team Delta offered help in chat - that&apos;s a great peer resource since they resolved a similar issue recently.</p>
-                      <p className="mb-2">I&apos;m also scheduling a 30-minute emergency help session with our technical coach at 2 PM today. The calendar invite includes a pre-call checklist to help diagnose the exact issue.</p>
-                      <p>Let&apos;s get this resolved quickly!</p>
-                      <p className="mt-2 font-medium">Best regards,<br/>Professor Davis</p>
-                    </div>
-                    <div className="flex space-x-2 mt-3">
-                      <button className="bg-blue-600 text-white px-3 py-2 text-sm rounded hover:bg-blue-700">Send Now</button>
-                      <button className="border border-gray-300 text-gray-700 px-3 py-2 text-sm rounded hover:bg-gray-50">Edit First</button>
-                      <button className="text-sm text-gray-600 hover:text-gray-800">Generate Different</button>
-                    </div>
-                  </div>
-                </div>
+              <span className="text-sm font-medium">38%</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Phone size={16} className="text-purple-600" />
+                <span className="text-sm">SMS</span>
               </div>
+              <span className="text-sm font-medium">17%</span>
             </div>
           </div>
         </div>
 
-        {/* Messages with AI Assistance */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Message List */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">Recent Conversations</h3>
+        <div className="bg-white rounded-lg border shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 text-sm">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span className="text-gray-600">Replied to Team Alpha inquiry</span>
+              <span className="text-gray-400 ml-auto">5 min ago</span>
             </div>
-            
-            <div className="divide-y divide-gray-200">
-              {/* Expert Feedback Request */}
-              <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium text-sm">MP</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-gray-900">Maria Perez (Industry Expert)</p>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs text-orange-600">Due in 6h</span>
-                        <span className="w-2 h-2 bg-blue-400 rounded-full" title="Email"></span>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">I&apos;ve reviewed Team Alpha&apos;s prototype. The technical implementation is solid, but I have concerns about the user experience flow...</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-gray-500">45 min ago</span>
-                      <div className="flex space-x-2">
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">AI Draft Ready</span>
-                        <button className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200">Forward to Team</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Team Progress Update */}
-              <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium text-sm">SC</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-gray-900">Sarah Chen (Team Lead - Delta)</p>
-                      <span className="text-xs text-gray-500">12h ago</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">Weekly update: We&apos;ve completed the user research phase and are moving into wireframe development. On track for Thursday demo.</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-gray-500">Team Delta thread • 4 messages</span>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Resolved</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Peer Help Connection */}
-              <div className="p-4 hover:bg-gray-50 cursor-pointer bg-green-50 border-l-4 border-green-400">
-                <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white font-medium text-sm">AK</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-gray-900">Alex Kumar → Taylor Brooks</p>
-                      <span className="text-xs text-green-600">Peer Helper</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">Hey Taylor, Alex from Team Delta here. We had the same API issue last week. Are you getting a 401 error or something else? I might be able to help.</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-gray-500">Via Chat • 30 min ago</span>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">AI-Facilitated Connection</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="flex items-center gap-3 text-sm">
+              <Users className="w-4 h-4 text-blue-500" />
+              <span className="text-gray-600">Escalated Team Gamma issue</span>
+              <span className="text-gray-400 ml-auto">12 min ago</span>
             </div>
-          </div>
-
-          {/* AI Communication Assistant */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">AI Communication Assistant</h3>
-            </div>
-            
-            <div className="p-6">
-              {/* Communication Insights */}
-              <div className="space-y-4 mb-6">
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <p className="text-sm font-medium text-yellow-800">🎯 Priority Action Needed</p>
-                  <p className="text-sm text-yellow-700 mt-1">Taylor&apos;s team crisis requires immediate response. AI has drafted emergency response above.</p>
-                </div>
-
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-sm font-medium text-blue-800">💡 Smart Connection Made</p>
-                  <p className="text-sm text-blue-700 mt-1">Connected Alex Kumar with Taylor Brooks - both worked on similar API issues.</p>
-                </div>
-
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <p className="text-sm font-medium text-green-800">📊 Communication Health</p>
-                  <p className="text-sm text-green-700 mt-1">94% of messages resolved within SLA this week. Team engagement up 12%.</p>
-                </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div className="space-y-3">
-                <h4 className="text-sm font-medium text-gray-900">Quick Actions</h4>
-                <button className="w-full bg-red-600 text-white py-2 px-4 rounded text-sm hover:bg-red-700">
-                  Send All Urgent Responses (3)
-                </button>
-                <button className="w-full bg-blue-600 text-white py-2 px-4 rounded text-sm hover:bg-blue-700">
-                  Review AI Drafts (8)
-                </button>
-                <button className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded text-sm hover:bg-gray-50">
-                  Schedule Bulk Office Hours
-                </button>
-                <button className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded text-sm hover:bg-gray-50">
-                  Export Communication Report
-                </button>
-              </div>
-
-              {/* Channel Performance */}
-              <div className="mt-6 pt-6 border-t">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Channel Effectiveness</h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Email</span>
-                    <div className="flex items-center">
-                      <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{width: '87%'}}></div>
-                      </div>
-                      <span className="text-sm text-gray-900">87%</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Chat</span>
-                    <div className="flex items-center">
-                      <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                        <div className="bg-green-500 h-2 rounded-full" style={{width: '94%'}}></div>
-                      </div>
-                      <span className="text-sm text-gray-900">94%</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">SMS</span>
-                    <div className="flex items-center">
-                      <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                        <div className="bg-purple-500 h-2 rounded-full" style={{width: '78%'}}></div>
-                      </div>
-                      <span className="text-sm text-gray-900">78%</span>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">Response rates in last 7 days</p>
-              </div>
+            <div className="flex items-center gap-3 text-sm">
+              <Calendar className="w-4 h-4 text-purple-500" />
+              <span className="text-gray-600">Scheduled check-in with Jordan</span>
+              <span className="text-gray-400 ml-auto">1h ago</span>
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
-  )
+  );
 } 

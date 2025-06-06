@@ -39,7 +39,8 @@ export async function POST(request: NextRequest) {
       type,
       text,
       isAnonymous,
-      position
+      position,
+      parentId
     } = await request.json();
 
     // Validate required fields
@@ -69,6 +70,7 @@ export async function POST(request: NextRequest) {
         text,
         isAnonymous: isAnonymous || false,
         position: position || { x: 0, y: 0 },
+        parentId: parentId || null,
         collaboratorId: auth.collaboratorId
       },
       include: {
@@ -91,6 +93,7 @@ export async function POST(request: NextRequest) {
       text: comment.text,
       isAnonymous: comment.isAnonymous,
       position: comment.position,
+      parentId: comment.parentId,
       createdAt: comment.createdAt,
       userName: comment.isAnonymous ? 'Anonymous' : comment.collaborator.name,
       collaboratorId: comment.collaboratorId
@@ -140,6 +143,7 @@ export async function GET(request: NextRequest) {
       text: comment.text,
       isAnonymous: comment.isAnonymous,
       position: comment.position,
+      parentId: comment.parentId,
       createdAt: comment.createdAt,
       userName: comment.isAnonymous ? 'Anonymous' : comment.collaborator.name,
       collaboratorId: comment.collaboratorId

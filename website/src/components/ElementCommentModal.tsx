@@ -4,23 +4,59 @@ import React, { useState } from 'react';
 import { Check, HelpCircle, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+interface CommentData {
+  id: string;
+  elementSelector: string;
+  elementPath: string;
+  commentType: 'ENDORSE' | 'CHALLENGE';
+  content: string;
+  isAnonymous: boolean;
+  author: string;
+  createdAt: string;
+  position?: { x: number; y: number };
+  parentId?: string;
+  replies?: CommentData[];
+}
+
 interface ElementCommentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (type: 'endorse' | 'challenge', text: string, isAnonymous: boolean) => void;
-  elementPath: string;
+  existingComment?: CommentData | null;
+  replyingTo?: CommentData | null;
 }
 
 const ElementCommentModal: React.FC<ElementCommentModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  elementPath
+  existingComment,
+  replyingTo
 }) => {
   const [feedbackType, setFeedbackType] = useState<'endorse' | 'challenge' | null>(null);
   const [feedbackText, setFeedbackText] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Initialize form based on existing comment or reply context
+  React.useEffect(() => {
+    if (existingComment) {
+      // Editing existing comment
+      setFeedbackType(existingComment.commentType.toLowerCase() as 'endorse' | 'challenge');
+      setFeedbackText(existingComment.content);
+      setIsAnonymous(existingComment.isAnonymous);
+    } else if (replyingTo) {
+      // Replying to comment - pre-fill with same type and clear text
+      setFeedbackType(replyingTo.commentType.toLowerCase() as 'endorse' | 'challenge');
+      setFeedbackText('');
+      setIsAnonymous(false);
+    } else {
+      // New comment
+      setFeedbackType(null);
+      setFeedbackText('');
+      setIsAnonymous(false);
+    }
+  }, [existingComment, replyingTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +109,7 @@ const ElementCommentModal: React.FC<ElementCommentModalProps> = ({
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">
-              Add Comment
+              {existingComment ? 'Edit Comment' : replyingTo ? `Reply to ${replyingTo.author}` : 'Add Comment'}
             </h3>
             <button
               onClick={handleClose}
@@ -83,14 +119,26 @@ const ElementCommentModal: React.FC<ElementCommentModalProps> = ({
             </button>
           </div>
           
-          {/* Element path display */}
-          <div className="bg-gray-100 p-3 rounded-md mb-4 text-sm text-gray-700">
-            <div className="font-medium mb-1">Commenting on:</div>
-            <div className="italic">{elementPath}</div>
-          </div>
+
           
+          {/* Show context for replies */}
+          {replyingTo && (
+            <div className="bg-gray-50 p-3 rounded-md mb-4 border-l-4 border-blue-500">
+              <div className="text-sm text-gray-600 mb-1">Replying to:</div>
+              <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium mb-2 ${
+                replyingTo.commentType === 'ENDORSE' 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-red-100 text-red-800'
+              }`}>
+                {replyingTo.commentType === 'ENDORSE' ? '✓ Endorse' : '! Challenge'}
+              </div>
+              <div className="text-sm italic text-gray-700">&ldquo;{replyingTo.content}&rdquo;</div>
+              <div className="text-xs text-gray-500 mt-1">by {replyingTo.author}</div>
+            </div>
+          )}
+
           {/* Comment type selection */}
-          {!feedbackType && (
+          {!feedbackType && !existingComment && (
             <div className="space-y-3 mb-4">
               <p className="text-sm text-gray-600 mb-3">
                 What type of feedback would you like to provide?

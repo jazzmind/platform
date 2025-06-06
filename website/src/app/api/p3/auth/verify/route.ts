@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { randomBytes } from 'crypto';
-import { SignJWT } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 
 const prisma = new PrismaClient();
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret-key');
@@ -104,17 +104,55 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET: Verify token and authenticate
+// GET: Verify token and authenticate OR check existing auth
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get('token');
 
+    // If no token in URL, check for existing JWT cookie
     if (!token) {
-      return NextResponse.json(
-        { error: 'Missing verification token' },
-        { status: 400 }
-      );
+      const authCookie = request.cookies.get('p3-auth');
+      
+      if (!authCookie) {
+        return NextResponse.json(
+          { error: 'Not authenticated' },
+          { status: 401 }
+        );
+      }
+
+      try {
+        // Verify the JWT
+        const { payload } = await jwtVerify(authCookie.value, JWT_SECRET);
+        
+        // Verify the collaborator still exists and is verified
+        const collaborator = await prisma.p3Collaborator.findUnique({
+          where: { 
+            id: payload.collaboratorId as string,
+            verifiedAt: { not: null }
+          }
+        });
+
+        if (!collaborator) {
+          return NextResponse.json(
+            { error: 'Invalid session' },
+            { status: 401 }
+          );
+        }
+
+        return NextResponse.json({
+          authenticated: true,
+          email: collaborator.email,
+          name: collaborator.name,
+          id: collaborator.id
+        });
+
+      } catch {
+        return NextResponse.json(
+          { error: 'Invalid session' },
+          { status: 401 }
+        );
+      }
     }
 
     // Check for verification token

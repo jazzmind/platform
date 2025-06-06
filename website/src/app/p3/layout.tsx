@@ -70,7 +70,7 @@ export default function P3Layout({
       </main>
       
       {/* Floating Comment Widget */}
-      <FloatingCommentWidget pageId="p3" />
+      <FloatingCommentWidget />
     </div>
   )
 }
