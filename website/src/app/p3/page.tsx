@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 export default function P3Dashboard() {
   return (
     <div className="p-6 space-y-6">
