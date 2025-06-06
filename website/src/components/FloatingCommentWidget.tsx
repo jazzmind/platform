@@ -5,7 +5,7 @@ import { MessageSquare, X, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ElementCommentModal from './ElementCommentModal';
 import CommentViewer from './CommentViewer';
-import P3AuthModal from './P3AuthModal';
+//import P3AuthModal from './P3AuthModal';
 
 interface ElementComment {
   id: string;
@@ -32,7 +32,7 @@ const FloatingCommentWidget: React.FC<FloatingCommentWidgetProps> = ({ pageId })
   const [showCommentViewer, setShowCommentViewer] = useState(false);
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
   const [showCommentTags, setShowCommentTags] = useState(true);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  //const [showAuthModal, setShowAuthModal] = useState(false);
   
   const mousePosition = useRef({ x: 0, y: 0 });
 
