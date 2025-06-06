@@ -5,3 +5,9 @@
 website/node_modules/**
 website/.next/**
 **/credentials.json
+node_modules
+.turbo
+**/.next
+.env
+.env.local
+**/dist

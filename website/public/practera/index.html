@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practera Educator Workspace 2.0 - Mockup Navigation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+        }
+        .header p {
+            margin: 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .mockup-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .mockup-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .mockup-card h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .mockup-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #5a67d8;
+        }
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e0;
+        }
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+        .features-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .features-list li:before {
+            content: "✓";
+            color: #48bb78;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Practera Educator Workspace 2.0</h1>
+        <p>AI-First Platform Mockup - Navigate the Future of Education</p>
+    </div>
+
+    <div class="section">
+        <h2>About This Mockup</h2>
+        <p>This browseable mockup demonstrates the vision outlined in the Practera Educator Workspace 2.0 document. Each page showcases different AI-powered features that capture learning wherever it happens, guide projects, and prove skill growth in real-time.</p>
+        
+        <h3>Key Features Demonstrated:</h3>
+        <ul class="features-list">
+            <li><strong>AI Meeting Capture:</strong> Bots join meetings to extract decisions, blockers, and learning moments</li>
+            <li><strong>Document & Code Watchers:</strong> Monitor GitHub, Google Drive, SharePoint for learning signals</li>
+            <li><strong>Project Brief Builder:</strong> Conversational wizard turns ideas into SMART goals</li>
+            <li><strong>Task Decomposition AI:</strong> Auto-creates Kanban tasks with owners and due dates</li>
+            <li><strong>Learning Velocity Analytics:</strong> Skills-as-trajectory feedback with real-time tracking</li>
+            <li><strong>Mixed Reality Integration:</strong> xAPI streaming from Unity & Unreal scenarios</li>
+            <li><strong>Cross-Modal Dashboards:</strong> Combine MR scores with expert ratings and meeting sentiment</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>Mockup Pages</h2>
+        <div class="mockup-grid">
+            <div class="mockup-card">
+                <h3>📊 Main Dashboard</h3>
+                <p>Overview of learning velocity, off-system captures, active projects, and AI insights. Shows real-time learning stream and intervention recommendations.</p>
+                <a href="/p3" class="btn">View Dashboard</a>
+                <a href="#" class="btn btn-secondary" onclick="showFeatures('dashboard')">Features</a>
+            </div>
+
+            <div class="mockup-card">
+                <h3>🚀 AI Project Scaffolding</h3>
+                <p>Project Brief Builder and Task Decomposition AI. Demonstrates conversational project creation with SMART goals and auto-generated Kanban boards.</p>
+                <a href="/p3/projects" class="btn">View Projects</a>
+                <a href="#" class="btn btn-secondary" onclick="showFeatures('projects')">Features</a>
+            </div>
+
+            <div class="mockup-card">
+                <h3>📈 Learning Velocity Analytics</h3>
+                <p>Skills-as-trajectory feedback with cohort heat maps, velocity trends, and AI intervention recommendations. Shows individual student dashboards.</p>
+                <a href="/p3/analytics" class="btn">View Analytics</a>
+                <a href="#" class="btn btn-secondary" onclick="showFeatures('analytics')">Features</a>
+            </div>
+
+            <div class="mockup-card">
+                <h3>🎯 Off-System Capture Hub</h3>
+                <p>Meeting bots, document watchers, and daily reflection nudges. Demonstrates how AI captures learning from Zoom, GitHub, Google Docs, and more.</p>
+                <a href="/p3/capture" class="btn">View Capture Hub</a>
+                <a href="#" class="btn btn-secondary" onclick="showFeatures('capture')">Features</a>
+            </div>
+
+            <div class="mockup-card">
+                <h3>🥽 Mixed Reality Integration</h3>
+                <p>MR scenarios with xAPI adapters, skill mapping, and cross-modal dashboards. Shows Unity/Unreal integration with live session monitoring.</p>
+                <a href="/p3/mr" class="btn">View MR Ready</a>
+                <a href="#" class="btn btn-secondary" onclick="showFeatures('mr')">Features</a>
+            </div>
+
+            <div class="mockup-card">
+                <h3>📋 Vision Document</h3>
+                <p>The original vision presentation that inspired this mockup. Contains the full roadmap and implementation timeline.</p>
+                <a href="/p3.html" class="btn">View Vision</a>
+                <a href="#" class="btn btn-secondary" onclick="showFeatures('vision')">Features</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Implementation Timeline</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+            <div style="border-left: 4px solid #48bb78; padding-left: 15px;">
+                <h4>Alpha • Aug–Sep 2025</h4>
+                <p>Meeting bots & Project Brief Builder live with 3 pilot courses.</p>
+            </div>
+            <div style="border-left: 4px solid #4299e1; padding-left: 15px;">
+                <h4>Beta 1 • Oct–Nov 2025</h4>
+                <p>Task Decomposition AI & Doc Watchers roll out; early KPIs tracked.</p>
+            </div>
+            <div style="border-left: 4px solid #9f7aea; padding-left: 15px;">
+                <h4>Beta 2 • Dec–Feb 2026</h4>
+                <p>Learning Velocity dashboards and MR adapters in pilot courses.</p>
+            </div>
+            <div style="border-left: 4px solid #f56565; padding-left: 15px;">
+                <h4>GA • Mar 2026</h4>
+                <p>Full MR pipeline & expanded gamification; legacy admin sunset roadmap starts.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Technical Notes</h2>
+        <p>This mockup is built using:</p>
+        <ul>
+            <li><strong>Next.js 15:</strong> React framework with App Router</li>
+            <li><strong>Tailwind CSS:</strong> Utility-first CSS framework</li>
+            <li><strong>Interactive Components:</strong> Simulated real-time data and AI responses</li>
+            <li><strong>Responsive Design:</strong> Works on desktop, tablet, and mobile</li>
+        </ul>
+        
+        <p><strong>Note:</strong> This is a static mockup for demonstration purposes. The AI interactions, real-time data, and integrations are simulated to show the intended user experience.</p>
+    </div>
+
+    <script>
+        function showFeatures(page) {
+            const features = {
+                dashboard: [
+                    "Real-time learning stream with AI-captured activities",
+                    "Learning velocity metrics and trends",
+                    "AI intervention recommendations",
+                    "System health monitoring",
+                    "Quick action shortcuts"
+                ],
+                projects: [
+                    "Conversational project brief builder",
+                    "AI task decomposition with auto-generated Kanban",
+                    "Adaptive checkpoint insertion",
+                    "Project template library",
+                    "Real-time progress tracking"
+                ],
+                analytics: [
+                    "Cohort skills heat map",
+                    "Individual velocity sparklines",
+                    "Multi-modal data integration",
+                    "At-risk learner identification",
+                    "Student self-regulation dashboard"
+                ],
+                capture: [
+                    "Meeting bot transcription and analysis",
+                    "GitHub/Google Drive/SharePoint monitoring",
+                    "Daily reflection nudge system",
+                    "Learning signal quality analytics",
+                    "Multi-platform integration status"
+                ],
+                mr: [
+                    "Unity & Unreal xAPI adapters",
+                    "Live MR session monitoring",
+                    "Skill mapping configuration",
+                    "Cross-modal performance analytics",
+                    "Developer integration guides"
+                ],
+                vision: [
+                    "Complete product vision",
+                    "Implementation roadmap",
+                    "Impact metrics and KPIs",
+                    "Technical architecture overview",
+                    "Business justification"
+                ]
+            };
+
+            alert(`Key Features:\n\n${features[page].map(f => `• ${f}`).join('\n')}`);
+        }
+    </script>
+</body>
+</html> 

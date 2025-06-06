@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practera Educator Workspace 2.0 - Interactive Mockup</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            background: #f8f9fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .intro {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .intro h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        .intro p {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .feature-card h3 {
+            color: #667eea;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .feature-card .icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        .feature-card p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .feature-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        .feature-list li {
+            padding: 5px 0;
+            color: #555;
+            position: relative;
+            padding-left: 20px;
+        }
+        .feature-list li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+        .cta-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        .cta-button:hover {
+            background: #5a6fd8;
+        }
+        .tech-specs {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .tech-specs h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .tech-category h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .tech-category ul {
+            list-style: none;
+        }
+        .tech-category li {
+            padding: 3px 0;
+            color: #666;
+            font-size: 0.95rem;
+        }
+        .personas {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .personas h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .persona-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .persona-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .persona-card h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .persona-card p {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 50px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎓 Practera Educator Workspace 2.0</h1>
+        <p>AI-First Platform Mockup - Capturing Learning Wherever It Happens</p>
+    </div>
+
+    <div class="container">
+        <div class="intro">
+            <h2>About This Interactive Mockup</h2>
+            <p>This browseable mockup demonstrates the comprehensive vision for Practera's AI-first educator workspace. Each page showcases different features that capture learning signals across meetings, documents, code repositories, and mixed reality environments.</p>
+            
+            <div class="warning">
+                <strong>Note:</strong> This is a functional prototype with simulated data. All AI interactions, student data, and system integrations are designed to demonstrate the intended user experience.
+            </div>
+            
+            <h3 style="margin-top: 20px; color: #667eea;">Key Innovation Areas:</h3>
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li><strong>Off-System Learning Capture:</strong> AI bots join meetings, monitor documents, track code changes</li>
+                <li><strong>Skills-as-Trajectory Feedback:</strong> Real-time learning velocity tracking and intervention</li>
+                <li><strong>Conversational Project Scaffolding:</strong> Natural language project setup with AI task decomposition</li>
+                <li><strong>Mixed Reality Ready:</strong> xAPI streaming from Unity & Unreal scenarios</li>
+                <li><strong>Automated Intervention Engine:</strong> Context-aware nudges and educator empowerment</li>
+            </ul>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3><span class="icon">🏠</span>Main Dashboard</h3>
+                <p>Central command center showing real-time learning velocity, AI insights, and activity streams from all integrated systems.</p>
+                <ul class="feature-list">
+                    <li>Live learning capture feed</li>
+                    <li>AI intervention recommendations</li>
+                    <li>Quick action shortcuts</li>
+                    <li>System health monitoring</li>
+                    <li>Student activity overview</li>
+                </ul>
+                <a href="/p3" class="cta-button">Explore Dashboard</a>
+            </div>
+
+            <div class="feature-card">
+                <h3><span class="icon">🚀</span>AI Project Scaffolding</h3>
+                <p>Conversational project creation that transforms vague ideas into SMART goals with intelligent task decomposition and adaptive checkpoints.</p>
+                <ul class="feature-list">
+                    <li>Project Brief Builder wizard</li>
+                    <li>Auto-generated Kanban boards</li>
+                    <li>Adaptive milestone insertion</li>
+                    <li>Template library integration</li>
+                    <li>Real-time progress tracking</li>
+                </ul>
+                <a href="/p3/projects" class="cta-button">Build Projects</a>
+            </div>
+
+            <div class="feature-card">
+                <h3><span class="icon">📊</span>Learning Velocity Analytics</h3>
+                <p>Skills-as-trajectory feedback with cohort heat maps, individual dashboards, and multi-modal data integration from all learning touchpoints.</p>
+                <ul class="feature-list">
+                    <li>Cohort skills heat mapping</li>
+                    <li>Individual velocity sparklines</li>
+                    <li>At-risk learner identification</li>
+                    <li>Cross-modal skill correlation</li>
+                    <li>Intervention effectiveness tracking</li>
+                </ul>
+                <a href="/p3/analytics" class="cta-button">View Analytics</a>
+            </div>
+
+            <div class="feature-card">
+                <h3><span class="icon">🎯</span>Off-System Capture Hub</h3>
+                <p>AI-powered monitoring that captures learning signals from meetings, documents, code repositories, and daily work without disrupting natural workflows.</p>
+                <ul class="feature-list">
+                    <li>Meeting bot transcription & analysis</li>
+                    <li>GitHub/Google Drive monitoring</li>
+                    <li>Daily reflection nudge system</li>
+                    <li>Multi-platform integration status</li>
+                    <li>Learning signal quality analytics</li>
+                </ul>
+                <a href="/p3/capture" class="cta-button">Manage Capture</a>
+            </div>
+
+            <div class="feature-card">
+                <h3><span class="icon">🥽</span>Mixed Reality Integration</h3>
+                <p>xAPI streaming from Unity & Unreal scenarios with cross-modal skill mapping, live session monitoring, and seamless platform integration.</p>
+                <ul class="feature-list">
+                    <li>Unity & Unreal xAPI adapters</li>
+                    <li>Live MR session monitoring</li>
+                    <li>Skill mapping configuration</li>
+                    <li>Cross-modal performance analytics</li>
+                    <li>Developer integration guides</li>
+                </ul>
+                <a href="/p3/mr" class="cta-button">Configure MR</a>
+            </div>
+
+            <div class="feature-card">
+                <h3><span class="icon">📬</span>Unified Communication</h3>
+                <p>Omni-channel messaging hub that aggregates communications across email, chat, SMS, and platform notifications into threaded conversations.</p>
+                <ul class="feature-list">
+                    <li>Cross-channel conversation threading</li>
+                    <li>AI-powered reply suggestions</li>
+                    <li>SLA tracking and alerts</li>
+                    <li>Response time analytics</li>
+                    <li>Bulk communication tools</li>
+                </ul>
+                <a href="/p3/inbox" class="cta-button">Manage Inbox</a>
+            </div>
+
+            <div class="feature-card">
+                <h3><span class="icon">📅</span>AI-Powered Scheduler</h3>
+                <p>Intelligent scheduling system like Calendly but designed for educational contexts with automation hooks and smart conflict resolution.</p>
+                <ul class="feature-list">
+                    <li>Smart availability pooling</li>
+                    <li>Automated meeting coordination</li>
+                    <li>Context-aware scheduling</li>
+                    <li>Integration with automations</li>
+                    <li>Meeting preparation workflows</li>
+                </ul>
+                <a href="/p3/scheduler" class="cta-button">Schedule Meetings</a>
+            </div>
+
+            <div class="feature-card">
+                <h3><span class="icon">⚡</span>Automation Management</h3>
+                <p>Natural language automation creation with visual workflow management, effectiveness analytics, and educator approval workflows.</p>
+                <ul class="feature-list">
+                    <li>Chat-based rule creation</li>
+                    <li>Visual automation editor</li>
+                    <li>Effectiveness tracking</li>
+                    <li>A/B testing framework</li>
+                    <li>Approval queue management</li>
+                </ul>
+                <a href="/p3/automations" class="cta-button">Manage Automations</a>
+            </div>
+        </div>
+
+        <div class="personas">
+            <h2>Student Personas Featured in Mockup</h2>
+            <div class="persona-grid">
+                <div class="persona-card">
+                    <h4>Sarah Chen</h4>
+                    <p>High-velocity learner, UX focus, rapid skill progression</p>
+                </div>
+                <div class="persona-card">
+                    <h4>Alex Kumar</h4>
+                    <p>Balanced technical skills, emerging leadership potential</p>
+                </div>
+                <div class="persona-card">
+                    <h4>Jordan Lee</h4>
+                    <p>Needs support, communication challenges, intervention target</p>
+                </div>
+                <div class="persona-card">
+                    <h4>Taylor Brooks</h4>
+                    <p>At-risk learner, requires immediate attention and support</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-specs">
+            <h2>Technical Implementation Overview</h2>
+            <div class="tech-grid">
+                <div class="tech-category">
+                    <h4>Frontend Framework</h4>
+                    <ul>
+                        <li>Next.js 15 with App Router</li>
+                        <li>React Server Components</li>
+                        <li>Tailwind CSS styling</li>
+                        <li>TypeScript throughout</li>
+                        <li>Mobile-first responsive design</li>
+                    </ul>
+                </div>
+                <div class="tech-category">
+                    <h4>AI & Integrations</h4>
+                    <ul>
+                        <li>OpenAI GPT-4 for conversations</li>
+                        <li>Zoom/Teams meeting bots</li>
+                        <li>GitHub API monitoring</li>
+                        <li>Google Drive watchers</li>
+                        <li>xAPI event streaming</li>
+                    </ul>
+                </div>
+                <div class="tech-category">
+                    <h4>Data Architecture</h4>
+                    <ul>
+                        <li>Event-driven design</li>
+                        <li>Real-time analytics</li>
+                        <li>Skills trajectory tracking</li>
+                        <li>Multi-modal data correlation</li>
+                        <li>Privacy-compliant storage</li>
+                    </ul>
+                </div>
+                <div class="tech-category">
+                    <h4>Platform Features</h4>
+                    <ul>
+                        <li>Automated intervention engine</li>
+                        <li>Natural language automation</li>
+                        <li>Cross-modal skill mapping</li>
+                        <li>Predictive analytics</li>
+                        <li>Educator empowerment tools</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Practera Educator Workspace 2.0</strong> - Interactive Mockup</p>
+        <p>Demonstrating the future of AI-first experiential learning platforms</p>
+        <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+            Last Updated: February 2025 | Status: Interactive Prototype
+        </p>
+    </div>
+
+    <script>
+        // Add some interactive enhancements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scroll for any anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Add hover effects to feature cards
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.borderLeftColor = '#5a6fd8';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.borderLeftColor = '#667eea';
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
