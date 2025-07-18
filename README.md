@@ -1,78 +1,217 @@
-# High Point Platform
+# Platform
 
-This is the monorepo for High Point, a solo-entrepreneur platform for running an AI native advisory business.
+A comprehensive master repository of cursor rules and project setup tools for consistent AI-assisted development.
 
-The platform is a series of NextJS packages that can be run standalone or integrated into a larger system. They are all used together as part of the High Point website, which serves as a demo for all the functionality.
+## 🚀 Quick Start
 
-## Why High Point?
+### Create a New Project
 
-High Point is named in memory of Camp High Point, a camp in the Adirondacks that my family used to run.
+```bash
+# Clone the platform repository
+git clone https://github.com/jazzmind/platform.git
+cd platform
 
-The name "High Point" also refers to the idea of a high point in a complex system - a point that is a good starting point for a business.
+# Test the setup system (recommended first run)
+node setup/test-setup.js
 
-## Vibeware
+# Create a new project with cursor rules
+./create-project
+# or
+./setup/new-project
+```
 
-This platform is being provide as "vibeware" - which is a modern version of "shareware" but for software built using AI. 
+The setup tool will guide you through creating:
+- **Business Documentation Projects**: For presentations, grants, and business content
+- **Development Projects**: Next.js applications with TypeScript  
+- **Hybrid Projects**: Both development and business capabilities
+- **Monorepos**: Multi-package projects with Turbo build system
+- **Claude-Flow Integration**: AI development orchestration
 
-If you're like me, your github is littered with 50-80% complete projects that were vibecoded. Rather than consign these to the digital dump heap, we can share them, learn from them and possibly even get them to a place where they are useful.
+## 📋 Cursor Rules System
 
-Vibeware donations go to a specific package in the platform. The amount donated and by whom is tracked and displayed on the package's github page. This gives me an indication of how much the community cares about the package and helps to prioritize development.
+This repository contains a centralized collection of cursor rules organized for maximum reusability:
 
-There is no guarantee of any kind that a donation will result in any kind of feature being added. It's just a way to say "thank you" for the platform and to help support future development.
+### Core Philosophy
+- **Centralized Management**: All rules maintained in one master repository
+- **Automatic Sync**: Projects stay updated with latest rule improvements
+- **Generalized Patterns**: Rules work for both monorepo and standalone patterns
+- **AI-Optimized**: Designed for efficient AI context usage
 
-That said, I'm always happy to chat about what you'd like to see!
+### Rule Categories
 
-However, I think we're getting close to the point where a feature request can be implemented as a PR automatically by an AI agent. Once I have that capability in the system I'll set up a donation system where it estimates the cost of the feature (AI calls and human review) and then quotes the donation amount needed. 
+#### 🏗️ Shared Rules (Always Included)
+Essential rules for any development project:
 
+- **Architecture** (`001-architect.mdc`): Planning and design patterns
+- **Error Handling** (`007-error-handling.mdc`): Systematic debugging approaches  
+- **Small Changes** (`008-small-changes.mdc`): Incremental development methodology
+- **Next.js** (`005-nextjs.mdc`): Framework-specific patterns and best practices
+- **Database** (`003-database.mdc`): Prisma ORM and multi-tenant patterns
+- **Authentication** (`004-authentication.mdc`): Security and session management
+- **UI Components** (`006-ui-components.mdc`): Component architecture and styling
+- **Documentation** (`400-md.mdc`, `401-documentation.mdc`): Standards and templates
+- **Testing** (`300-qa-testing.mdc`, `302-security-testing.mdc`): Quality assurance
 
-# Packages
+#### 💼 Business Rules (Optional)
+Specialized rules for business and presentation work:
 
-## Meetings
+- **Events** (`600-events.mdc`): Event planning and management
+- **Presentations**: Technical (`700`), business (`701`), coaching (`702`), RevealJS (`703`)
+- **Grant Writing** (`750-grant-writing.mdc`): Funding proposals and impact documentation  
+- **Renewable Energy** (`760-renewable-energy.mdc`): Industry-specific content and compliance
 
-This is both a Calendly/Doodle replacement and something a bit more to help with complex multi-party scheduling using AI.
+## 🛠 Project Setup Features
 
-## Events
+### Automated Project Creation
+The setup tool creates fully configured projects with:
 
-This is a simple event management system that allows you to create events and manage sign-ups / attendance.
+- **Cursor Rules**: Automatically installed and flattened for easy access
+- **Development Environment**: Next.js 15, TypeScript, Tailwind CSS
+- **Build Tools**: Turbo (monorepos) or standard Next.js build
+- **Sync Scripts**: Keep rules updated from this master repository
+- **AI Integration**: Optional Claude Code and claude-flow setup
 
-## Presentations
+### Monorepo Support
+For complex projects with multiple packages:
 
-This is the Present Presentations system, which allows you to talk and have a presentation created dynamically based on your talk.
+```
+your-project/
+├── packages/           # Individual packages
+│   ├── web/           # Frontend application  
+│   ├── api/           # Backend services
+│   └── shared/        # Shared utilities
+├── .cursor/           # Cursor AI configuration
+│   └── rules/         # All rules flattened
+├── turbo.json         # Turbo build system
+└── package.json       # Root configuration
+```
 
-## Teaming
+### Standalone Project Support  
+For focused single-purpose projects:
 
-This is a sophisticated team formation tool that takes an arbitrary set of participants forms them into a set of optimized teams based on an arbitrary set of constraints.
+```
+your-project/
+├── src/               # Source code
+│   └── app/           # Next.js app directory
+├── .cursor/           # Cursor AI configuration  
+│   └── rules/         # All rules flattened
+└── package.json       # Project configuration
+```
 
-## Expert
+## 🔄 Rule Synchronization
 
-This system allows you to build an AI Expert using prompts and documents - it's a simple RAG tool meant to be used as a starting point for more complex AI systems.
+### Automatic Updates
+Every created project includes a sync script:
 
-It has a chat interface for asking questions interactively but also works via API.
+```bash
+# In any project created with platform setup
+npm run sync-rules
+```
 
-## Form
+This script:
+1. Downloads latest rules from `jazzmind/platform` repository
+2. Flattens directory structure into `.cursor/rules/`  
+3. Updates the sync script itself to latest version
+4. Maintains consistency across all your projects
 
-This lets you create forms to collect structured data and documents from users. Given some initial context data, it can search the web and or uploaded documents to automatically populate the form.
+### Rule Evolution
+As rules improve in the master repository, all projects can benefit:
+- **Bug fixes** in rule logic
+- **New patterns** and best practices
+- **Framework updates** (Next.js 15, new TypeScript features)
+- **Enhanced AI guidance** based on real-world usage
 
-## Feedback
+## 🤖 AI Development Integration
 
-This lets you define criteria/rubrics and collect evaluations on structured data and documents. It allows you to assign human and AI experts to collect feedback.
+### Claude Code Support
+All development projects are optimized for Claude Code with:
+- Pre-configured cursor rules for consistent AI guidance
+- Proper file structure for AI navigation
+- Documentation templates for AI understanding
 
-It also has an in-document commenting/endorsing/challenging system.
+### Claude-Flow Integration (Optional)
+Advanced AI development orchestration with:
+- **Hive-mind coordination**: Multiple AI agents working together
+- **Neural pattern recognition**: Smart code analysis and suggestions
+- **Auto-MCP setup**: Seamless Claude Code integration  
+- **Enterprise security**: Quantum-resistant architecture
 
-## Contact
+Learn more: [claude-flow repository](https://github.com/ruvnet/claude-flow)
 
-This is a simple web-based contact form. It might get less simple in the future.
+## 📖 Usage Examples
 
-# Using multiple packages together
+### Create a Simple Website
+```bash
+./setup/new-project
+# Choose: Website/Development Project > Standard Repository
+```
 
-Let's say you want to create a new event and you want to use the Expert to answer questions about the event. After the event you create a summary document and want to allow attendees to provide feedback on the event via in-document comments.
+### Create a Multi-Package Monorepo
+```bash
+./setup/new-project
+# Choose: Website/Development Project > Monorepo > Include Claude-Flow  
+```
 
-You can do this by using the following packages:
+### Create Business Documentation Project  
+```bash
+./setup/new-project
+# Choose: Business Documentation Project
+```
 
-- Events
-- Expert
-- Feedback
+### Create Hybrid Development + Business Project
+```bash
+./setup/new-project
+# Choose: Both (Hybrid Project) > Monorepo
+```
 
+## 🏛 Architecture Principles
 
-## Running the platform
+### Generalization Strategy
+Rules support both usage patterns:
+- **Monorepo**: Projects with packages in `@/packages`
+- **Standalone**: Projects with code in `@/website` or `@/src`
+
+### Glob Patterns
+Rules use flexible glob patterns that work in both contexts:
+```mdc
+globs: src/**/*,website/src/**/*,packages/**/src/**/*
+```
+
+### Technology Agnostic
+While optimized for Next.js and TypeScript, rules maintain technology independence where appropriate, focusing on patterns and principles rather than specific implementations.
+
+## 🤝 Contributing
+
+### Rule Development
+When developing new rules:
+
+1. **Start specific**: Create rules for your current project
+2. **Test thoroughly**: Ensure rules work with AI assistants
+3. **Generalize**: Remove project-specific details
+4. **Document**: Add clear examples and context
+5. **Sync back**: Contribute improvements to shared rules
+
+### Rule Quality Standards
+- **AI-optimized**: Efficient token usage and clear guidance
+- **Action-oriented**: Focus on what to do, not just what to avoid
+- **Context-aware**: Include when and why to apply rules
+- **Example-rich**: Provide both good and bad examples
+
+## 📚 Documentation
+
+- **Setup Guide**: `setup/README.md` - Detailed setup tool documentation
+- **Rule Examples**: Each `.mdc` file contains usage examples
+- **Architecture**: `docs/architecture.md` - System design principles
+- **How Rules Work**: `setup/rules/shared/how-cursor-rules-work.md`
+
+## 🔗 Related Projects
+
+- [Claude Code](https://claude.ai/code) - AI code editor integration
+- [claude-flow](https://github.com/ruvnet/claude-flow) - AI development orchestration
+- [Cursor](https://cursor.sh) - AI-first code editor
+- [Next.js 15](https://nextjs.org) - React framework
+
+---
+
+*Platform - Streamlined AI development with centralized cursor rules*
 

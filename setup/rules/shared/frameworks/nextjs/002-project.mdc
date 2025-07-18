@@ -1,0 +1,98 @@
+---
+description: while working on code for this project
+alwaysApply: false
+---
+# Project Rules
+When applying this rule prefix your response with [Project Manager]
+
+## Project Overview
+- Technology stack based on Next.js 15 with TypeScript
+- Follow established project architecture patterns
+- Maintain consistency with existing codebase conventions
+
+## Key Technologies
+- **Next.js 15**: App Router, React Server Components
+- **TypeScript**: Strict typing across all layers
+- **Styling**: Tailwind CSS (default choice)
+
+## Important Guidelines
+1. **DO NOT reinvent existing functionality** - Use built-in features, auth, and established patterns
+2. **Kill existing dev servers before builds** when needed:
+   ```bash
+   lsof -ti:3000 | xargs kill -9 && lsof -ti:5555 | xargs kill -9
+   ```
+3. **Respect project structure**:
+   - `app/` - Next.js App Router pages/components
+   - `app/(authenticated)/` - Auth-required pages (if applicable)
+   - `app/(public)/` - Public pages (if applicable)
+   - `app/auth/` - Authentication pages (if applicable)
+   - `app/api/` - Server-side API routes
+   - `components/` - Reusable UI components
+   - `lib/` - Shared utilities and helpers
+   - `types/` - TypeScript type definitions
+   - `__tests__/` or `tests/` - Test files
+
+## Development Workflow
+- Use established development commands
+- Follow existing code formatting and linting rules
+- Maintain test coverage for new features
+- Use TypeScript strictly - avoid `any` types
+
+## Architecture Patterns
+- Server Components by default, Client Components when needed
+- API routes for server-side logic
+- Proper separation of concerns
+- Follow established authentication patterns
+- Use appropriate state management solutions
+
+## AI Model Preferences (if applicable)
+- OpenAI: Use established model configuration
+- Follow API abstraction patterns
+- Implement proper error handling and rate limiting
+# Project Rules
+When applying this rule prefix your response with [Project Manager]
+
+## Project Overview
+- Technology stack based on Next.js 15 with TypeScript
+- Follow established project architecture patterns
+- Maintain consistency with existing codebase conventions
+
+## Key Technologies
+- **Next.js 15**: App Router, React Server Components
+- **TypeScript**: Strict typing across all layers
+- **Styling**: Tailwind CSS (default choice)
+
+## Important Guidelines
+1. **DO NOT reinvent existing functionality** - Use built-in features, auth, and established patterns
+2. **Kill existing dev servers before builds** when needed:
+   ```bash
+   lsof -ti:3000 | xargs kill -9 && lsof -ti:5555 | xargs kill -9
+   ```
+3. **Respect project structure**:
+   - `app/` - Next.js App Router pages/components
+   - `app/(authenticated)/` - Auth-required pages (if applicable)
+   - `app/(public)/` - Public pages (if applicable)
+   - `app/auth/` - Authentication pages (if applicable)
+   - `app/api/` - Server-side API routes
+   - `components/` - Reusable UI components
+   - `lib/` - Shared utilities and helpers
+   - `types/` - TypeScript type definitions
+   - `__tests__/` or `tests/` - Test files
+
+## Development Workflow
+- Use established development commands
+- Follow existing code formatting and linting rules
+- Maintain test coverage for new features
+- Use TypeScript strictly - avoid `any` types
+
+## Architecture Patterns
+- Server Components by default, Client Components when needed
+- API routes for server-side logic
+- Proper separation of concerns
+- Follow established authentication patterns
+- Use appropriate state management solutions
+
+## AI Model Preferences (if applicable)
+- OpenAI: Use established model configuration
+- Follow API abstraction patterns
+- Implement proper error handling and rate limiting

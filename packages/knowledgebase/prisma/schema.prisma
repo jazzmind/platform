@@ -1,0 +1,182 @@
+// Knowledgebase Package Prisma Schema
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// File storage for extracted content and analysis
+model FileData {
+  id                String   @id @default(cuid())
+  fileId            String   // Reference to the original file in blob storage
+  entityType        String   // 'knowledgebase' | 'polysec' | 'opportunity' | 'proposal'
+  entityId          String   // ID of the parent entity
+  dataType          String   // 'extractedText' | 'semanticSection' | 'fileMetadata' | 'chunk'
+  chunkIndex        Int?     // For chunks, the index within the file
+  totalChunks       Int?     // Total number of chunks in the file
+  content           String?  // The actual text content (for chunks and sections)
+  contentHash       String?  // Hash of the content for deduplication
+  metadata          Json?    // Optional metadata about the chunk/section
+  organizationId    String   // For multi-tenant isolation
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Indexes for performance
+  @@index([fileId, entityType, entityId])
+  @@index([organizationId, dataType])
+  @@index([entityType, entityId])
+  @@index([fileId, dataType])
+  @@index([contentHash])
+  @@index([fileId, chunkIndex])
+  @@map("file_data")
+}
+
+// Vector embeddings for semantic search
+model Vector {
+  id               String   @id @default(cuid())
+  entityType       String   // 'knowledgebase' | 'polysec' | 'opportunity' | 'proposal'
+  entityId         String   // ID of the entity this vector belongs to
+  sourceEntityType String?  // 'FileData' | 'Section' | 'Document'
+  sourceEntityId   String?  // ID of the source entity (e.g., FileData ID for chunks)
+  contentHash      String?  // Hash of the content for deduplication
+  vector           Json     // Array of floats (the embedding)
+  metadata         Json?    // Additional metadata about the chunk/content
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([entityType, entityId])
+  @@index([sourceEntityType, sourceEntityId])
+  @@index([contentHash])
+  @@map("vectors")
+}
+
+// Versioned sections for structured content
+model Section {
+  id               String   @id @default(cuid())
+  sectionGroupId   String   // UUID to group all versions of the same logical section
+  entityType       String   // 'knowledgebase' | 'polysec' | 'opportunity' | 'proposal'
+  entityId         String   // ID of the parent entity
+  organizationId   String   // Multi-tenant isolation
+  type             String   // 'text' | 'fields' | 'metadata'
+  title            String   
+  content          String?  @db.Text // The section content
+  version          Int      @default(1) // Version number for this section
+  order            Int      @default(0) // Display order within the entity
+  isActive         Boolean  @default(true) // Whether this is the current version
+  createdBy        String?  // Contact ID of who created this version
+  createdAt        DateTime @default(now())
+  modifiedAt       DateTime @updatedAt
+
+  // Indexes for performance
+  @@index([entityType, entityId, isActive])
+  @@index([organizationId])
+  @@index([entityType, entityId, order])
+  @@index([sectionGroupId]) // For finding all versions of the same section
+  @@index([entityType, entityId, sectionGroupId, version]) // For finding specific versions
+  @@index([createdBy]) // For tracking who created versions
+  @@map("sections")
+}
+
+// Processing jobs for async document processing
+model ProcessingJob {
+  id               String   @id @default(cuid())
+  processingId     String   @unique // External processing ID for tracking
+  fileId           String   // Reference to the file being processed
+  entityType       String   // 'knowledgebase' | 'polysec'
+  entityId         String   // Parent entity ID
+  organizationId   String   // Multi-tenant isolation
+  status           ProcessingStatus @default(PENDING)
+  stage            ProcessingStage @default(UPLOADING)
+  progress         Int      @default(0) // 0-100 percentage
+  totalSteps       Int      @default(5) // Total processing steps
+  currentStep      Int      @default(0) // Current step number
+  message          String?  // Current status message
+  result           Json?    // Final processing result
+  error            String?  // Error message if failed
+  metadata         Json?    // Additional processing metadata
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([processingId])
+  @@index([fileId])
+  @@index([organizationId, status])
+  @@index([entityType, entityId])
+  @@map("processing_jobs")
+}
+
+// Document metadata and file information
+model Document {
+  id               String   @id @default(cuid())
+  fileId           String   @unique // Blob storage reference
+  filename         String
+  originalName     String   // Original filename from upload
+  fileType         DocumentFileType
+  mimeType         String
+  fileSize         Int      // Size in bytes
+  blobUrl          String   // Vercel blob URL
+  entityType       String   // 'knowledgebase' | 'polysec'
+  entityId         String   // Parent entity ID
+  organizationId   String   // Multi-tenant isolation
+  uploadedBy       String?  // Contact ID who uploaded
+  status           DocumentStatus @default(UPLOADED)
+  extractedAt      DateTime? // When text extraction completed
+  processedAt      DateTime? // When full processing completed
+  tags             String[] // Document tags for categorization
+  classification   Json?    // AI classification results
+  metadata         Json?    // Additional file metadata
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([fileId])
+  @@index([entityType, entityId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([fileType])
+  @@index([uploadedBy])
+  @@map("documents")
+}
+
+// Enums
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum ProcessingStage {
+  UPLOADING
+  EXTRACTING
+  CHUNKING
+  EMBEDDING
+  ANALYZING
+  COMPLETING
+}
+
+enum DocumentStatus {
+  UPLOADED
+  EXTRACTING
+  EXTRACTED
+  PROCESSING
+  PROCESSED
+  FAILED
+}
+
+enum DocumentFileType {
+  PDF
+  DOCX
+  TXT
+  HTML
+  MD
+  CSV
+  XLSX
+  PPTX
+} 

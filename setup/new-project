@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Platform Project Setup - Simple Wrapper
+# Usage: ./setup/new-project
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Run the Node.js setup script
+node "$SCRIPT_DIR/create-project.js" "$@" 

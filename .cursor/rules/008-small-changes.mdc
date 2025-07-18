@@ -1,0 +1,165 @@
+---
+description: When fixing bugs or implementing enhancements, when exploring solutions to complex issues, when code affects critical user workflows
+globs: 
+alwaysApply: false
+---
+# Small Targeted Changes Rule
+
+## Context
+- When fixing bugs or implementing enhancements
+- When exploring solutions to complex issues
+- When code affects critical user workflows
+
+## Requirements
+
+- Make one small, targeted change at a time
+- Add debug console.log statements to track data flow before making changes
+- Verify the fix works before making additional changes
+- Get explicit confirmation from user before modifying multiple files
+- Prefer temporary debug logs over permanent code changes when diagnosing issues
+- Start with minimal changes to the most likely source of the problem
+
+## Debugging Approach
+
+1. **Identify the Problem** - Understand what's not working
+2. **Add Logging** - Insert debug statements to track data flow
+3. **Make Small Changes** - Fix one thing at a time
+4. **Verify Results** - Confirm the fix before proceeding
+5. **Clean Up** - Remove debug logs once issue is resolved
+
+## Examples
+
+<example>
+User: The file upload isn't passing data back to the parent component.
+Assistant: I'll help find the issue. First, let's add some debugging to track the data flow:
+
+```javascript
+// In the FileUploader component
+const handleUpload = (file) => {
+  console.log('FileUploader - file before processing:', file);
+  // Process file
+  const processedFile = processFile(file);
+  console.log('FileUploader - processedFile before callback:', processedFile);
+  onUploadComplete(processedFile);
+};
+```
+
+This will help us see if the data is being properly processed before being passed to the parent.
+</example>
+
+<example>
+User: The form validation doesn't work correctly.
+Assistant: I'll add debug logging to isolate the issue before making changes:
+
+```javascript
+function validateInput(input) {
+  console.log('validateInput input:', input);
+  const isValid = checkValidation(input);
+  console.log('validateInput result:', isValid);
+  return isValid;
+}
+```
+
+This will show us the exact input and what the validation is returning.
+</example>
+
+<example>
+User: Our API call is failing.
+Assistant: Let's first add logging to identify where the issue occurs:
+
+```javascript
+async function updateData(id, data) {
+  console.log('updateData called with:', { id, data });
+  try {
+    const response = await api.put(`/api/data/${id}`, data);
+    console.log('API response:', response);
+    return response.data;
+  } catch (error) {
+    console.error('API error details:', error.response?.data || error.message);
+    throw error;
+  }
+}
+```
+
+This will help us see the exact request data and response/error before we modify any logic.
+</example>
+# Small Targeted Changes Rule
+
+## Context
+- When fixing bugs or implementing enhancements
+- When exploring solutions to complex issues
+- When code affects critical user workflows
+
+## Requirements
+
+- Make one small, targeted change at a time
+- Add debug console.log statements to track data flow before making changes
+- Verify the fix works before making additional changes
+- Get explicit confirmation from user before modifying multiple files
+- Prefer temporary debug logs over permanent code changes when diagnosing issues
+- Start with minimal changes to the most likely source of the problem
+
+## Debugging Approach
+
+1. **Identify the Problem** - Understand what's not working
+2. **Add Logging** - Insert debug statements to track data flow
+3. **Make Small Changes** - Fix one thing at a time
+4. **Verify Results** - Confirm the fix before proceeding
+5. **Clean Up** - Remove debug logs once issue is resolved
+
+## Examples
+
+<example>
+User: The file upload isn't passing data back to the parent component.
+Assistant: I'll help find the issue. First, let's add some debugging to track the data flow:
+
+```javascript
+// In the FileUploader component
+const handleUpload = (file) => {
+  console.log('FileUploader - file before processing:', file);
+  // Process file
+  const processedFile = processFile(file);
+  console.log('FileUploader - processedFile before callback:', processedFile);
+  onUploadComplete(processedFile);
+};
+```
+
+This will help us see if the data is being properly processed before being passed to the parent.
+</example>
+
+<example>
+User: The form validation doesn't work correctly.
+Assistant: I'll add debug logging to isolate the issue before making changes:
+
+```javascript
+function validateInput(input) {
+  console.log('validateInput input:', input);
+  const isValid = checkValidation(input);
+  console.log('validateInput result:', isValid);
+  return isValid;
+}
+```
+
+This will show us the exact input and what the validation is returning.
+</example>
+
+<example>
+User: Our API call is failing.
+Assistant: Let's first add logging to identify where the issue occurs:
+
+```javascript
+async function updateData(id, data) {
+  console.log('updateData called with:', { id, data });
+  try {
+    const response = await api.put(`/api/data/${id}`, data);
+    console.log('API response:', response);
+    return response.data;
+  } catch (error) {
+    console.error('API error details:', error.response?.data || error.message);
+    throw error;
+  }
+}
+```
+
+This will help us see the exact request data and response/error before we modify any logic.
+</example>

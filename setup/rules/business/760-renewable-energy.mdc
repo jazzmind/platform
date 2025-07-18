@@ -1,0 +1,113 @@
+---
+description: Use when creating content related to renewable energy projects, infrastructure, and policy
+globs: 
+alwaysApply: false
+---
+
+# Renewable Energy Expert Rules
+
+## Context
+- Applied to content about renewable energy technologies and infrastructure
+- Requires understanding of technical, regulatory, and market factors
+- Used for proposals, technical documentation, and policy recommendations
+
+## Core Experts
+
+### Transmission Expert
+**Purpose**: Address technical aspects of energy transmission
+
+<required>
+- Specify transmission technology parameters accurately
+- Address interconnection challenges
+- Explain capacity and reliability factors
+- Provide accurate loss calculations
+</required>
+
+<example>
+✅ Good Technical Description:
+```markdown
+The Phase I/II HVDC-TF infrastructure utilizes 1200kV HVDC technology with bidirectional flow capability, enabling 4GW of transmission capacity between the Northern Maine renewable generation hub and the ISO-NE grid. The system incorporates VSC converter stations with black start capability and reduces transmission losses by 30-40% compared to equivalent AC lines.
+```
+</example>
+
+<example type="invalid">
+❌ Poor Technical Description:
+```markdown
+The power lines will connect renewable energy from Canada to the US with high voltage technology that is better than regular power lines.
+```
+</example>
+
+### Policy Expert
+**Purpose**: Navigate regulatory and policy landscape
+
+<required>
+- Cite relevant regulations and policies
+- Identify permitting requirements
+- Address environmental compliance
+- Explain stakeholder rights
+</required>
+
+<example>
+✅ Good Policy Context:
+```markdown
+This project addresses requirements under the Massachusetts Clean Energy Standard (310 CMR 7.75), while navigating FERC Order 1000 competitive transmission processes. The stakeholder engagement framework aligns with NEPA Section 106 consultation requirements and incorporates environmental justice principles from the Massachusetts Environmental Justice Policy of 2021.
+```
+</example>
+
+### Impact Analyst
+**Purpose**: Quantify environmental and economic benefits
+
+<required>
+- Calculate carbon reduction metrics
+- Assess economic development impacts
+- Evaluate grid reliability improvements
+- Measure community benefits
+</required>
+
+## Technical Areas
+
+### Transmission Infrastructure
+<rules>
+- Specify voltage and capacity specifications
+- Differentiate AC vs. DC technology benefits
+- Address converter station requirements
+- Explain reliability and redundancy measures
+</rules>
+
+### Renewable Integration
+<rules>
+- Specify variable resource integration methods
+- Address curtailment mitigation
+- Explain storage interaction
+- Quantify capacity factors
+</rules>
+
+### Project Development
+<rules>
+- Outline permitting timelines
+- Document stakeholder engagement process
+- Detail environmental studies required
+- Address construction challenges
+</rules>
+
+## Best Practices
+
+### Technical Communication
+- Use precise technical terminology
+- Provide comparative benchmarks
+- Include relevant standards compliance
+- Quantify wherever possible
+
+### Stakeholder Engagement
+- Identify all affected stakeholder groups
+- Address common misconceptions
+- Provide transparent impact assessments
+- Document consultation processes
+
+<critical>
+- NEVER misrepresent technical specifications
+- ALWAYS acknowledge environmental impacts
+- ENSURE regulatory requirements are accurately represented
+- QUANTIFY benefits with evidence-based metrics
+- DISTINGUISH between proven and emerging technologies
+</critical>

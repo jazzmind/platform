@@ -1,0 +1,126 @@
+---
+description: Use when creating or enhancing grant applications to maximize funding success rate and impact
+globs: grants/**/*
+alwaysApply: false
+---
+
+# Grant Writing Expert Rules
+
+## Context
+- Applied to grant applications for government, foundation, and corporate funding
+- Requires understanding of funder priorities, evaluation criteria, and impact metrics
+- Used for competitive funding proposals in any sector
+
+## Core Experts
+
+### Grant Strategist
+**Purpose**: Develop strategic approach to funding opportunities
+
+<required>
+- Analyze funder priorities and strategic goals
+- Align project with funding objectives
+- Position unique value proposition
+- Structure competitive advantage claims
+</required>
+
+<example>
+✅ Good Strategic Alignment:
+```markdown
+Our AI-driven stakeholder engagement platform directly addresses the Massachusetts Technology Collaborative's priority to "develop new AI systems that solve pressing challenges" by creating an open-source solution that transforms infrastructure project communication, reduces delays, and establishes Massachusetts as a leader in AI for public works management.
+```
+</example>
+
+<example type="invalid">
+❌ Poor Strategic Alignment:
+```markdown
+Our project will use AI to help with project management which could be useful for many organizations and businesses that need better ways to manage stakeholders.
+```
+</example>
+
+### Impact Expert
+**Purpose**: Articulate measurable outcomes and benefits
+
+<required>
+- Define quantifiable success metrics
+- Demonstrate community/industry impact
+- Project scalability and sustainability
+- Calculate ROI for funders
+</required>
+
+<example>
+✅ Strong Impact Statement:
+```markdown
+## Expected Outcomes
+- 40% reduction in project delays from stakeholder concerns
+- $4.2M cost savings on typical infrastructure projects
+- 3x increase in stakeholder satisfaction scores
+- Open-source release enabling 150+ public agencies to adopt within 18 months
+```
+</example>
+
+### Budget Expert
+**Purpose**: Create defensible and strategic budgets
+
+<required>
+- Align resource allocation with priorities
+- Justify all expenses with clear rationale
+- Demonstrate cost-effectiveness
+- Include appropriate matching/leverage
+</required>
+
+## Proposal Structure
+
+### Executive Summary
+<rules>
+- Problem: Clear articulation of challenge
+- Solution: Innovative approach
+- Team: Unique qualifications
+- Impact: Quantifiable outcomes
+- Request: Specific ask with ROI
+</rules>
+
+### Need Statement
+<rules>
+- Evidence-based problem definition
+- Scope and significance
+- Stakeholder implications
+- Urgency justification
+</rules>
+
+### Methodology
+<rules>
+- Clear implementation plan
+- Technical approach
+- Innovation elements
+- Risk mitigation strategies
+</rules>
+
+### Evaluation Plan
+<rules>
+- Specific, measurable metrics
+- Data collection methods
+- Reporting mechanisms
+- Independent validation
+</rules>
+
+## Best Practices
+
+### Narrative Development
+- Problem-solution framing
+- Compelling statistics and examples
+- Stakeholder testimonials
+- Clear theory of change
+
+### Visual Presentation
+- Logic models
+- Process diagrams
+- Impact visualizations
+- Budget breakdowns
+
+<critical>
+- NEVER use vague, unmeasurable outcomes
+- ALWAYS align with funder's strategic priorities
+- ENSURE all claims are supported by evidence
+- MAINTAIN appropriate technical level for reviewers
+- QUANTIFY impact whenever possible
+</critical>

@@ -1,0 +1,118 @@
+---
+description: ALWAYS use planning, documenting, updating or otherwise working on Events
+globs: events/**/*.{md,mdx}
+alwaysApply: false
+---
+
+# Events Organization and Management Guidelines
+
+## Overview
+This rule defines the structure and organization for event planning within our codebase. Each event should be documented consistently to ensure clear communication, effective management, and successful execution.
+
+## Event Structure
+Events should be organized in the `/events` directory following this structure:
+- `/events/`
+  - `/{event-name}/`
+    - `overview.md` - Event description, objectives, and goals
+    - `team.md` - Team members and their roles
+    - `tracking.md` - Activities, deadlines, and status tracking
+
+## Document Templates
+
+### Overview Document (overview.md)
+```markdown
+# [Event Name]
+
+## Event Summary
+[Brief description of the event]
+
+## Date and Location
+- **Date:** [Event date(s)]
+- **Location:** [Event location]
+- **Format:** [In-person/Virtual/Hybrid]
+
+## Objectives
+- [Primary objective]
+- [Secondary objective]
+- ...
+
+## Target Audience
+[Description of the target audience]
+
+## Key Metrics
+- [Metric 1]
+- [Metric 2]
+- ...
+
+## Budget
+- **Total Budget:** [Amount]
+- **Key Allocations:**
+  - [Item 1]: [Amount]
+  - [Item 2]: [Amount]
+  - ...
+
+## Related Links
+- [Link description]: [URL]
+- ...
+```
+
+### Team Document (team.md)
+```markdown
+# [Event Name] - Team
+
+## Core Team
+| Name | Role | Responsibilities | Contact |
+|------|------|-----------------|---------|
+| [Name] | [Role] | [Key responsibilities] | [Email/Phone] |
+| ... | ... | ... | ... |
+
+## Extended Team
+| Name | Role | Responsibilities | Contact |
+|------|------|-----------------|---------|
+| [Name] | [Role] | [Key responsibilities] | [Email/Phone] |
+| ... | ... | ... | ... |
+
+## Partners/Vendors
+| Organization | Contact Person | Service Provided | Contact |
+|--------------|----------------|------------------|---------|
+| [Organization] | [Name] | [Service] | [Email/Phone] |
+| ... | ... | ... | ... |
+```
+
+### Tracking Document (tracking.md)
+```markdown
+# [Event Name] - Tracking
+
+## Timeline
+| Deadline | Activity | Owner | Status | Notes |
+|----------|----------|-------|--------|-------|
+| [Date] | [Activity] | [Name] | [Not Started/In Progress/Complete] | [Notes] |
+| ... | ... | ... | ... | ... |
+
+## Key Milestones
+| Date | Milestone | Dependencies | Status |
+|------|-----------|--------------|--------|
+| [Date] | [Milestone] | [Dependencies] | [Status] |
+| ... | ... | ... | ... |
+
+## Issues/Risks
+| Issue | Impact | Mitigation Plan | Owner | Status |
+|-------|--------|-----------------|-------|--------|
+| [Issue] | [Impact] | [Mitigation] | [Owner] | [Status] |
+| ... | ... | ... | ... | ... |
+
+## Action Items
+| Task | Owner | Due Date | Status | Notes |
+|------|-------|----------|--------|-------|
+| [Task] | [Owner] | [Date] | [Status] | [Notes] |
+| ... | ... | ... | ... | ... |
+```
+
+## Best Practices
+1. Update tracking documents regularly (at least weekly)
+2. Use consistent naming conventions for all events
+3. Archive completed events rather than deleting them
+4. Include contact information for all team members
+5. Link to relevant external resources where appropriate
+6. Maintain version history for significant document changes
+7. Ensure all deadlines are clearly marked with owners assigned 

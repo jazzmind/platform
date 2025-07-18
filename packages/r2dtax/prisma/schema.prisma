@@ -1,0 +1,159 @@
+// This is your Prisma schema file for r2dtax
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id              String        @id @default(cuid())
+  name            String
+  reference       String?       // Project reference code like "INT20_01"
+  startDate       DateTime
+  endDate         DateTime
+  totalBudget     Decimal?      @db.Decimal(15, 2)
+  description     String        @db.Text
+  primaryContact  String?
+  status          ProjectStatus @default(ACTIVE)
+  organizationId  String        // Multi-tenant isolation
+  
+  // Relations
+  activities      RDActivity[]
+  narratives      RDNarrative[]
+  evidence        Evidence[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  
+  @@map("projects")
+}
+
+model RDActivity {
+  id           String         @id @default(cuid())
+  projectId    String
+  type         ActivityType
+  name         String
+  hypothesis   String?        @db.Text
+  experiments  String?        @db.Text
+  results      String?        @db.Text
+  startDate    DateTime
+  endDate      DateTime
+  expenditure  Decimal?       @db.Decimal(15, 2)
+  status       ActivityStatus @default(PLANNED)
+  
+  // Relations
+  project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  timeEntries  TimeEntry[]
+  narratives   RDNarrative[]
+  evidence     Evidence[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("rd_activities")
+}
+
+model TimeEntry {
+  id               String    @id @default(cuid())
+  activityId       String
+  userId           String
+  date             DateTime  @db.Date
+  hours            Decimal   @db.Decimal(5, 2)
+  description      String    @db.Text
+  approved         Boolean   @default(false)
+  approvedBy       String?
+  approvedAt       DateTime?
+  evidenceFileId   String?   // Reference to knowledgebase file
+  
+  // Relations
+  activity         RDActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("time_entries")
+}
+
+model RDNarrative {
+  id           String        @id @default(cuid())
+  projectId    String
+  activityId   String?       // Optional - for activity-specific narratives
+  type         NarrativeType
+  content      String        @db.Text
+  version      Int           @default(1)
+  generatedAt  DateTime      @default(now())
+  approved     Boolean       @default(false)
+  approvedBy   String?
+  approvedAt   DateTime?
+  metadata     Json?         // Generation metadata (AI model, prompts, etc.)
+  
+  // Relations
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  activity     RDActivity?   @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("rd_narratives")
+}
+
+model Evidence {
+  id           String       @id @default(cuid())
+  projectId    String
+  activityId   String?      // Optional - can be project-level evidence
+  fileId       String       // Knowledgebase file reference
+  type         EvidenceType
+  description  String       @db.Text
+  uploadedAt   DateTime     @default(now())
+  uploadedBy   String
+  
+  // Relations
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  activity     RDActivity?  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("evidence")
+}
+
+// Enums
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ActivityType {
+  CORE
+  SUPPORTING
+}
+
+enum ActivityStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum NarrativeType {
+  CORE_ACTIVITY
+  SUPPORTING_ACTIVITY
+  PROJECT_SUMMARY
+  COMPLIANCE_REPORT
+}
+
+enum EvidenceType {
+  DOCUMENT
+  EXPERIMENT_DATA
+  LITERATURE_REVIEW
+  MEETING_NOTES
+  TECHNICAL_SPECIFICATION
+  RESEARCH_PAPER
+} 

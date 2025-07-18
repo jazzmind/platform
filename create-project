@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Platform Project Creation - Root Convenience Script
+# This script provides easy access to the project setup tools from the platform root
+
+echo "🚀 Platform Project Setup"
+echo "========================"
+echo ""
+echo "Project Creation Paths:"
+echo "- Standalone projects: ../projectname (sibling to platform)"
+echo "- Package projects: packages/projectname (within platform)"
+echo ""
+echo "Features:"
+echo "- Standalone: Complete independent Next.js applications"
+echo "- Package: Dual-mode packages for monorepo integration"
+echo ""
+
+# Check if we're in the platform directory
+if [ ! -d "setup" ]; then
+    echo "❌ Error: This script must be run from the platform repository root"
+    echo "   Make sure you're in the directory containing the 'setup' folder"
+    exit 1
+fi
+
+# Check if setup tools exist
+if [ ! -f "setup/create-project.js" ]; then
+    echo "❌ Error: Setup tools not found"
+    echo "   Expected: setup/create-project.js"
+    exit 1
+fi
+
+# Run the setup tool directly
+exec node setup/create-project.js "$@" 
