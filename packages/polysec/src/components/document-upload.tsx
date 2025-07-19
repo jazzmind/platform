@@ -19,8 +19,6 @@ export function DocumentUpload({ onUploadSuccess }: DocumentUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
 
   const uploadFile = async (file: File, title?: string, version?: string) => {
-    const uploadId = Date.now() + Math.random();
-    
     // Add to uploads list
     setUploads(prev => [...prev, {
       file,
@@ -73,10 +71,7 @@ export function DocumentUpload({ onUploadSuccess }: DocumentUploadProps) {
           : upload
       ));
 
-      // Call success callback after a short delay
-      setTimeout(() => {
-        onUploadSuccess();
-      }, 1000);
+      return result.data.id;
 
     } catch (error) {
       setUploads(prev => prev.map(upload => 
@@ -88,6 +83,7 @@ export function DocumentUpload({ onUploadSuccess }: DocumentUploadProps) {
             }
           : upload
       ));
+      throw error;
     }
   };
 
@@ -95,25 +91,61 @@ export function DocumentUpload({ onUploadSuccess }: DocumentUploadProps) {
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (!files || isUploading) return;
-    
-    setIsUploading(true);
-    
-    // Upload files sequentially to avoid overwhelming the server
-    for (const file of Array.from(files)) {
-      await uploadFile(file);
+    if (!files || files.length === 0 || isUploading) {
+      return;
     }
     
-    setIsUploading(false);
+    console.log(`📁 File Upload: Selected ${files.length} files`);
+    setIsUploading(true);
     
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+    try {
+      let successCount = 0;
+      
+      // Upload files sequentially to avoid overwhelming the server
+      for (const file of Array.from(files)) {
+        try {
+          await uploadFile(file);
+          successCount++;
+          console.log(`✅ File Upload: Successfully uploaded ${file.name}`);
+        } catch (error) {
+          console.error(`❌ File Upload: Failed to upload ${file.name}:`, error);
+        }
+      }
+      
+      // Only call onUploadSuccess if at least one file was uploaded successfully
+      if (successCount > 0) {
+        console.log(`🎉 File Upload: ${successCount} files uploaded successfully`);
+        // Call success callback after a short delay to let UI update
+        setTimeout(() => {
+          onUploadSuccess();
+        }, 500);
+      }
+      
+    } finally {
+      setIsUploading(false);
+      
+      // Reset file input value to allow selecting the same file again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
-  const handleUploadClick = () => {
+  const handleUploadClick = (event?: React.MouseEvent) => {
+    if (isUploading) {
+      console.log('🚫 File Upload: Upload in progress, ignoring click');
+      return;
+    }
+    
+    console.log('📂 File Upload: Opening file dialog');
     fileInputRef.current?.click();
+  };
+
+  const handleButtonClick = (event: React.MouseEvent) => {
+    // Only prevent default for button clicks to avoid form submission
+    event.preventDefault();
+    event.stopPropagation();
+    handleUploadClick();
   };
 
   const clearUploads = () => {
@@ -127,7 +159,10 @@ export function DocumentUpload({ onUploadSuccess }: DocumentUploadProps) {
         onClick={handleUploadClick}
         className={`
           border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-          ${isUploading ? 'border-gray-300 bg-gray-100 cursor-not-allowed' : 'border-gray-300 hover:border-gray-400'}
+          ${isUploading 
+            ? 'border-gray-300 bg-gray-100 cursor-not-allowed' 
+            : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+          }
         `}
       >
         <input
@@ -149,36 +184,45 @@ export function DocumentUpload({ onUploadSuccess }: DocumentUploadProps) {
           
           <div>
             <h3 className="text-lg font-medium text-gray-900">
-              {isUploading ? 'Uploading...' : 'Click to select files'}
+              {isUploading ? 'Processing Files...' : 'Upload Security Policy Documents'}
             </h3>
-            <p className="text-gray-500">
-              Supports PDF, DOCX, and TXT files up to 100MB each
+            <p className="text-gray-600">
+              {isUploading 
+                ? 'Please wait while your documents are being processed'
+                : 'Click to select PDF, DOCX, or TXT files'
+              }
             </p>
+            
+            {!isUploading && (
+              <button 
+                type="button"
+                onClick={handleButtonClick}
+                className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Select Files
+              </button>
+            )}
           </div>
-          
-          {!isUploading && (
-            <button
-              type="button"
-              onClick={handleUploadClick}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Select Files
-            </button>
-          )}
         </div>
       </div>
 
       {/* Upload Progress */}
       {uploads.length > 0 && (
-        <div className="bg-white rounded-lg border shadow-sm">
-          <div className="px-6 py-4 border-b flex justify-between items-center">
-            <h3 className="text-lg font-medium text-gray-900">Upload Progress</h3>
-            <button
-              onClick={clearUploads}
-              className="text-sm text-gray-500 hover:text-gray-700"
-            >
-              Clear All
-            </button>
+        <div className="bg-white border rounded-lg shadow">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h4 className="text-lg font-medium text-gray-900">Upload Progress</h4>
+              <button
+                onClick={clearUploads}
+                disabled={isUploading}
+                className="text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50"
+              >
+                Clear All
+              </button>
+            </div>
           </div>
           
           <div className="divide-y">
@@ -252,7 +296,7 @@ export function DocumentUpload({ onUploadSuccess }: DocumentUploadProps) {
           <li>• Supported formats: PDF, DOCX, TXT</li>
           <li>• Maximum file size: 100MB</li>
           <li>• Files will be processed automatically after upload</li>
-          <li>• Text extraction may take a few moments for large files</li>
+          <li>• AI extraction and indexing may take a few moments for large files</li>
         </ul>
       </div>
     </div>

@@ -26,6 +26,10 @@ export class SearchService {
       defaultLimit: 10,
       maxLimit: 100,
       similarityThreshold: 0.7,
+      defaultThreshold: 0.7,
+      enableHybridSearch: false,
+      enableCaching: false,
+      cacheTimeout: 300000,
       ...config,
     };
   }
@@ -42,6 +46,7 @@ export class SearchService {
       filters?: SearchFilters;
       threshold?: number;
       includeMetadata?: boolean;
+      organizationId?: string;
     } = {}
   ): Promise<SearchResult[]> {
     try {
@@ -49,7 +54,8 @@ export class SearchService {
         limit = this.config.defaultLimit, 
         threshold = this.config.similarityThreshold,
         includeMetadata = true,
-        filters 
+        filters,
+        organizationId
       } = options;
 
       // Validate limit
@@ -58,7 +64,9 @@ export class SearchService {
       // Generate embedding for the query
       const queryEmbedding = await this.embeddingService.generateSingleEmbedding(query);
 
-      // Find similar embeddings
+      console.log(`🔍 SearchService: Searching with entityType=${entityType}, entityId=${entityId}`);
+      
+      // Find similar embeddings using pgvector
       const similarVectors = await this.embeddingService.findSimilarEmbeddings(
         queryEmbedding,
         entityType,
@@ -69,8 +77,11 @@ export class SearchService {
         }
       );
 
+      console.log(`🔍 SearchService: Found ${similarVectors.length} similar vectors`);
+
       // Get the source chunks and their metadata
       const chunkIds = similarVectors.map(v => v.sourceEntityId).filter(Boolean) as string[];
+      console.log(`🔍 SearchService: Looking up chunks with IDs:`, chunkIds);
       
       const chunks = await this.prisma.fileData.findMany({
         where: {
@@ -78,6 +89,7 @@ export class SearchService {
           entityType,
           entityId,
           dataType: 'chunk',
+          ...(organizationId && { organizationId }),
           ...(filters && this.buildFiltersWhere(filters)),
         },
       });
@@ -90,26 +102,28 @@ export class SearchService {
 
           const result: SearchResult = {
             id: chunk.id,
-            score: (vector as any).similarity,
-            content: chunk.content || '',
-            title: (chunk.metadata as any)?.title || '',
-            excerpt: this.generateExcerpt(chunk.content || '', query),
-            type: 'chunk',
+            similarity: (vector as any).similarity,
+            content: this.generateExcerpt(chunk.content || '', query),
             source: {
-              type: 'chunk',
-              id: chunk.id,
-              filename: (chunk.metadata as any)?.filename || '',
+              fileId: chunk.fileId, // Use actual fileId
+              filename: (chunk.metadata as any)?.fileId || (chunk.metadata as any)?.extractedFrom || '',
+            },
+            metadata: {
+              fileType: (chunk.metadata as any)?.fileType || 'unknown',
+              uploadedAt: chunk.createdAt.toISOString(),
+              extractedAt: chunk.updatedAt.toISOString(),
+              chunkIndex: chunk.chunkIndex, // Move chunk index to metadata
+              documentName: (chunk.metadata as any)?.fileId || (chunk.metadata as any)?.extractedFrom || '',
             },
           };
 
           if (includeMetadata) {
             result.metadata = {
-              chunkIndex: (chunk.metadata as any)?.chunkIndex,
-              startOffset: (chunk.metadata as any)?.startOffset,
-              endOffset: (chunk.metadata as any)?.endOffset,
-              confidence: (chunk.metadata as any)?.confidence,
-              section: (chunk.metadata as any)?.section,
-              ...(chunk.metadata as any),
+              // Preserve essential UI fields
+              fileType: (chunk.metadata as any)?.fileType || 'unknown',
+              uploadedAt: chunk.createdAt.toISOString(),
+              extractedAt: chunk.updatedAt.toISOString(),
+              documentName: (chunk.metadata as any)?.fileId || (chunk.metadata as any)?.extractedFrom || '',
             };
           }
 
@@ -119,7 +133,7 @@ export class SearchService {
 
       // Sort by score and limit results
       return results
-        .sort((a, b) => b.score - a.score)
+        .sort((a, b) => b.similarity - a.similarity)
         .slice(0, validLimit);
 
     } catch (error: unknown) {
@@ -164,52 +178,60 @@ export class SearchService {
       // Generate embedding for query
       const queryEmbedding = await this.embeddingService.generateSingleEmbedding(query);
 
-      // Get vectors for these chunks
+      // Get chunk IDs for filtering
       const chunkIds = chunks.map(c => c.id);
-      const vectors = await this.prisma.vector.findMany({
-        where: {
-          sourceEntityId: { in: chunkIds },
-          entityType,
-          entityId,
-        },
-      });
 
-      // Calculate similarities and create results
+      // Use pgvector to find similar chunks directly
+      const queryVector = `[${queryEmbedding.join(',')}]`;
+      const maxDistance = 1 - threshold;
+
+      const vectorResults = await this.prisma.$queryRaw<Array<{
+        id: string;
+        sourceEntityId: string;
+        similarity: number;
+      }>>`
+        SELECT 
+          id, "sourceEntityId",
+          1 - (embedding <=> ${queryVector}::vector) AS similarity
+        FROM vectors 
+        WHERE "sourceEntityId" = ANY(${chunkIds})
+          AND "entityType" = ${entityType}
+          AND "entityId" = ${entityId}
+          AND (embedding <=> ${queryVector}::vector) <= ${maxDistance}
+        ORDER BY embedding <=> ${queryVector}::vector
+        LIMIT ${limit}
+      `;
+
+      // Create search results
       const results: SearchResult[] = [];
 
-      for (const vector of vectors) {
-        const chunk = chunks.find(c => c.id === vector.sourceEntityId);
+      for (const vectorResult of vectorResults) {
+        const chunk = chunks.find(c => c.id === vectorResult.sourceEntityId);
         if (!chunk) continue;
 
-        const embedding = vector.vector as number[];
-        const similarity = this.cosineSimilarity(queryEmbedding, embedding);
-
-        if (similarity >= threshold) {
-          results.push({
-            id: chunk.id,
-            score: similarity,
-            content: chunk.content || '',
-            title: (chunk.metadata as any)?.title || '',
-            excerpt: this.generateExcerpt(chunk.content || '', query),
-            type: 'chunk',
-            source: {
-              type: 'chunk',
-              id: chunk.id,
-              filename: (chunk.metadata as any)?.filename || '',
-            },
-            metadata: {
-              chunkIndex: (chunk.metadata as any)?.chunkIndex,
-              startOffset: (chunk.metadata as any)?.startOffset,
-              endOffset: (chunk.metadata as any)?.endOffset,
-              fileId,
-            },
-          });
-        }
+        results.push({
+          id: chunk.id,
+          similarity: vectorResult.similarity,
+          content: this.generateExcerpt(chunk.content || '', query),
+          source: {
+            fileId: chunk.id,
+            filename: (chunk.metadata as any)?.filename || '',
+          },
+          metadata: {
+            fileType: (chunk.metadata as any)?.fileType,
+            uploadedAt: chunk.createdAt.toISOString(),
+            extractedAt: chunk.updatedAt.toISOString(),
+            chunkIndex: chunk.chunkIndex,
+            highlights: (chunk.metadata as any)?.highlights,
+          },
+          context: {
+            before: (chunk.metadata as any)?.before,
+            after: (chunk.metadata as any)?.after,
+          },
+        });
       }
 
-      return results
-        .sort((a, b) => b.score - a.score)
-        .slice(0, limit);
+      return results;
 
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -283,20 +305,20 @@ export class SearchService {
     limit: number = 5
   ): Promise<SearchResult[]> {
     try {
-      // Get the vector for the source chunk
-      const sourceVector = await this.prisma.vector.findFirst({
-        where: {
-          sourceEntityId: chunkId,
-          entityType,
-          entityId,
-        },
-      });
+      // Get the vector for the source chunk using raw SQL to access embedding
+      const sourceVectors = await this.prisma.$queryRaw<Array<{ embedding: any }>>`
+        SELECT embedding FROM vectors 
+        WHERE "sourceEntityId" = ${chunkId}
+          AND "entityType" = ${entityType}
+          AND "entityId" = ${entityId}
+        LIMIT 1
+      `;
 
-      if (!sourceVector) {
+      if (sourceVectors.length === 0) {
         return [];
       }
 
-      const queryEmbedding = sourceVector.vector as number[];
+      const queryEmbedding = sourceVectors[0].embedding as number[];
 
       // Find similar content
       return this.embeddingService.findSimilarEmbeddings(
@@ -313,15 +335,18 @@ export class SearchService {
           .slice(0, limit)
           .map(vector => ({
             id: vector.sourceEntityId || '',
-            score: (vector as any).similarity,
+            similarity: (vector as any).similarity,
             content: '',
-            title: '',
-            excerpt: '',
-            type: 'chunk' as const,
             source: {
-              type: 'chunk' as const,
-              id: vector.sourceEntityId || '',
+              fileId: vector.sourceEntityId || '',
               filename: '',
+              chunkIndex: 0,
+              sectionTitle: '',
+            },
+            metadata: {
+              fileType: 'txt' as any,
+              uploadedAt: new Date().toISOString(),
+              extractedAt: new Date().toISOString(),
             },
           }));
       });
@@ -384,23 +409,7 @@ export class SearchService {
     return content.substring(0, maxLength).trim() + '...';
   }
 
-  private cosineSimilarity(a: number[], b: number[]): number {
-    if (a.length !== b.length) {
-      throw new Error('Vectors must have the same length');
-    }
-
-    let dotProduct = 0;
-    let normA = 0;
-    let normB = 0;
-
-    for (let i = 0; i < a.length; i++) {
-      dotProduct += a[i] * b[i];
-      normA += a[i] * a[i];
-      normB += b[i] * b[i];
-    }
-
-    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-  }
+  // Removed cosineSimilarity method - now using pgvector's native cosine distance operator (<=>)
 
   private createError(code: string, message: string, originalError?: unknown): KnowledgebaseError {
     return {

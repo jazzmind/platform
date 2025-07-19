@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DocumentService } from '../../../lib/services/document-service';
+import { PolicyDocumentService } from '../../../lib/services/document-service';
 import { FileType, ProcessingStatus } from '../../../types';
 import type { ApiResponse, DocumentSearchResponse, DocumentSearchResult } from '../../../types';
 
-const documentService = new DocumentService();
+const policyService = new PolicyDocumentService();
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,17 +14,29 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status') as ProcessingStatus | null;
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
     const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : undefined;
+    const organizationId = searchParams.get('organizationId') || 'default-org';
 
-    // Get documents from service
-    const documents = await documentService.listDocuments({
-      fileType: fileType || undefined,
-      status: status || undefined,
+    console.log(`📚 PolySec API: Fetching documents for organization ${organizationId}`);
+
+    // Get documents from policy service
+    const documents = await policyService.listDocuments(organizationId, {
       limit,
       offset
     });
 
+    // Apply client-side filtering (since knowledgebase integration handles basic filtering)
+    let filteredDocuments = documents;
+    
+    if (fileType) {
+      filteredDocuments = filteredDocuments.filter(doc => doc.fileType === fileType);
+    }
+    
+    if (status) {
+      filteredDocuments = filteredDocuments.filter(doc => doc.status === status);
+    }
+
     // Transform to search results
-    const searchResults: DocumentSearchResult[] = documents.map(doc => ({
+    const searchResults: DocumentSearchResult[] = filteredDocuments.map(doc => ({
       id: doc.id,
       title: doc.title,
       fileName: doc.fileName,
@@ -34,23 +46,22 @@ export async function GET(request: NextRequest) {
       sectionsCount: Array.isArray(doc.sections) ? doc.sections.length : 0
     }));
 
-    // Get total count for pagination
-    const totalCount = await documentService.getDocumentCount();
-
     const response: DocumentSearchResponse = {
       documents: searchResults,
-      total: totalCount,
-      hasMore: (offset || 0) + (limit || 50) < totalCount
+      total: filteredDocuments.length,
+      hasMore: false // Simple implementation
     };
+
+    console.log(`✅ PolySec API: Retrieved ${searchResults.length} documents`);
 
     return NextResponse.json<ApiResponse<DocumentSearchResponse>>({
       success: true,
       data: response,
-      message: 'Documents retrieved successfully'
+      message: 'Policy documents retrieved successfully'
     });
 
   } catch (error) {
-    console.error('Documents list error:', error);
+    console.error('PolySec documents list error:', error);
     
     return NextResponse.json<ApiResponse<never>>({
       success: false,

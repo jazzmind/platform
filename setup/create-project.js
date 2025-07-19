@@ -189,7 +189,7 @@ class ProjectSetup {
         "export": "npm run build"
       },
       dependencies: {
-        "next": "15.1.4",
+        "next": "^15.3.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
       },
@@ -368,7 +368,7 @@ module.exports = nextConfig;
         "sync-rules": "node scripts/sync-rules.js"
       },
       dependencies: {
-        "next": "15.1.4",
+        "next": "^15.3.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
       },

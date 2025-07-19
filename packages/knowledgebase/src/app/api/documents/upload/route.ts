@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DocumentService } from '../../../../lib/services/DocumentService';
+import { ProcessingService } from '../../../../lib/services/ProcessingService';
 import type { EntityType } from '../../../../lib/types';
 
 export async function POST(request: NextRequest) {
@@ -17,23 +17,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const documentService = new DocumentService();
+    console.log(`🚀 Upload API: Starting full document processing for ${file.name}`);
     
-    const result = await documentService.uploadDocument({
-      file,
+    // Get file content as buffer  
+    const fileContent = Buffer.from(await file.arrayBuffer());
+    console.log(`📁 Upload API: File buffer created, size: ${fileContent.length} bytes`);
+    
+    // Use ProcessingService to handle full pipeline: upload → extract → chunk → embed
+    const processingService = new ProcessingService();
+    
+    const result = await processingService.processDocument(
+      fileContent,
+      file.name,
       entityType,
       entityId,
-      organizationId,
-    });
+      organizationId
+    );
+    
+    console.log(`✅ Upload API: Processing completed for ${file.name}`);
 
     return NextResponse.json(result);
 
   } catch (error) {
-    console.error('Document upload error:', error);
+    console.error('Document upload and processing error:', error);
     
     return NextResponse.json(
       { 
-        error: 'Upload failed',
+        error: 'Upload and processing failed',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }

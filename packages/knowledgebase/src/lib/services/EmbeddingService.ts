@@ -26,6 +26,8 @@ export class EmbeddingService {
       batchSize: 100,
       retryAttempts: 3,
       retryDelay: 1000,
+      maxRetries: 3,
+      timeout: 30000,
       ...config,
     };
 
@@ -96,7 +98,7 @@ export class EmbeddingService {
   }
 
   /**
-   * Find similar embeddings using vector search
+   * Find similar embeddings using pgvector cosine similarity
    */
   async findSimilarEmbeddings(
     queryEmbedding: number[],
@@ -109,33 +111,45 @@ export class EmbeddingService {
   ) {
     try {
       const { limit = 10, threshold = 0.7 } = options;
-
-      // Note: This is a simplified similarity search
-      // In production, you'd want to use a proper vector database like Pinecone, Weaviate, or pgvector
-      const vectors = await this.prisma.vector.findMany({
-        where: {
-          entityType,
-          entityId,
-        },
-        take: limit * 2, // Get more results to filter by similarity
-      });
-
-      // Calculate cosine similarity
-      const similarities = vectors.map(vector => {
-        const embedding = vector.vector as number[];
-        const similarity = this.cosineSimilarity(queryEmbedding, embedding);
-        
-        return {
-          ...vector,
-          similarity,
-        };
-      });
-
-      // Filter by threshold and sort by similarity
-      return similarities
-        .filter(item => item.similarity >= threshold)
-        .sort((a, b) => b.similarity - a.similarity)
-        .slice(0, limit);
+      
+      console.log(`🔍 EmbeddingService: Finding similar embeddings using pgvector for ${entityType}/${entityId}`);
+      
+      const queryVector = `[${queryEmbedding.join(',')}]`;
+      
+      // Use pgvector's cosine distance operator (<=>)  
+      // Note: cosine distance = 1 - cosine similarity, so smaller distance = higher similarity
+      const maxDistance = 1 - threshold;
+      
+      const results = await this.prisma.$queryRaw<Array<{
+        id: string;
+        entityType: string;
+        entityId: string;
+        sourceEntityType: string | null;
+        sourceEntityId: string | null;
+        contentHash: string | null;
+        metadata: any;
+        createdAt: Date;
+        updatedAt: Date;
+        similarity: number;
+      }>>`
+        SELECT 
+          id, "entityType", "entityId", "sourceEntityType", "sourceEntityId",
+          "contentHash", metadata, "createdAt", "updatedAt",
+          1 - (embedding <=> ${queryVector}::vector) AS similarity
+        FROM vectors 
+        WHERE "entityType" = ${entityType} 
+          AND "entityId" = ${entityId}
+          AND (embedding <=> ${queryVector}::vector) <= ${maxDistance}
+        ORDER BY embedding <=> ${queryVector}::vector
+        LIMIT ${limit}
+      `;
+      
+      console.log(`✅ EmbeddingService: Found ${results.length} similar embeddings with pgvector`);
+      
+      return results.map(result => ({
+        ...result,
+        vector: null, // Don't return the actual vector data to save bandwidth
+      }));
 
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -241,26 +255,32 @@ export class EmbeddingService {
     entityType: EntityType,
     entityId: string
   ) {
-    const vectorData = embeddings.map((emb, index) => ({
-      id: emb.id,
-      vector: emb.embedding,
-      entityType,
-      entityId,
-      sourceEntityType: 'chunk',
-      sourceEntityId: emb.chunkId,
-      contentHash: chunks[index].contentHash,
-      metadata: {
-        chunkText: chunks[index].content.substring(0, 500), // Store first 500 chars for reference
-        chunkMetadata: chunks[index].metadata as any,
+    console.log(`🔧 EmbeddingService: Storing ${embeddings.length} pgvector embeddings`);
+    
+    // Use raw SQL for pgvector insertion since Prisma doesn't fully support vector types yet
+    for (const [index, emb] of embeddings.entries()) {
+      const vectorString = `[${emb.embedding.join(',')}]`;
+      const metadataJson = JSON.stringify({
+        chunkText: chunks[index].content.substring(0, 500),
+        chunkMetadata: chunks[index].metadata,
         generatedAt: new Date().toISOString(),
         model: this.config.model,
         dimensions: this.config.dimensions,
-      },
-    }));
-
-    await this.prisma.vector.createMany({
-      data: vectorData,
-    });
+      });
+      
+      await this.prisma.$executeRaw`
+        INSERT INTO vectors (
+          id, "entityType", "entityId", "sourceEntityType", "sourceEntityId", 
+          "contentHash", embedding, metadata, "createdAt", "updatedAt"
+        ) VALUES (
+          ${emb.id}, ${entityType}, ${entityId}, 'chunk', ${emb.chunkId},
+          ${chunks[index].contentHash}, CAST(${vectorString} AS vector), 
+          CAST(${metadataJson} AS jsonb), NOW(), NOW()
+        )
+      `;
+    }
+    
+    console.log(`✅ EmbeddingService: Successfully stored ${embeddings.length} pgvector embeddings`);
   }
 
   private async retryOperation<T>(
@@ -288,23 +308,7 @@ export class EmbeddingService {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private cosineSimilarity(a: number[], b: number[]): number {
-    if (a.length !== b.length) {
-      throw new Error('Vectors must have the same length');
-    }
-
-    let dotProduct = 0;
-    let normA = 0;
-    let normB = 0;
-
-    for (let i = 0; i < a.length; i++) {
-      dotProduct += a[i] * b[i];
-      normA += a[i] * a[i];
-      normB += b[i] * b[i];
-    }
-
-    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-  }
+  // Removed cosineSimilarity method - now using pgvector's native cosine distance operator (<=>) for much better performance
 
   private generateEmbeddingId(): string {
     return `emb_${crypto.randomUUID()}`;

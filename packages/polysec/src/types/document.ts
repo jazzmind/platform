@@ -8,7 +8,9 @@ export enum FileType {
 export enum ProcessingStatus {
   PROCESSING = 'PROCESSING',
   COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED'
+  FAILED = 'FAILED',  
+  PENDING = 'PENDING',
+  CANCELLED = 'CANCELLED'
 }
 
 export interface PolicyDocument {

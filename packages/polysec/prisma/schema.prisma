@@ -71,7 +71,9 @@ enum FileType {
 }
 
 enum ProcessingStatus {
+  PENDING
   PROCESSING
   COMPLETED
   FAILED
+  CANCELLED
 } 

@@ -43,6 +43,10 @@ export interface ExtractedContent {
       images: number;
     };
     format?: string;
+    errorDetails?: {
+      name: string;
+      message: string;
+    };
   };
 }
 
@@ -106,14 +110,14 @@ export interface SearchResult {
   source: {
     fileId: string;
     filename: string;
-    chunkIndex?: number;
-    sectionTitle?: string;
   };
   metadata: {
     fileType: FileType;
     uploadedAt: string;
     extractedAt: string;
     highlights?: string[];
+    documentName?: string;
+    chunkIndex?: number;
   };
   context?: {
     before?: string;

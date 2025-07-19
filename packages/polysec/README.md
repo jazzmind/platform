@@ -1,28 +1,30 @@
-# PolySec - Security Policy Management System
+# PolySec - AI-Powered Security Policy Management System
 
-A comprehensive security policy management system that processes policy documents, answers security questionnaires, and performs compliance analysis.
+A comprehensive AI-powered security policy management system that processes policy documents, answers security questionnaires, and performs compliance analysis using advanced semantic search and natural language processing.
 
-## Phase 1: Document Management Foundation ✅
+## 🚀 Production Ready with AI Integration ✅
 
-**Status**: Complete and Ready for Use
+**Status**: Production Ready with Full AI Capabilities
 
-### Features Implemented
+### 🎯 Core Features
 
-- **Document Upload & Storage**: Upload PDF, DOCX, and TXT files up to 100MB
-- **Document Processing**: Basic text extraction and section parsing
-- **Document Management**: View, filter, and delete uploaded documents
-- **Document Viewer**: Full document viewer with section navigation
-- **Mock Database**: In-memory storage for Phase 1 development
-- **REST API**: Complete API endpoints for document operations
-- **Web Interface**: Responsive UI with tabbed navigation
+- **🤖 AI-Powered Document Processing**: Upload PDF, DOCX, and TXT files with automatic text extraction, chunking, and vector embedding generation
+- **🔍 Semantic Search**: Advanced pgvector-based similarity search for finding relevant policy information
+- **❓ AI Security Questionnaire**: Get instant answers to compliance questions based on your policy documents
+- **📋 Compliance Frameworks**: Built-in support for SOC 2, ISO 27001, PCI DSS, and custom frameworks
+- **🎯 Policy Analysis**: AI-powered content analysis and section identification
+- **📊 Confidence Scoring**: Each answer includes confidence levels and source document references
+- **🌐 Web Interface**: Modern, responsive UI with tabbed navigation and real-time processing
 
 ### Technology Stack
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS v4
-- **Storage**: Mock in-memory database (Phase 1)
-- **File Processing**: Basic text extraction
+- **AI & Search**: OpenAI GPT-4 + text-embedding-3-small, pgvector
+- **Storage**: Knowledgebase integration with Vercel blob storage
+- **Database**: PostgreSQL with pgvector extension
+- **Processing**: Real-time document processing and vector embedding generation
 - **Architecture**: Dual-mode (standalone app + composable package)
 
 ## Quick Start
@@ -85,23 +87,44 @@ Content-Type: multipart/form-data
 
 # Form fields:
 # - file: File (required)
-# - title: string (optional)
+# - title: string (optional) 
 # - version: string (optional)
+# - organizationId: string (optional)
 ```
 
 ### List Documents
 ```http
-GET /api/documents?fileType=PDF&status=COMPLETED&limit=10&offset=0
+GET /api/documents?fileType=PDF&status=COMPLETED&limit=10&offset=0&organizationId=org-123
 ```
 
 ### Get Document
 ```http
-GET /api/documents/{id}
+GET /api/documents/{id}?organizationId=org-123
 ```
 
 ### Delete Document
 ```http
-DELETE /api/documents/{id}
+DELETE /api/documents/{id}?organizationId=org-123
+```
+
+### 🔒 Security Questionnaire
+```http
+POST /api/security/questionnaire
+Content-Type: application/json
+
+{
+  "questions": [
+    "What is your data encryption policy?",
+    "How do you handle incident response?"
+  ],
+  "organizationId": "org-123"
+}
+```
+
+### Get Questionnaire Templates
+```http
+GET /api/security/questionnaire?framework=soc2
+# Available frameworks: soc2, iso27001, pci, general
 ```
 
 ## File Support

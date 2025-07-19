@@ -6,12 +6,10 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "next lint",
-    "postinstall": "prisma generate"
+    "lint": "next lint"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.1",
-    "@prisma/client": "^6.6.0",
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "^9.0.3",
     "@sonnenreich/shared": "*",
@@ -28,7 +26,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
     "postcss": "^8",
-    "prisma": "^6.6.0",
     "tailwindcss": "^4.1.7",
     "typescript": "^5"
   }

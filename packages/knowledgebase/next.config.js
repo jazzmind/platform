@@ -6,11 +6,31 @@ const nextConfig = {
   // Enable standalone mode for development
   output: process.env.NODE_ENV === 'production' ? 'export' : undefined,
   
-  // Configure for both standalone and composition modes
-  experimental: {
-    // Enable app directory
-    appDir: true,
-  }
+  // Configure webpack to handle pdfjs-dist legacy build
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Configure externals for server-side rendering
+      config.externals = config.externals || [];
+      config.externals.push({
+        // Treat canvas as external to avoid server-side issues
+        canvas: 'commonjs canvas',
+      });
+      
+      // Handle pdfjs-dist legacy build imports
+      config.resolve = config.resolve || {};
+      config.resolve.alias = config.resolve.alias || {};
+      
+      // Don't try to bundle the legacy build - let it be dynamically imported
+      config.externals.push(function ({ request }, callback) {
+        if (request === 'pdfjs-dist/legacy/build/pdf.mjs') {
+          return callback(null, `commonjs ${request}`);
+        }
+        callback();
+      });
+    }
+    
+    return config;
+  },
 };
 
 module.exports = nextConfig;

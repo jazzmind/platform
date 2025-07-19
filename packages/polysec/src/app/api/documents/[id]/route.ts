@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DocumentService } from '../../../../lib/services/document-service';
+import { PolicyDocumentService } from '../../../../lib/services/document-service';
 import type { ApiResponse, PolicyDocument } from '../../../../types';
 
-const documentService = new DocumentService();
+const policyService = new PolicyDocumentService();
 
 interface RouteParams {
   params: Promise<{
@@ -13,25 +13,31 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const organizationId = searchParams.get('organizationId') || 'default-org';
+    
+    console.log(`📄 PolySec API: Fetching document ${id} for organization ${organizationId}`);
     
     // Get document by ID
-    const document = await documentService.getDocument(id);
+    const document = await policyService.getDocument(id, organizationId);
 
     if (!document) {
       return NextResponse.json<ApiResponse<never>>({
         success: false,
-        error: 'Document not found'
+        error: 'Policy document not found'
       }, { status: 404 });
     }
+
+    console.log(`✅ PolySec API: Retrieved document ${document.title}`);
 
     return NextResponse.json<ApiResponse<PolicyDocument>>({
       success: true,
       data: document,
-      message: 'Document retrieved successfully'
+      message: 'Policy document retrieved successfully'
     });
 
   } catch (error) {
-    console.error('Document get error:', error);
+    console.error('PolySec document get error:', error);
     
     return NextResponse.json<ApiResponse<never>>({
       success: false,
@@ -43,25 +49,31 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const organizationId = searchParams.get('organizationId') || 'default-org';
+    
+    console.log(`🗑️ PolySec API: Deleting document ${id} for organization ${organizationId}`);
     
     // Delete document
-    const success = await documentService.deleteDocument(id);
+    const success = await policyService.deleteDocument(id, organizationId);
 
     if (!success) {
       return NextResponse.json<ApiResponse<never>>({
         success: false,
-        error: 'Document not found or could not be deleted'
+        error: 'Policy document not found or could not be deleted'
       }, { status: 404 });
     }
+
+    console.log(`✅ PolySec API: Deleted document ${id}`);
 
     return NextResponse.json<ApiResponse<{ id: string }>>({
       success: true,
       data: { id },
-      message: 'Document deleted successfully'
+      message: 'Policy document deleted successfully'
     });
 
   } catch (error) {
-    console.error('Document delete error:', error);
+    console.error('PolySec document delete error:', error);
     
     return NextResponse.json<ApiResponse<never>>({
       success: false,

@@ -2,7 +2,6 @@
 const config = {
   displayName: 'Knowledgebase Package',
   preset: 'ts-jest',
-  testEnvironment: 'node',
   
   // Test file patterns
   testMatch: [
@@ -22,22 +21,23 @@ const config = {
   coverageReporters: ['text', 'lcov', 'html'],
   
   // Module resolution
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   
   // Setup files
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   
+  // Custom Jest environment that loads env vars first
+  testEnvironment: '<rootDir>/tests/jest-environment.js',
+  
   // Transform configuration
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: {
-        compilerOptions: {
-          // Use ES modules for testing
-          module: 'CommonJS',
-          target: 'ES2020',
-        }
+        // Use ES modules for testing
+        module: 'CommonJS',
+        target: 'ES2020',
       }
     }]
   },

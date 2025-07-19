@@ -6,3 +6,6 @@ export { default as PolySec } from './polysec';
 export { DocumentUpload } from './document-upload';
 export { DocumentList } from './document-list';
 export { DocumentViewer } from './document-viewer';
+
+// Security compliance components
+export { SecurityQuestionnaire } from './security-questionnaire';

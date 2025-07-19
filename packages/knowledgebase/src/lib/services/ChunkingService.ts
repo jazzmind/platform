@@ -32,7 +32,8 @@ export class ChunkingService {
     extractedContent: ExtractedContent,
     fileId: string,
     entityType: string,
-    entityId: string
+    entityId: string,
+    fileType?: string
   ): Promise<ContentChunk[]> {
     try {
       const { text } = extractedContent;
@@ -55,6 +56,7 @@ export class ChunkingService {
           fileId,
           entityType,
           entityId,
+          fileType: fileType || 'unknown',
           chunkSize: chunk.length,
           wordsCount: this.countWords(chunk),
           extractedFrom: extractedContent.metadata.title,

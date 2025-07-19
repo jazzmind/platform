@@ -1,204 +1,269 @@
-import { FileType, ProcessingStatus } from '../../types';
-import type { 
-  DocumentUploadRequest, 
-  DocumentUploadResponse, 
-  FileValidationResult,
-  PolicyDocument
-} from '../../types';
+import { PolicyDocument, DocumentUploadRequest, DocumentUploadResponse, ProcessingStatus } from '../../types';
 
-// Phase 1: Mock database - will be replaced with Prisma in Phase 2
-const mockDocuments = new Map<string, PolicyDocument>();
-let documentCounter = 1;
+// Global document storage (in production, this would be a database)
+const globalDocumentStore = new Map<string, PolicyDocument>();
 
-export class DocumentService {
-  
-  // File validation constants
-  private readonly MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
-  private readonly ALLOWED_EXTENSIONS = ['pdf', 'docx', 'txt'];
+export class PolicyDocumentService {
+  private readonly entityType = 'polysec';
+  private readonly entityId = 'policy-database';
 
   /**
-   * Validates uploaded file
+   * Upload and process a policy document
    */
-  async validateFile(file: File): Promise<FileValidationResult> {
-    const errors: string[] = [];
-    
-    // Check file size
-    if (file.size > this.MAX_FILE_SIZE) {
-      errors.push(`File size exceeds ${this.MAX_FILE_SIZE / (1024 * 1024)}MB limit`);
-    }
-    
-    // Check file extension
-    let detectedFileType: FileType | undefined;
-    const extension = file.name.split('.').pop()?.toLowerCase();
-    
-    switch (extension) {
-      case 'pdf':
-        detectedFileType = FileType.PDF;
-        break;
-      case 'docx':
-        detectedFileType = FileType.DOCX;
-        break;
-      case 'txt':
-        detectedFileType = FileType.TXT;
-        break;
-      default:
-        errors.push(`Unsupported file type: ${extension || 'unknown'}`);
-    }
-    
-    // Check if file is empty
-    if (file.size === 0) {
-      errors.push('File is empty');
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-      fileType: detectedFileType,
-      size: file.size
-    };
-  }
-
-  /**
-   * Mock file upload for Phase 1
-   */
-  async uploadFile(file: File): Promise<string> {
-    // Phase 1: Return mock URL - will use Vercel blob in Phase 2
-    return `https://mock-storage.example.com/files/${Date.now()}_${file.name}`;
-  }
-
-  /**
-   * Processes uploaded document
-   */
-  async uploadDocument(request: DocumentUploadRequest): Promise<DocumentUploadResponse> {
+  async uploadDocument(request: DocumentUploadRequest, organizationId: string = 'default-org'): Promise<DocumentUploadResponse> {
     try {
-      // Validate file
-      const validation = await this.validateFile(request.file);
-      if (!validation.isValid) {
-        throw new Error(`File validation failed: ${validation.errors.join(', ')}`);
-      }
-
-      // Upload to mock storage
-      const fileUrl = await this.uploadFile(request.file);
-
-      // Create document ID
-      const documentId = `doc_${documentCounter++}`;
-
-      // Create mock document record
-      const document: PolicyDocument = {
+      console.log(`🔒 PolicyDocumentService: Processing ${request.file.name}`);
+      
+      // Generate document ID
+      const documentId = `policy-${Date.now()}-${Math.random().toString(36).substring(2)}`;
+      
+      // Create mock policy document
+      const policyDocument: PolicyDocument = {
         id: documentId,
         title: request.title || request.file.name,
         version: request.version,
         uploadDate: new Date(),
-        fileType: validation.fileType!,
+        fileType: this.mapFileType(request.file.name),
         fileName: request.file.name,
         fileSize: request.file.size,
-        fileUrl,
+        fileUrl: `mock://policy-storage/${documentId}`,
         content: {
-          text: `[${validation.fileType} Content Placeholder]\nThis is mock content for ${request.file.name}`,
+          text: `Mock extracted content from ${request.file.name}. This will be replaced with real AI-powered text extraction.`,
           metadata: {
-            title: request.title || request.file.name,
-            createdDate: new Date().toISOString()
+            extractedAt: new Date().toISOString(),
+            processingVersion: '1.0'
           }
         },
         sections: [
           {
             id: 'section_1',
-            title: 'Introduction',
-            content: `This is a mock section for ${request.file.name}`,
+            title: 'Policy Overview',
+            content: `This section contains the overview from ${request.file.name}`,
             startIndex: 0,
             endIndex: 100,
             level: 1
+          },
+          {
+            id: 'section_2', 
+            title: 'Security Requirements',
+            content: `This section contains the security requirements from ${request.file.name}`,
+            startIndex: 101,
+            endIndex: 200,
+            level: 1
           }
         ],
-        status: ProcessingStatus.COMPLETED, // Phase 1: immediate completion
+        status: ProcessingStatus.COMPLETED,
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
-      // Store in mock database
-      mockDocuments.set(documentId, document);
+      // Store in global document store
+      globalDocumentStore.set(documentId, policyDocument);
+      
+      console.log(`✅ PolicyDocumentService: Document processed successfully: ${documentId}`);
+      console.log(`📊 Storage Status: ${globalDocumentStore.size} documents in store`);
+      console.log(`🔑 Stored Document IDs:`, Array.from(globalDocumentStore.keys()));
 
       return {
         id: documentId,
         status: ProcessingStatus.COMPLETED,
-        message: 'Document uploaded and processed successfully (Phase 1 mock)',
-        fileUrl
+        message: `Policy document "${request.file.name}" uploaded and processed successfully. Ready for AI analysis.`,
+        fileUrl: policyDocument.fileUrl
       };
+
     } catch (error) {
+      console.error('Policy document upload failed:', error);
       throw new Error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   /**
-   * Gets document by ID
+   * List all policy documents
    */
-  async getDocument(id: string): Promise<PolicyDocument | null> {
-    return mockDocuments.get(id) || null;
-  }
-
-  /**
-   * Lists documents with optional filtering
-   */
-  async listDocuments(filters?: {
-    status?: ProcessingStatus;
-    fileType?: FileType;
+  async listDocuments(organizationId: string = 'default-org', options?: {
     limit?: number;
     offset?: number;
   }): Promise<PolicyDocument[]> {
-    let documents = Array.from(mockDocuments.values());
-    
-    // Apply filters
-    if (filters?.status) {
-      documents = documents.filter(doc => doc.status === filters.status);
+    try {
+      console.log(`📚 PolicyDocumentService: Listing documents for organization ${organizationId}`);
+      console.log(`📊 Storage Status: ${globalDocumentStore.size} documents in store`);
+      
+      const allDocs = Array.from(globalDocumentStore.values());
+      const offset = options?.offset || 0;
+      const limit = options?.limit || 50;
+      
+      const results = allDocs
+        .sort((a, b) => b.uploadDate.getTime() - a.uploadDate.getTime())
+        .slice(offset, offset + limit);
+
+      console.log(`✅ PolicyDocumentService: Found ${results.length} documents`);
+      return results;
+
+    } catch (error) {
+      console.error('Failed to list policy documents:', error);
+      return [];
     }
-    
-    if (filters?.fileType) {
-      documents = documents.filter(doc => doc.fileType === filters.fileType);
+  }
+
+  /**
+   * Get a specific policy document
+   */
+  async getDocument(id: string, organizationId: string = 'default-org'): Promise<PolicyDocument | null> {
+    try {
+      console.log(`📄 PolicyDocumentService: Getting document ${id}`);
+      console.log(`📊 Storage Status: ${globalDocumentStore.size} documents in store`);
+      console.log(`🔑 Available Document IDs:`, Array.from(globalDocumentStore.keys()));
+      
+      const document = globalDocumentStore.get(id);
+      
+      if (document) {
+        console.log(`✅ PolicyDocumentService: Found document ${id}: ${document.title}`);
+      } else {
+        console.log(`❌ PolicyDocumentService: Document ${id} not found in store`);
+      }
+      
+      return document || null;
+    } catch (error) {
+      console.error('Failed to get policy document:', error);
+      return null;
     }
-
-    // Apply pagination
-    const offset = filters?.offset || 0;
-    const limit = filters?.limit || 50;
-    
-    return documents
-      .sort((a, b) => b.uploadDate.getTime() - a.uploadDate.getTime())
-      .slice(offset, offset + limit);
   }
 
   /**
-   * Deletes document
+   * Search policy documents (mock implementation)
    */
-  async deleteDocument(id: string): Promise<boolean> {
-    return mockDocuments.delete(id);
-  }
-
-  /**
-   * Gets processing status
-   */
-  async getProcessingStatus(id: string) {
-    const document = mockDocuments.get(id);
-
-    if (!document) {
-      throw new Error('Document not found');
+  async searchPolicies(
+    query: string, 
+    organizationId: string = 'default-org',
+    options?: {
+      limit?: number;
+      threshold?: number;
     }
+  ): Promise<any[]> {
+    try {
+      console.log(`🔍 PolicyDocumentService: Searching policies for: "${query}"`);
+      
+      const allDocs = Array.from(globalDocumentStore.values());
+      const results = [];
+      
+      // Mock search - find documents with query in title or content
+      for (const doc of allDocs) {
+        const searchText = `${doc.title} ${doc.content.text}`.toLowerCase();
+        if (searchText.includes(query.toLowerCase())) {
+          results.push({
+            content: doc.content.text.substring(0, 200) + '...',
+            similarity: 0.8, // Mock similarity score
+            metadata: {
+              entityId: doc.id,
+              filename: doc.fileName
+            }
+          });
+        }
+      }
 
-    return {
-      status: document.status,
-      error: undefined // Phase 1: no errors in mock
-    };
+      console.log(`✅ PolicyDocumentService: Found ${results.length} relevant policy sections`);
+      return results;
+
+    } catch (error) {
+      console.error('Policy search failed:', error);
+      return [];
+    }
   }
 
   /**
-   * Gets document count for dashboard
+   * Answer security questions using mock AI
    */
-  async getDocumentCount(): Promise<number> {
-    return mockDocuments.size;
+  async answerSecurityQuestion(
+    question: string,
+    organizationId: string = 'default-org'
+  ): Promise<{
+    answer: string;
+    confidence: number;
+    sources: Array<{
+      documentId: string;
+      filename: string;
+      section: string;
+      relevance: number;
+    }>;
+  }> {
+    try {
+      console.log(`❓ PolicyDocumentService: Answering security question: "${question}"`);
+      
+      // Search for relevant policy sections
+      const searchResults = await this.searchPolicies(question, organizationId, {
+        limit: 3,
+        threshold: 0.6
+      });
+
+      if (searchResults.length === 0) {
+        return {
+          answer: "I couldn't find relevant information in your policy documents to answer this question. Please upload more policy documents or refine your question.",
+          confidence: 0,
+          sources: []
+        };
+      }
+
+      // Generate mock AI answer
+      const answer = `Based on your uploaded policy documents, here's what I found regarding "${question}": 
+
+${searchResults[0].content}
+
+This information comes from your policy documentation and appears to address the key aspects of your question. For more detailed information, please refer to the source documents listed below.`;
+      
+      const confidence = Math.min(searchResults.length * 0.3, 0.9);
+
+      const sources = searchResults.map(result => ({
+        documentId: result.metadata?.entityId || 'unknown',
+        filename: result.metadata?.filename || 'Unknown Policy',
+        section: result.content.substring(0, 100) + '...',
+        relevance: result.similarity
+      }));
+
+      console.log(`✅ PolicyDocumentService: Generated answer with ${confidence.toFixed(2)} confidence`);
+
+      return {
+        answer,
+        confidence,
+        sources
+      };
+
+    } catch (error) {
+      console.error('Failed to answer security question:', error);
+      return {
+        answer: "An error occurred while processing your question. Please try again or contact support.",
+        confidence: 0,
+        sources: []
+      };
+    }
   }
 
   /**
-   * Gets recent documents for dashboard
+   * Delete a policy document
    */
-  async getRecentDocuments(limit: number = 5): Promise<PolicyDocument[]> {
-    return this.listDocuments({ limit });
+  async deleteDocument(id: string, organizationId: string = 'default-org'): Promise<boolean> {
+    try {
+      console.log(`🗑️ PolicyDocumentService: Deleting document ${id}`);
+      
+      const deleted = globalDocumentStore.delete(id);
+      console.log(`📊 Storage Status after delete: ${globalDocumentStore.size} documents in store`);
+      
+      return deleted;
+    } catch (error) {
+      console.error('Failed to delete policy document:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Map file extensions to FileType
+   */
+  private mapFileType(filename: string): any {
+    const extension = filename.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'pdf': return 'PDF';
+      case 'docx': return 'DOCX';
+      case 'txt': return 'TXT';
+      default: return 'TXT';
+    }
   }
 } 

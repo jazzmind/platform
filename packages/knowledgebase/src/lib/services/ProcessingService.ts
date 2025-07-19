@@ -29,111 +29,6 @@ export class ProcessingService {
   }
 
   /**
-   * Process a document through the full pipeline
-   */
-  async processDocument(request: UploadRequest): Promise<ProcessingResult> {
-    const processingId = `proc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    try {
-      // Initialize processing status
-      this.updateProcessingStatus(processingId, {
-        stage: 'uploading',
-        current: 0,
-        total: 5,
-        message: 'Uploading document...',
-        percentage: 0,
-      });
-
-      // Step 1: Upload document
-      const uploadResult = await this.documentService.uploadDocument(request);
-      
-      this.updateProcessingStatus(processingId, {
-        stage: 'extracting',
-        current: 1,
-        total: 5,
-        message: 'Extracting text content...',
-        percentage: 20,
-      });
-
-      // Step 2: Extract text (simplified - in a real implementation, you'd need the file content)
-      // For now, we'll simulate this step since we don't have the actual file processing integrated yet
-      await this.delay(1000); // Simulate processing time
-      
-      this.updateProcessingStatus(processingId, {
-        stage: 'chunking',
-        current: 2,
-        total: 5,
-        message: 'Chunking content...',
-        percentage: 40,
-      });
-
-      // Step 3: Chunk content (simplified)
-      await this.delay(1000);
-      
-      this.updateProcessingStatus(processingId, {
-        stage: 'embedding',
-        current: 3,
-        total: 5,
-        message: 'Generating embeddings...',
-        percentage: 60,
-      });
-
-      // Step 4: Generate embeddings (simplified)
-      await this.delay(2000);
-      
-      this.updateProcessingStatus(processingId, {
-        stage: 'analyzing',
-        current: 4,
-        total: 5,
-        message: 'Analyzing content...',
-        percentage: 80,
-      });
-
-      // Step 5: Final analysis (simplified)
-      await this.delay(1000);
-      
-      this.updateProcessingStatus(processingId, {
-        stage: 'completing',
-        current: 5,
-        total: 5,
-        message: 'Processing complete!',
-        percentage: 100,
-      });
-
-      const result: ProcessingResult = {
-        success: true,
-        fileId: uploadResult.fileId || 'unknown',
-        processingId,
-        documentsProcessed: 1,
-        chunksCreated: Math.floor(Math.random() * 50) + 10, // Simulated
-        embeddingsGenerated: Math.floor(Math.random() * 50) + 10, // Simulated
-        sectionsIdentified: Math.floor(Math.random() * 5) + 1, // Simulated
-        processingTime: 5000, // 5 seconds total
-      };
-
-      // Clean up processing status after a delay
-      setTimeout(() => {
-        this.processingStatus.delete(processingId);
-      }, 30000); // Keep for 30 seconds
-
-      return result;
-
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
-      this.updateProcessingStatus(processingId, {
-        stage: 'uploading', // Reset to first stage
-        current: 0,
-        total: 5,
-        message: `Error: ${errorMessage}`,
-        percentage: 0,
-      });
-
-      throw this.createError('PROCESSING_FAILED', `Document processing failed: ${errorMessage}`, error);
-    }
-  }
-
-  /**
    * Get processing status for a specific job
    */
   getProcessingStatus(processingId: string): ProcessingProgress | null {
@@ -143,7 +38,7 @@ export class ProcessingService {
   /**
    * Process document with real pipeline (for future implementation)
    */
-  async processDocumentFull(
+  async processDocument(
     fileContent: Buffer,
     filename: string,
     entityType: EntityType,
@@ -162,7 +57,26 @@ export class ProcessingService {
         percentage: 25,
       });
 
-      const extractedContent = await this.textExtractionService.extractText(fileContent, filename);
+      // Detect file type from filename
+      const fileExtension = filename.split('.').pop()?.toLowerCase() || 'txt';
+      console.log(`🔍 ProcessingService: File extension detected: '${fileExtension}'`);
+      
+      const fileTypeMap: Record<string, any> = {
+        'pdf': 'pdf',
+        'docx': 'docx', 
+        'doc': 'docx',
+        'txt': 'txt',
+        'html': 'html',
+        'htm': 'html',
+        'md': 'txt'
+      };
+      const fileType = fileTypeMap[fileExtension] || 'txt';
+      console.log(`🔍 ProcessingService: Mapped file type: '${fileType}'`);
+      console.log(`🔍 ProcessingService: About to call text extraction for ${filename}`);
+      
+      const extractedContent = await this.textExtractionService.extractText(fileContent, fileType, filename);
+      console.log(`✅ ProcessingService: Text extraction completed. Text length: ${extractedContent.text.length}`);
+      console.log(`✅ ProcessingService: Extraction metadata:`, extractedContent.metadata);
 
       // Step 2: Chunk content
       this.updateProcessingStatus(processingId, {
@@ -173,13 +87,36 @@ export class ProcessingService {
         percentage: 50,
       });
 
-      const chunks = await this.chunkingService.chunkContent(
+      const chunks = await this.chunkingService.createChunks(
         extractedContent,
         filename,
         entityType,
         entityId,
-        organizationId
+        fileType
       );
+      console.log(`✅ ProcessingService: Created ${chunks.length} chunks`);
+
+      // Step 2.5: Store file metadata and chunks in database
+      this.updateProcessingStatus(processingId, {
+        stage: 'chunking',
+        current: 2.5,
+        total: 4,
+        message: 'Storing file and chunks...',
+        percentage: 62,
+      });
+
+      // First upload the file metadata
+      const uploadResult = await this.documentService.uploadDocument({
+        file: new File([fileContent], filename),
+        entityType,
+        entityId,
+        organizationId,
+      });
+      console.log(`✅ ProcessingService: File metadata stored with ID: ${uploadResult.fileId}`);
+
+      // Store chunks in database
+      await this.storeChunks(chunks, uploadResult.fileId, entityType, entityId, organizationId);
+      console.log(`✅ ProcessingService: Stored ${chunks.length} chunks in database`);
 
       // Step 3: Generate embeddings
       this.updateProcessingStatus(processingId, {
@@ -190,12 +127,34 @@ export class ProcessingService {
         percentage: 75,
       });
 
+      // Re-fetch chunks from database to get their IDs for embedding generation
+      const storedChunks = await this.prisma.fileData.findMany({
+        where: {
+          fileId: uploadResult.fileId,
+          entityType,
+          entityId,
+          organizationId,
+          dataType: 'chunk',
+        },
+      });
+      console.log(`✅ ProcessingService: Retrieved ${storedChunks.length} stored chunks for embedding`);
+
       const embeddingIds = await this.embeddingService.generateEmbeddings(
-        chunks,
+        storedChunks.map((chunk, index) => ({
+          id: chunk.id,
+          content: chunk.content || '',
+          chunkIndex: index,
+          totalChunks: storedChunks.length,
+          startOffset: 0,
+          endOffset: chunk.content?.length || 0,
+          contentHash: chunk.contentHash || '',
+          metadata: chunk.metadata as any,
+        })),
         entityType,
         entityId,
         organizationId
       );
+      console.log(`✅ ProcessingService: Generated ${embeddingIds.length} embeddings`);
 
       // Step 4: Complete
       this.updateProcessingStatus(processingId, {
@@ -233,8 +192,8 @@ export class ProcessingService {
     organizationId: string
   ): Promise<ProcessingResult> {
     try {
-      // Delete existing embeddings
-      await this.embeddingService.deleteEmbeddings(entityType, entityId, organizationId);
+      // Delete existing embeddings  
+      await this.embeddingService.deleteEmbeddings(entityType, entityId, organizationId, [fileId]);
 
       // Get existing chunks and regenerate embeddings
       const chunks = await this.prisma.fileData.findMany({
@@ -292,6 +251,33 @@ export class ProcessingService {
   }
 
   // Private helper methods
+  private async storeChunks(
+    chunks: any[],
+    fileId: string,
+    entityType: EntityType,
+    entityId: string,
+    organizationId: string
+  ): Promise<void> {
+    console.log(`🔧 ProcessingService: Storing ${chunks.length} chunks for file ${fileId}`);
+    
+    for (const chunk of chunks) {
+      await this.prisma.fileData.create({
+        data: {
+          fileId,
+          entityType,
+          entityId,
+          dataType: 'chunk',
+          chunkIndex: chunk.chunkIndex,
+          totalChunks: chunk.totalChunks,
+          content: chunk.content,
+          contentHash: chunk.contentHash,
+          metadata: chunk.metadata || {},
+          organizationId,
+        },
+      });
+    }
+  }
+
   private updateProcessingStatus(processingId: string, progress: ProcessingProgress) {
     this.processingStatus.set(processingId, progress);
   }

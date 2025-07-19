@@ -139,26 +139,40 @@ export class DocumentService {
         throw new Error('File not found');
       }
 
+      // Get all chunks for this document to find their IDs
+      const chunks = await this.prisma.fileData.findMany({
+        where: {
+          fileId,
+          organizationId,
+          dataType: 'chunk',
+        },
+        select: { id: true },
+      });
+
+      const chunkIds = chunks.map(chunk => chunk.id);
+      console.log(`🗑️ DocumentService: Deleting document ${fileId} with ${chunkIds.length} chunks`);
+
       // Delete from blob storage
       const blobUrl = (fileRecord.metadata as any)?.blobUrl as string;
       if (blobUrl) {
         await del(blobUrl);
       }
 
-      // Delete all associated records
+      // Delete all associated records in proper order
       await this.prisma.$transaction([
-        // Delete file data records
+        // First delete vector records for all chunks
+        this.prisma.vector.deleteMany({
+          where: {
+            sourceEntityId: { in: chunkIds },
+          },
+        }),
+        // Then delete all file data records (metadata + chunks)
         this.prisma.fileData.deleteMany({
           where: { fileId, organizationId },
         }),
-        // Delete vector records
-        this.prisma.vector.deleteMany({
-          where: {
-            sourceEntityType: 'FileData',
-            sourceEntityId: fileId,
-          },
-        }),
       ]);
+
+      console.log(`✅ DocumentService: Successfully deleted document ${fileId} and ${chunkIds.length} associated vectors`);
 
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

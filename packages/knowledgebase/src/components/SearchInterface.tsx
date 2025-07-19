@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import type { SearchInterfaceProps, SearchResult } from '../lib/types';
 
 export function SearchInterface({
@@ -24,8 +24,11 @@ export function SearchInterface({
     'access control',
     'compliance requirements',
   ]);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSearch = useCallback(async (searchQuery: string) => {
+    console.log(`🔍 SearchInterface: Starting search for "${searchQuery}"`);
+    
     if (!searchQuery.trim()) {
       setResults([]);
       return;
@@ -34,21 +37,17 @@ export function SearchInterface({
     setIsSearching(true);
     
     try {
-      // Make API call to search endpoint
-      const response = await fetch('/api/documents/search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: searchQuery,
-          entityType,
-          entityId,
-          limit: 10,
-          threshold: 0.7,
-          includeMetadata: true,
-        }),
-      });
+      // Make API call to search endpoint using GET
+      const searchUrl = new URL('/api/documents/search', window.location.origin);
+      searchUrl.searchParams.set('q', searchQuery);
+      searchUrl.searchParams.set('entityType', entityType);
+      searchUrl.searchParams.set('entityId', entityId);
+      searchUrl.searchParams.set('organizationId', organizationId);
+      searchUrl.searchParams.set('limit', '10');
+      searchUrl.searchParams.set('threshold', '0.1'); // Very permissive threshold for testing
+      
+      console.log(`🔧 SearchInterface: Making GET request to ${searchUrl.toString()}`);
+      const response = await fetch(searchUrl.toString());
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -57,6 +56,9 @@ export function SearchInterface({
 
       const searchResponse = await response.json();
       const searchResults = searchResponse.results || [];
+      
+      console.log(`✅ SearchInterface: Search completed for "${searchQuery}", found ${searchResults.length} results`);
+      console.log(`✅ SearchInterface: Search response:`, searchResponse);
       
       setResults(searchResults);
       onSearch?.(searchQuery, searchResults);
@@ -78,6 +80,36 @@ export function SearchInterface({
     setQuery(suggestion);
     handleSearch(suggestion);
   }, [handleSearch]);
+
+  // Debounced search effect
+  useEffect(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    if (query.trim().length === 0) {
+      setResults([]);
+      return;
+    }
+
+    if (query.trim().length < 3) {
+      return; // Don't search for queries less than 3 characters
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      handleSearch(query);
+    }, 500); // 500ms debounce
+
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [query]); // Removed handleSearch from dependencies to prevent infinite loops
+
+  const handleQueryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  }, []);
 
   return (
     <div className={`search-interface ${className}`}>
@@ -102,7 +134,7 @@ export function SearchInterface({
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={handleQueryChange}
             placeholder={placeholder}
             className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
             disabled={isSearching}
@@ -196,56 +228,7 @@ export function SearchInterface({
         </div>
       )}
 
-      {/* Search Results */}
-      {results.length > 0 && (
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">
-              Search Results ({results.length})
-            </h3>
-            <p className="text-sm text-gray-500">
-              Found in {results.length} document{results.length !== 1 ? 's' : ''}
-            </p>
-          </div>
-          
-          <div className="space-y-4">
-            {results.map((result) => (
-              <div
-                key={result.id}
-                className="bg-white p-4 border border-gray-200 rounded-lg hover:border-gray-300 cursor-pointer transition-colors"
-                onClick={() => onResultSelect?.(result)}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-medium text-gray-900 hover:text-blue-600">
-                    {result.source.filename}
-                  </h4>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-green-600 font-medium">
-                      {Math.round(result.similarity * 100)}% match
-                    </span>
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded uppercase">
-                      {result.metadata.fileType}
-                    </span>
-                  </div>
-                </div>
-                
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  {result.content}
-                </p>
-                
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span>
-                    Uploaded {new Date(result.metadata.uploadedAt).toLocaleDateString()}
-                  </span>
-                  {result.source.chunkIndex !== undefined && (
-                    <span>Section {result.source.chunkIndex + 1}</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Search Results - Display handled by parent component to avoid duplication */}
 
       {/* No Results */}
       {query && !isSearching && results.length === 0 && (
