@@ -1,7 +1,7 @@
 {
-  "name": "@sonnenreich/auth",
+  "name": "@jazzmind/auth",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "main": "index.ts",
   "exports": {
     ".": "./index.ts",
@@ -22,16 +22,16 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.1",
+    "@prisma/client": "^5.0.0",
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "^9.0.3",
-    "@sonnenreich/shared": "*",
+    "@jazzmind/shared": "*",
     "@tailwindcss/postcss": "^4.1.7",
-    "next": "^15.3.0",
+    "next": "^15.0.0",
     "next-auth": "^5.0.0-beta.19",
+    "prisma": "^5.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "@prisma/client": "^5.0.0",
-    "prisma": "^5.0.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.31",
@@ -47,5 +47,13 @@
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jazzmind/platform.git",
+    "directory": "packages/auth"
   }
 }

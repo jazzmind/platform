@@ -74,7 +74,7 @@ We have successfully implemented a comprehensive authorization system that provi
 
 2. **Run Setup Script**
    ```typescript
-   import { setupAuthorizationSystem } from '@sonnenreich/shared';
+   import { setupAuthorizationSystem } from '@jazzmind/shared';
    import { PrismaClient } from '@prisma/client';
    
    const prisma = new PrismaClient();
@@ -96,7 +96,7 @@ We have successfully implemented a comprehensive authorization system that provi
 
 4. **Protect API Routes**
    ```typescript
-   import { withMeetingAuthorization } from '@sonnenreich/shared';
+   import { withMeetingAuthorization } from '@jazzmind/shared';
    
    // Protect meeting edit endpoint
    export const PUT = withMeetingAuthorization('edit')(async (req, { params }) => {
@@ -129,7 +129,7 @@ graph TD
 ### 1. Creating a Meeting with Authorization
 
 ```typescript
-import { MeetingAuthService, AccessType } from '@sonnenreich/shared';
+import { MeetingAuthService, AccessType } from '@jazzmind/shared';
 
 // Create meeting
 const { meeting, permissions } = await MeetingAuthService.createMeetingWithOwnership({
@@ -164,7 +164,7 @@ await MeetingAuthService.addMeetingParticipant(
 ### 2. Checking Meeting Permissions
 
 ```typescript
-import { checkMeetingPermissions } from '@sonnenreich/shared';
+import { checkMeetingPermissions } from '@jazzmind/shared';
 
 const permissions = await checkMeetingPermissions(userId, meetingId);
 
@@ -190,7 +190,7 @@ if (permissions.canManageParticipants) {
 
 ```typescript
 // pages/api/meetings/[meetingId]/route.ts
-import { withMeetingAuthorization, type AuthorizedRequest } from '@sonnenreich/shared';
+import { withMeetingAuthorization, type AuthorizedRequest } from '@jazzmind/shared';
 
 // View meeting (requires view permission)
 export const GET = withMeetingAuthorization('view')(
@@ -308,7 +308,7 @@ const result = await authEngine.requestPackageAccess(userId, {
 
 ### For Existing Packages
 
-- [ ] **Install Dependencies**: Add `@sonnenreich/shared` dependency
+- [ ] **Install Dependencies**: Add `@jazzmind/shared` dependency
 - [ ] **Initialize Authorization**: Run setup script for your package
 - [ ] **Update Database**: Add resource access tracking
 - [ ] **Retrofit APIs**: Add authorization checks to existing endpoints

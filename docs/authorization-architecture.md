@@ -47,7 +47,7 @@
   - Manage permission caching
   - Provide authorization APIs
 
-### Shared Auth Utils (`@sonnenreich/shared`)
+### Shared Auth Utils (`@jazzmind/shared`)
 - **Purpose**: Common authorization utilities and React hooks
 - **Implementation**: TypeScript utilities and React components
 - **Key Responsibilities**:

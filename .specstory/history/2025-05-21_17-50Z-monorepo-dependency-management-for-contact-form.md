@@ -6,7 +6,7 @@ _**User**_
 
 @contact OK - using the monorepo structure, I want to take the contact form and nodemailer server action and turn it into a proper reusable package. I've moved the code from the main site into here but haven't refactored yet.
 
-First question - can we move next, react and associated types dependencies into @sonnenreich/shared so we don't have to re-install nextjs for every package?
+First question - can we move next, react and associated types dependencies into @jazzmind/shared so we don't have to re-install nextjs for every package?
 
 ---
 
@@ -26,11 +26,11 @@ _**Assistant**_
 - In a monorepo, it is best practice to avoid duplicating heavy dependencies like `next`, `react`, and their types in every package.
 - Instead, you can:
   - Hoist these dependencies to the root `package.json` (if using npm/yarn workspaces or pnpm).
-  - Or, create a shared package (e.g., `@sonnenreich/shared`) that exports these dependencies as peer dependencies, and have each package reference them.
+  - Or, create a shared package (e.g., `@jazzmind/shared`) that exports these dependencies as peer dependencies, and have each package reference them.
 
 #### 2. Next.js Constraints
 - Next.js expects to be installed at the root of the project (or at the app boundary) for its CLI and build tools to work.
-- For shared code (like React components, hooks, types), a `@sonnenreich/shared` package is ideal.
+- For shared code (like React components, hooks, types), a `@jazzmind/shared` package is ideal.
 - For Next.js itself, it should generally remain a root dependency, not in every package.
 
 #### 3. Types
@@ -41,16 +41,16 @@ _**Assistant**_
 ### Recommendation
 
 - **next**: Keep as a root dependency (in the main site or root package.json), not in every package.
-- **react** and **react-dom**: Can be hoisted to the root or provided via `@sonnenreich/shared` as peer dependencies.
-- **@types/react**, **@types/node**, etc.: Can be hoisted or provided via `@sonnenreich/shared` as devDependencies.
-- **@sonnenreich/shared**: Use for shared code, types, and possibly re-exporting React (but not Next.js itself).
+- **react** and **react-dom**: Can be hoisted to the root or provided via `@jazzmind/shared` as peer dependencies.
+- **@types/react**, **@types/node**, etc.: Can be hoisted or provided via `@jazzmind/shared` as devDependencies.
+- **@jazzmind/shared**: Use for shared code, types, and possibly re-exporting React (but not Next.js itself).
 
 ---
 
 ### Next Steps
 
 1. **Move Next.js to the root package.json** (if not already there).
-2. **Move React and types to the root or to `@sonnenreich/shared`** as peer dependencies.
+2. **Move React and types to the root or to `@jazzmind/shared`** as peer dependencies.
 3. **Update all package.json files** in sub-packages to reference these as peer dependencies (not direct dependencies).
 4. **Document this in your monorepo README** for clarity.
 
@@ -88,7 +88,7 @@ _**Assistant**_
 - **Workspaces**: All packages (apps and libs) should be listed in the root workspace config.
 - **Dependencies**: 
   - `next`, `react`, `react-dom` in root (or main app) `package.json`.
-  - Shared code in `@sonnenreich/shared` or similar.
+  - Shared code in `@jazzmind/shared` or similar.
 - **Scripts**: Root scripts for build, dev, lint, etc., using monorepo tooling.
 - **Documentation**: Clear instructions in `README.md` and `docs/architecture.md`.
 
@@ -194,7 +194,7 @@ Read file: site/README.md
 ### 2. Dependency Management
 - `site/package.json` contains all Next.js, React, and related dependencies.
 - No duplication of Next.js or React in other packages (good).
-- Shared code should go in a package like `@sonnenreich/shared` (not yet present).
+- Shared code should go in a package like `@jazzmind/shared` (not yet present).
 
 ### 3. Scripts
 - Root scripts use `turbo` for build/dev/lint.
@@ -223,7 +223,7 @@ Read file: site/README.md
 - **Create `docs/architecture.md`:** Document monorepo structure, dependency management, and Next.js integration.
 
 ### 3. Shared Package
-- Create `@sonnenreich/shared` for shared code, types, and utilities (not for Next.js itself).
+- Create `@jazzmind/shared` for shared code, types, and utilities (not for Next.js itself).
 
 ### 4. Dependency Hoisting
 - Keep `next`, `react`, `react-dom` in `site/package.json`.
@@ -315,7 +315,7 @@ Here's why:
 **What CAN be in the top-level `package.json` or a shared package:**
 
 *   **Development Dependencies:** Tools like `typescript`, `eslint`, `prettier`, `@types/node`, `@types/react` can often be in the root `devDependencies` for consistency.
-*   **Shared UI Components/Logic:** A separate package (e.g., `@sonnenreich/shared`) can house common React components, hooks, utility functions, and types. This shared package would list `react` as a `peerDependency`.
+*   **Shared UI Components/Logic:** A separate package (e.g., `@jazzmind/shared`) can house common React components, hooks, utility functions, and types. This shared package would list `react` as a `peerDependency`.
 
 ---
 
@@ -409,7 +409,7 @@ Would you like me to help with updating the `README.md` and creating the `docs/a
 
 _**User**_
 
-What about putting next in the @sonnenreich/shared package and having that as a dependecy of each other package? this way we don't have massive fs bloat due to redundant node_modules dirs everywhere?
+What about putting next in the @jazzmind/shared package and having that as a dependecy of each other package? this way we don't have massive fs bloat due to redundant node_modules dirs everywhere?
 
 ---
 
@@ -427,11 +427,11 @@ That's a common desire in monorepos – to centralize dependencies like Next.js 
 
 Here's a more detailed breakdown:
 
-**Why Putting `next` in `@sonnenreich/shared` is Problematic for Multiple Next.js Apps:**
+**Why Putting `next` in `@jazzmind/shared` is Problematic for Multiple Next.js Apps:**
 
 1.  **Next.js CLI & Build Context:**
     *   The `next` CLI (e.g., `next dev`, `next build`) operates by looking for its configuration (`next.config.js`), `pages`/`app` directory, and the `next` package itself within the *current working directory's* project structure.
-    *   If `next` is in `@sonnenreich/shared`, the CLI might not correctly resolve paths or configurations for the specific application (e.g., `packages/contact` or `website`) you're trying to run or build. Each app expects `node_modules/next` to be directly available to it.
+    *   If `next` is in `@jazzmind/shared`, the CLI might not correctly resolve paths or configurations for the specific application (e.g., `packages/contact` or `website`) you're trying to run or build. Each app expects `node_modules/next` to be directly available to it.
 
 2.  **Module Resolution and `node_modules`:**
     *   While package managers (npm/yarn/pnpm with workspaces) do hoist dependencies and use symlinks, Next.js has a complex internal build system. It often makes assumptions about the location of its own files and dependencies relative to the project root.
@@ -454,7 +454,7 @@ Here's a more detailed breakdown:
 
 **When a Shared Package for Next.js *Might* Make Sense (and it's rare):**
 
-*   If `@sonnenreich/shared` was *itself* the ONLY Next.js application, and other packages were just libraries consumed by it. But your description is that `packages/*` are also "mini Next.js sites."
+*   If `@jazzmind/shared` was *itself* the ONLY Next.js application, and other packages were just libraries consumed by it. But your description is that `packages/*` are also "mini Next.js sites."
 
 **Recommendation: Stick to Per-App Next.js Dependencies**
 
@@ -465,14 +465,14 @@ For your setup, where `website` and various `packages/*` are intended to be runn
 
 This ensures that each Next.js app has its own clean, predictable environment for the Next.js CLI and build system to operate correctly.
 
-**What `@sonnenreich/shared` IS Good For:**
+**What `@jazzmind/shared` IS Good For:**
 
 *   **Shared React Components:** UI elements used across multiple Next.js apps.
 *   **Shared Hooks:** Custom React hooks.
 *   **Utility Functions:** Common JavaScript/TypeScript logic.
 *   **Type Definitions:** Shared TypeScript interfaces and types.
 *   **Configuration Objects:** Shared constants or configuration snippets (but not `next.config.js` itself).
-*   For these, `@sonnenreich/shared` would list `react` as a `peerDependency`.
+*   For these, `@jazzmind/shared` would list `react` as a `peerDependency`.
 
 I understand the desire to minimize redundancy, but with Next.js's specific build architecture and the way modern package managers handle workspaces, the current approach (each app having its own `next` dependency) is the most robust and correct one.
 
@@ -557,7 +557,7 @@ I will add a new "Monorepo Structure" section to the `README.md`.
 + 
 + - **`website/`**: The main Next.js application for viewing presentations and other content.
 + - **`packages/*`**: Contains reusable packages and smaller, standalone Next.js applications. Each Next.js application within `packages/` (e.g., `@sonnenreich/contact`) manages its own `next`, `react`, and `react-dom` dependencies.
-+ - **`@sonnenreich/shared`** (planned): A future package for shared React components, hooks, utilities, and types across different Next.js applications in this monorepo. Packages consuming shared components will list `react` as a `peerDependency`.
++ - **`@jazzmind/shared`** (planned): A future package for shared React components, hooks, utilities, and types across different Next.js applications in this monorepo. Packages consuming shared components will list `react` as a `peerDependency`.
 + 
 + ### Key Development Scripts (run from the root):
 + 
@@ -609,7 +609,7 @@ Now, I'll create the `docs/architecture.md` file with details about the monorepo
 +     - **`website/`**: The primary Next.js application serving the main public-facing website.
 +     - **`packages/*/`**: This directory contains other independent Next.js applications or JavaScript/TypeScript packages. Each sub-directory within `packages/` that is a Next.js app (e.g., `packages/contact`) is a self-contained Next.js project.
 + - **Shared Packages**:
-+     - **`@sonnenreich/shared`** (conceptual, to be created): This package is intended to house shared React components, hooks, utility functions, and TypeScript types that can be consumed by any of the Next.js applications within the monorepo.
++     - **`@jazzmind/shared`** (conceptual, to be created): This package is intended to house shared React components, hooks, utility functions, and TypeScript types that can be consumed by any of the Next.js applications within the monorepo.
 + 
 + ## 2. Next.js Application Strategy
 + 
@@ -627,7 +627,7 @@ Now, I'll create the `docs/architecture.md` file with details about the monorepo
 + 
 + - **Workspaces**: `npm` workspaces are defined in the root `package.json` to link local packages.
 + - **Application Dependencies**: As stated above, core Next.js dependencies (`next`, `react`, `react-dom`) are project-local.
-+ - **Shared Code (`@sonnenreich/shared`)**:
++ - **Shared Code (`@jazzmind/shared`)**:
 +     - This package will export common UI components, hooks, and utilities.
 +     - It will list `react` and `react-dom` as `peerDependencies` to avoid version conflicts with the consuming Next.js applications. Consuming applications must have `react` and `react-dom` as direct dependencies.
 + - **Development Dependencies**: Common development tools like `typescript`, `eslint`, `prettier`, and global type definitions (e.g., `@types/node`) can be defined in the root `package.json`'s `devDependencies` section to ensure consistency. Project-specific types (e.g., `@types/nodemailer` for a package using nodemailer) should be in that package's `devDependencies`.
@@ -1098,7 +1098,7 @@ Now, I'll add the `exports` field to `packages/contact/package.json`.
 +     "./form": "./src/components/ContactForm.tsx"
 +   },
     "dependencies": {
-      "@sonnenreich/shared": "*",
+      "@jazzmind/shared": "*",
 ```
 
 ---
@@ -1204,22 +1204,22 @@ _**Assistant**_
 
 <think><details><summary>Thought Process</summary>**Addressing the 404 Error**
 
-I'm currently focused on this pesky 404 error when installing.  The root cause seems pretty straightforward: a missing dependency in the `packages/contact` directory, or perhaps a misconfiguration in the monorepo. I'm checking the `package.json` for `@sonnenreich/shared` and the linking setup. It's likely related to either a pathing or version issue within the contact's dependency tree, which I plan to resolve.
+I'm currently focused on this pesky 404 error when installing.  The root cause seems pretty straightforward: a missing dependency in the `packages/contact` directory, or perhaps a misconfiguration in the monorepo. I'm checking the `package.json` for `@jazzmind/shared` and the linking setup. It's likely related to either a pathing or version issue within the contact's dependency tree, which I plan to resolve.
 
 
 **Investigating Dependency Issue**
 
-I've zeroed in on the root cause: the `@sonnenreich/shared` dependency in `packages/contact` doesn't exist yet, as per our documentation. The `package.json` confirms its presence, but the actual package is missing. This causes the dreaded 404. For a quick fix, I'm considering removing the dependency if `contact` doesn't use its functionality. Alternatively, I might create a minimal `@sonnenreich/shared` package to satisfy the dependency for now.
+I've zeroed in on the root cause: the `@jazzmind/shared` dependency in `packages/contact` doesn't exist yet, as per our documentation. The `package.json` confirms its presence, but the actual package is missing. This causes the dreaded 404. For a quick fix, I'm considering removing the dependency if `contact` doesn't use its functionality. Alternatively, I might create a minimal `@jazzmind/shared` package to satisfy the dependency for now.
 
 
 **Evaluating Dependency Removal**
 
-I've determined that the `packages/contact` directory currently doesn't actually utilize anything from the non-existent `@sonnenreich/shared` package. Therefore, removing the dependency from `packages/contact/package.json` is the most straightforward solution for now. This will allow `npm install` to proceed without the 404 error. Longer-term, we will need to create the shared package or integrate its planned functionality. I'm moving forward with this temporary fix to unblock the installation process.
+I've determined that the `packages/contact` directory currently doesn't actually utilize anything from the non-existent `@jazzmind/shared` package. Therefore, removing the dependency from `packages/contact/package.json` is the most straightforward solution for now. This will allow `npm install` to proceed without the 404 error. Longer-term, we will need to create the shared package or integrate its planned functionality. I'm moving forward with this temporary fix to unblock the installation process.
 
 
 **Pinpointing the E404 Root**
 
-I've determined the crux of the problem: a dependency on the absent `@sonnenreich/shared` package. This leads to the 'E404 Not Found' error during installation.  I'm now focused on the optimal short-term solution: removing the unused dependency from `packages/contact` to unblock `npm install`, while also recommending running the install from the monorepo root for future consistency.
+I've determined the crux of the problem: a dependency on the absent `@jazzmind/shared` package. This leads to the 'E404 Not Found' error during installation.  I'm now focused on the optimal short-term solution: removing the unused dependency from `packages/contact` to unblock `npm install`, while also recommending running the install from the monorepo root for future consistency.
 
 
 </details></think>
@@ -1233,19 +1233,19 @@ I've determined the crux of the problem: a dependency on the absent `@sonnenreic
 
 ---
 
-You're encountering that `E404 Not Found` error for `@sonnenreich/shared` because:
+You're encountering that `E404 Not Found` error for `@jazzmind/shared` because:
 
-1.  The `packages/contact/package.json` file lists `@sonnenreich/shared` as a dependency:
+1.  The `packages/contact/package.json` file lists `@jazzmind/shared` as a dependency:
     ```json
       "dependencies": {
-        "@sonnenreich/shared": "*", 
+        "@jazzmind/shared": "*", 
         // ... other dependencies
       }
     ```
-2.  The `@sonnenreich/shared` package is currently conceptual and hasn't been created yet in your `packages/` directory. We noted this in the documentation updates (`@sonnenreich/shared` (planned) or (conceptual, to be created)).
-3.  When `npm install` runs (especially within a sub-package like `packages/contact` rather than the monorepo root), it tries to find `@sonnenreich/shared`. Since it's not published to the npm registry and doesn't yet exist as a local workspace package that `npm` can link, the installation fails.
+2.  The `@jazzmind/shared` package is currently conceptual and hasn't been created yet in your `packages/` directory. We noted this in the documentation updates (`@jazzmind/shared` (planned) or (conceptual, to be created)).
+3.  When `npm install` runs (especially within a sub-package like `packages/contact` rather than the monorepo root), it tries to find `@jazzmind/shared`. Since it's not published to the npm registry and doesn't yet exist as a local workspace package that `npm` can link, the installation fails.
 
-**The immediate solution is to remove this dependency from `packages/contact/package.json` for now, as the contact form functionality we've just set up doesn't actually use anything from `@sonnenreich/shared` yet.**
+**The immediate solution is to remove this dependency from `packages/contact/package.json` for now, as the contact form functionality we've just set up doesn't actually use anything from `@jazzmind/shared` yet.**
 
 I'll prepare that change.
 
@@ -1262,14 +1262,14 @@ Read file: packages/contact/package.json
 ```diff
     },
     "dependencies": {
--     "@sonnenreich/shared": "*",
+-     "@jazzmind/shared": "*",
       "@prisma/client": "^6.6.0",
       "next": "^15.3.0",
 ```
 
 ---
 
-The `@sonnenreich/shared` dependency has been removed from `packages/contact/package.json`.
+The `@jazzmind/shared` dependency has been removed from `packages/contact/package.json`.
 
 **Next Steps:**
 
@@ -1281,7 +1281,7 @@ The `@sonnenreich/shared` dependency has been removed from `packages/contact/pac
     ```bash
     npm install
     ```
-    This should now succeed without trying to find a non-existent `@sonnenreich/shared` package from the npm registry and will correctly set up the dependencies for both your `website` and `packages/contact` apps, linking them as necessary.
+    This should now succeed without trying to find a non-existent `@jazzmind/shared` package from the npm registry and will correctly set up the dependencies for both your `website` and `packages/contact` apps, linking them as necessary.
 
 After the installation is complete from the root, you should be able to run and test both applications as previously discussed.
 
@@ -1309,7 +1309,7 @@ Ah, my apologies! I see you've attached the `packages/shared` directory now, and
 The issue you encountered with `npm install` (the `E404 Not Found - GET https://registry.npmjs.org/@sonnenreich%2fshared`) when running it *inside* the `packages/contact` directory, even if `packages/shared` exists, typically happens because:
 
 1.  **Workspace Configuration Not Fully Utilized**: When you run `npm install` within a sub-package of a workspace, npm might not always perfectly resolve local workspace dependencies before trying the public registry, especially if the linkage isn't perfectly established or if the sub-package's `node_modules` is in an inconsistent state.
-2.  **Name in `package.json`**: The `name` field in `packages/shared/package.json` must be `"@sonnenreich/shared"` for the local workspace linking to work correctly when another package (like `contact`) lists `"@sonnenreich/shared": "*"` or `"@sonnenreich/shared": "workspace:*"` as a dependency.
+2.  **Name in `package.json`**: The `name` field in `packages/shared/package.json` must be `"@jazzmind/shared"` for the local workspace linking to work correctly when another package (like `contact`) lists `"@jazzmind/shared": "*"` or `"@jazzmind/shared": "workspace:*"` as a dependency.
 
 Let's verify the `name` in `packages/shared/package.json` and ensure it's correctly set up to be recognized by the npm workspaces.
 
@@ -1320,26 +1320,26 @@ Read file: packages/shared/package.json
 ---
 
 The `packages/shared/package.json` looks good:
--   `"name": "@sonnenreich/shared"` is correct.
+-   `"name": "@jazzmind/shared"` is correct.
 -   It has build scripts using `tsup`, which is typical for a shared library.
 
 **Why the Error Still Occurred (Most Likely Reasons):**
 
-1.  **Running `npm install` in the Sub-Package:** As mentioned before, running `npm install` directly inside `packages/contact` can sometimes be less reliable for resolving local workspace dependencies compared to running it from the monorepo root. The root-level `npm install` is designed to discover all workspace packages (like `@sonnenreich/shared`) and link them appropriately.
+1.  **Running `npm install` in the Sub-Package:** As mentioned before, running `npm install` directly inside `packages/contact` can sometimes be less reliable for resolving local workspace dependencies compared to running it from the monorepo root. The root-level `npm install` is designed to discover all workspace packages (like `@jazzmind/shared`) and link them appropriately.
 2.  **Version Specifier in `packages/contact/package.json`:**
     Currently, `packages/contact/package.json` would have had:
     ```json
     "dependencies": {
-      "@sonnenreich/shared": "*",
+      "@jazzmind/shared": "*",
       // ...
     }
     ```
     Using `"*"` can sometimes be ambiguous for local packages. While it often works, a more explicit way to reference a local workspace package is using the `workspace:` protocol. This tells npm explicitly to link to the local workspace package.
-    Example: `"@sonnenreich/shared": "workspace:*"` or `"@sonnenreich/shared": "workspace:^0.1.0"` (if you want to match a specific version range of your local package).
+    Example: `"@jazzmind/shared": "workspace:*"` or `"@jazzmind/shared": "workspace:^0.1.0"` (if you want to match a specific version range of your local package).
 
 **Recommended Approach:**
 
-1.  **Restore the `@sonnenreich/shared` dependency in `packages/contact/package.json`**, but this time use the `workspace:` protocol.
+1.  **Restore the `@jazzmind/shared` dependency in `packages/contact/package.json`**, but this time use the `workspace:` protocol.
 2.  **ALWAYS run `npm install` from the root of your monorepo (`/Users/wessonnenreich/Code/sonnenreich/platform`)**. This is the most reliable way to ensure npm correctly discovers, links, and hoists dependencies in a workspace setup.
 
 Let's add the dependency back to `packages/contact/package.json` using the `workspace:*` specifier.
@@ -1349,14 +1349,14 @@ Let's add the dependency back to `packages/contact/package.json` using the `work
 ```diff
     },
     "dependencies": {
-+     "@sonnenreich/shared": "workspace:*",
++     "@jazzmind/shared": "workspace:*",
       "@prisma/client": "^6.6.0",
       "next": "^15.3.0",
 ```
 
 ---
 
-Okay, the `@sonnenreich/shared` dependency has been re-added to `packages/contact/package.json` using `workspace:*`.
+Okay, the `@jazzmind/shared` dependency has been re-added to `packages/contact/package.json` using `workspace:*`.
 
 **Now, please try the following:**
 
@@ -1369,9 +1369,9 @@ Okay, the `@sonnenreich/shared` dependency has been re-added to `packages/contac
     npm install
     ```
 
-This should now correctly link `@sonnenreich/shared` to `packages/contact` (and any other packages that might depend on it in the future) without trying to fetch it from the public npm registry.
+This should now correctly link `@jazzmind/shared` to `packages/contact` (and any other packages that might depend on it in the future) without trying to fetch it from the public npm registry.
 
-After the install completes from the root, you can proceed to test your applications. Even though `packages/contact` doesn't actively *use* any code from `@sonnenreich/shared` yet, this setup ensures the dependency linkage is correct for when it does.
+After the install completes from the root, you can proceed to test your applications. Even though `packages/contact` doesn't actively *use* any code from `@jazzmind/shared` yet, this setup ensures the dependency linkage is correct for when it does.
 
 ---
 
@@ -1411,8 +1411,8 @@ I will prepare the change for `packages/contact/package.json`.
 ```diff
     },
     "dependencies": {
--     "@sonnenreich/shared": "workspace:*",
-+     "@sonnenreich/shared": "0.1.0",
+-     "@jazzmind/shared": "workspace:*",
++     "@jazzmind/shared": "0.1.0",
       "@prisma/client": "^6.6.0",
       "next": "^15.3.0",
 ```
@@ -1420,7 +1420,7 @@ I will prepare the change for `packages/contact/package.json`.
 ---
 
 Okay, the dependency in `packages/contact/package.json` has been changed to:
-`"@sonnenreich/shared": "0.1.0"`
+`"@jazzmind/shared": "0.1.0"`
 
 **Crucial Next Step:**
 
@@ -1435,8 +1435,8 @@ Okay, the dependency in `packages/contact/package.json` has been changed to:
 
 Running `npm install` from the monorepo root is key. This allows npm to:
 1.  Discover all packages defined in your root `package.json`'s `workspaces` array (which should include `packages/*` and thus `packages/shared`).
-2.  See that `packages/contact` depends on `@sonnenreich/shared` version `0.1.0`.
-3.  Find the local `packages/shared` which provides `@sonnenreich/shared` at version `0.1.0`.
+2.  See that `packages/contact` depends on `@jazzmind/shared` version `0.1.0`.
+3.  Find the local `packages/shared` which provides `@jazzmind/shared` at version `0.1.0`.
 4.  Link them locally instead of going to the npm registry.
 
 This is the standard and most reliable way for npm workspaces to handle local inter-package dependencies. The previous errors arose from running `npm install` within the sub-package (`packages/contact`) where the workspace context might not be fully established for linking.
@@ -1520,7 +1520,7 @@ Now I'll edit `packages/contact/next.config.js`.
 
 ```diff
   const nextConfig = {
-    transpilePackages: ["@sonnenreich/shared"],
+    transpilePackages: ["@jazzmind/shared"],
 +   serverExternalPackages: ["@prisma/client"],
     // Using experimental flag to enable Next.js 15 features
 -   experimental: {
@@ -1623,14 +1623,14 @@ This usually happens due to a few reasons in a monorepo:
       },
     ```
     For another package (like `website`) to consume these, the `@sonnenreich/contact` package usually needs a build step that transpiles these TypeScript files into JavaScript (e.g., in a `dist` folder), and the `exports` map should then point to these JavaScript files. Next.js applications consuming external packages expect to import JavaScript.
-3.  **`transpilePackages`**: While `transpilePackages: ["@sonnenreich/shared"]` is in `packages/contact/next.config.js`, the `website`'s `next.config.js` would also need `transpilePackages: ["@sonnenreich/contact"]` if it's to consume TypeScript source files directly from the contact package. However, the more robust solution is for `@sonnenreich/contact` to build itself into JS.
+3.  **`transpilePackages`**: While `transpilePackages: ["@jazzmind/shared"]` is in `packages/contact/next.config.js`, the `website`'s `next.config.js` would also need `transpilePackages: ["@sonnenreich/contact"]` if it's to consume TypeScript source files directly from the contact package. However, the more robust solution is for `@sonnenreich/contact` to build itself into JS.
 
 **Let's prioritize making `@sonnenreich/contact` build itself into JS and export that.**
 
 **Plan:**
 
 1.  **Modify `packages/contact/package.json`**:
-    *   Add a build script (e.g., using `tsup` similar to `@sonnenreich/shared`, or just `tsc`).
+    *   Add a build script (e.g., using `tsup` similar to `@jazzmind/shared`, or just `tsc`).
     *   Update the `exports` map to point to the compiled JavaScript files in a `dist` directory.
     *   Add `main`, `module`, and `types` fields pointing to `dist`.
     *   Ensure `files` includes `dist/**`.
@@ -1644,7 +1644,7 @@ This usually happens due to a few reasons in a monorepo:
 
 **Step 1 & 2: Update `packages/contact/package.json` and add build tool**
 
-Let's use `tsup` for consistency if `@sonnenreich/shared` uses it. It simplifies the build process.
+Let's use `tsup` for consistency if `@jazzmind/shared` uses it. It simplifies the build process.
 
 First, I'll check `packages/contact/package.json` to see its current state for scripts and dev dependencies.
 
@@ -2451,7 +2451,7 @@ Okay, the `website/next.config.ts` (your main site's Next.js config) has:
 const nextConfig: NextConfig = {
   // ...
   transpilePackages: [
-    "@sonnenreich/shared",
+    "@jazzmind/shared",
     "@sonnenreich/presentation-feature"
   ],
 };
@@ -3184,17 +3184,17 @@ _**Assistant**_
 
 ---
 
-You're right, the build log clearly shows that `@sonnenreich/shared` is now the point of failure.
+You're right, the build log clearly shows that `@jazzmind/shared` is now the point of failure.
 Specifically, these errors:
 
-From `tsup`'s main build for `@sonnenreich/shared`:
+From `tsup`'s main build for `@jazzmind/shared`:
 ```
 ✘ [ERROR] Could not resolve "./utils"
     src/index.tsx:2:14:
       2 │ export * from './utils';
 ```
 
-From `tsup`'s DTS build for `@sonnenreich/shared`:
+From `tsup`'s DTS build for `@jazzmind/shared`:
 ```
 error TS5074: Option '--incremental' can only be specified using tsconfig...
 src/index.tsx(2,15): error TS2307: Cannot find module './utils' or its corresponding type declarations.
@@ -3204,9 +3204,9 @@ src/index.tsx(5,15): error TS2306: File '/Users/wessonnenreich/Code/sonnenreich/
 This means:
 1.  **Missing `./utils` file**: `packages/shared/src/index.tsx` is trying to export from a `./utils` file that likely doesn't exist or isn't resolvable.
 2.  **`src/types.ts` is not a module**: `packages/shared/src/index.tsx` is also trying to export from `src/types.ts`, but TypeScript thinks this file isn't a module (it might be empty, or not have any `export` statements).
-3.  **Incremental Build Error (TS5074)**: Similar to the issue we fixed for `@sonnenreich/contact`, the `@sonnenreich/shared` package's `tsconfig.json` is likely inheriting `incremental: true` from the root, causing problems for its DTS build.
+3.  **Incremental Build Error (TS5074)**: Similar to the issue we fixed for `@sonnenreich/contact`, the `@jazzmind/shared` package's `tsconfig.json` is likely inheriting `incremental: true` from the root, causing problems for its DTS build.
 
-**Plan to Fix `@sonnenreich/shared`:**
+**Plan to Fix `@jazzmind/shared`:**
 
 1.  **Examine `packages/shared/src/index.tsx`** to see what it's trying to export.
 2.  **Create placeholder files for `utils` and ensure `types.ts` is a module** (even if they are initially empty or have minimal exports) or remove the exports from `index.tsx` if they are not intended.
@@ -3308,9 +3308,9 @@ Read file: packages/shared/tsconfig.json
 
 `packages/shared/tsconfig.json` updated.
 
-The error `Could not resolve "./utils"` from the main `tsup` build for `@sonnenreich/shared` (not the DTS one) for the line `export * from './lib/utils';` is a bit strange since `packages/shared/src/lib/utils.ts` exists.
+The error `Could not resolve "./utils"` from the main `tsup` build for `@jazzmind/shared` (not the DTS one) for the line `export * from './lib/utils';` is a bit strange since `packages/shared/src/lib/utils.ts` exists.
 
-Let's double-check the `tsup` configuration for `@sonnenreich/shared`. It's defined in its `package.json` script: `"build": "tsup src/index.tsx --format esm,cjs --dts --external react"`.
+Let's double-check the `tsup` configuration for `@jazzmind/shared`. It's defined in its `package.json` script: `"build": "tsup src/index.tsx --format esm,cjs --dts --external react"`.
 This command tells `tsup` that the entry point is `src/index.tsx`. `tsup` should then resolve `./lib/utils` relative to `src/index.tsx`.
 
 It's possible the previous failures left `tsup` in a bad state, or there's a subtle path issue.
@@ -3325,9 +3325,9 @@ It's possible the previous failures left `tsup` in a bad state, or there's a sub
     ```bash
     npm run build
     ```
-    Pay close attention to the output for `@sonnenreich/shared`. If it still fails to resolve `./lib/utils` within `src/index.tsx`, we might need to look at the `baseUrl` or `paths` in `packages/shared/tsconfig.json` or how `tsup` is interpreting them. However, a relative path like `'./lib/utils'` from `src/index.tsx` to `src/lib/utils.ts` should be straightforward.
+    Pay close attention to the output for `@jazzmind/shared`. If it still fails to resolve `./lib/utils` within `src/index.tsx`, we might need to look at the `baseUrl` or `paths` in `packages/shared/tsconfig.json` or how `tsup` is interpreting them. However, a relative path like `'./lib/utils'` from `src/index.tsx` to `src/lib/utils.ts` should be straightforward.
 
-Let's see if these changes allow `@sonnenreich/shared` to build cleanly.
+Let's see if these changes allow `@jazzmind/shared` to build cleanly.
 
 ---
 
@@ -3349,7 +3349,7 @@ _**Assistant**_
 
 Yes, this is definite progress!
 - `@sonnenreich/contact`: Build success!
-- `@sonnenreich/shared`: Build success!
+- `@jazzmind/shared`: Build success!
 
 The Turborepo output now shows new build failures in other packages:
 - `@sonnenreich/events`
@@ -3421,7 +3421,7 @@ I will now apply the fix to all of them.
 
 ```diff
   const nextConfig = {
-    transpilePackages: ["@sonnenreich/shared"],
+    transpilePackages: ["@jazzmind/shared"],
 +   serverExternalPackages: ["@prisma/client"],
     // Using experimental flag to enable Next.js 15 features
 -   experimental: {
@@ -3438,7 +3438,7 @@ I will now apply the fix to all of them.
 
 ```diff
   const nextConfig = {
-    transpilePackages: ["@sonnenreich/shared"],
+    transpilePackages: ["@jazzmind/shared"],
 +   serverExternalPackages: ["@prisma/client"],
     // Using experimental flag to enable Next.js 15 features
 -   experimental: {
@@ -3455,7 +3455,7 @@ I will now apply the fix to all of them.
 
 ```diff
   const nextConfig = {
-    transpilePackages: ["@sonnenreich/shared"],
+    transpilePackages: ["@jazzmind/shared"],
 +   serverExternalPackages: ["@prisma/client"],
     // Using experimental flag to enable Next.js 15 features
 -   experimental: {
@@ -3472,7 +3472,7 @@ I will now apply the fix to all of them.
 
 ```diff
   const nextConfig = {
-    transpilePackages: ["@sonnenreich/shared"],
+    transpilePackages: ["@jazzmind/shared"],
 +   serverExternalPackages: ["@prisma/client"],
     // Using experimental flag to enable Next.js 15 features
 -   experimental: {
@@ -3489,7 +3489,7 @@ I will now apply the fix to all of them.
 
 ```diff
   const nextConfig = {
-    transpilePackages: ["@sonnenreich/shared"],
+    transpilePackages: ["@jazzmind/shared"],
 +   serverExternalPackages: ["@prisma/client"],
     // Using experimental flag to enable Next.js 15 features
 -   experimental: {
@@ -3557,18 +3557,18 @@ This means the `@sonnenreich/events` package is trying to import components and 
 
 **Possible Scenarios & Solutions:**
 
-1.  **These are intended to be shared components/utils from `@sonnenreich/shared`:**
-    *   If `MarkdownRenderer`, `ToggleableChatPanel`, and `rate-limit` are (or should be) in `@sonnenreich/shared`, then the import paths in `@sonnenreich/events` need to be updated to import from `@sonnenreich/shared/...`.
-    *   For example, instead of `import MarkdownRenderer from './MarkdownRenderer'`, it might become `import { MarkdownRenderer } from '@sonnenreich/shared/components/MarkdownRenderer';` (path depends on how `@sonnenreich/shared` exports them).
-    *   The `rate-limit` might be `import { rateLimit } from '@sonnenreich/shared/lib/rate-limit';`.
-    *   This would require `@sonnenreich/shared` to actually contain and export these modules.
+1.  **These are intended to be shared components/utils from `@jazzmind/shared`:**
+    *   If `MarkdownRenderer`, `ToggleableChatPanel`, and `rate-limit` are (or should be) in `@jazzmind/shared`, then the import paths in `@sonnenreich/events` need to be updated to import from `@jazzmind/shared/...`.
+    *   For example, instead of `import MarkdownRenderer from './MarkdownRenderer'`, it might become `import { MarkdownRenderer } from '@jazzmind/shared/components/MarkdownRenderer';` (path depends on how `@jazzmind/shared` exports them).
+    *   The `rate-limit` might be `import { rateLimit } from '@jazzmind/shared/lib/rate-limit';`.
+    *   This would require `@jazzmind/shared` to actually contain and export these modules.
 
 2.  **These files were moved, deleted, or never created in `@sonnenreich/events`:**
     *   If they were specific to `@sonnenreich/events` but are now missing, they need to be restored or recreated.
 
-Given that `@sonnenreich/shared` is for shared code, it's a strong possibility that these were intended to be sourced from there.
+Given that `@jazzmind/shared` is for shared code, it's a strong possibility that these were intended to be sourced from there.
 
-Let's check if `@sonnenreich/shared` contains these. I'll look for `MarkdownRenderer.tsx`, `ToggleableChatPanel.tsx` in `packages/shared/src/components/` and `rate-limit.ts` in `packages/shared/src/lib/`.
+Let's check if `@jazzmind/shared` contains these. I'll look for `MarkdownRenderer.tsx`, `ToggleableChatPanel.tsx` in `packages/shared/src/components/` and `rate-limit.ts` in `packages/shared/src/lib/`.
 
 ---
 
@@ -3598,20 +3598,20 @@ Let's check if `@sonnenreich/shared` contains these. I'll look for `MarkdownRend
 
 ---
 
-Okay, we found some of them in `@sonnenreich/shared`!
+Okay, we found some of them in `@jazzmind/shared`!
 - `packages/shared/src/components/MarkdownRenderer.tsx` **exists**.
 - `packages/shared/src/lib/rate-limit.ts` **exists**.
 - `ToggleableChatPanel.tsx` is **still missing** from `packages/shared/src/components/`.
 
 This means:
-- Imports for `MarkdownRenderer` and `rate-limit` in `@sonnenreich/events` should be changed to point to `@sonnenreich/shared`.
+- Imports for `MarkdownRenderer` and `rate-limit` in `@sonnenreich/events` should be changed to point to `@jazzmind/shared`.
 - We need to decide what to do about `ToggleableChatPanel`. Was it renamed? Should it also be in shared? Or is it an older, now-deleted component?
 
 **Step 2a: Update imports in `@sonnenreich/events` for `MarkdownRenderer` and `rate-limit`.**
 
-For this, I need to know how `@sonnenreich/shared` exports these. It has an `src/index.tsx` that exports from `./lib/utils` and `./types`. It doesn't seem to explicitly export components or other lib files directly from its main `index.tsx`.
+For this, I need to know how `@jazzmind/shared` exports these. It has an `src/index.tsx` that exports from `./lib/utils` and `./types`. It doesn't seem to explicitly export components or other lib files directly from its main `index.tsx`.
 
-Does `@sonnenreich/shared` have an `exports` map in its `package.json` that would allow importing subpaths like `@sonnenreich/shared/components/MarkdownRenderer` or `@sonnenreich/shared/lib/rate-limit`? Or should these be added to `packages/shared/src/index.tsx`?
+Does `@jazzmind/shared` have an `exports` map in its `package.json` that would allow importing subpaths like `@jazzmind/shared/components/MarkdownRenderer` or `@jazzmind/shared/lib/rate-limit`? Or should these be added to `packages/shared/src/index.tsx`?
 
 Let's check `packages/shared/package.json` for an `exports` map.
 
@@ -3621,7 +3621,7 @@ Read file: packages/shared/package.json
 
 ---
 
-`@sonnenreich/shared/package.json` does **not** have an `exports` map. This means other packages can only import what's exported from its `main`/`module`/`types` entry point, which is `dist/index.js` (and `.mjs`, `.d.ts`).
+`@jazzmind/shared/package.json` does **not** have an `exports` map. This means other packages can only import what's exported from its `main`/`module`/`types` entry point, which is `dist/index.js` (and `.mjs`, `.d.ts`).
 
 Currently, `packages/shared/src/index.tsx` only exports:
 ```typescript
@@ -3633,12 +3633,12 @@ export * from './types';
 ```
 It does *not* export `MarkdownRenderer` or `rate-limit`.
 
-**Path Forward for `@sonnenreich/events` to use items from `@sonnenreich/shared`:**
+**Path Forward for `@sonnenreich/events` to use items from `@jazzmind/shared`:**
 
 1.  **Modify `packages/shared/src/index.tsx`** to also export `MarkdownRenderer` and `rateLimit` (assuming `rate-limit.ts` exports a function named `rateLimit`).
-2.  **Re-build `@sonnenreich/shared`** using `npm run build` in its directory (or rely on `turbo build` from root).
-3.  **Update import paths in `@sonnenreich/events`** to import these from the main entry of `@sonnenreich/shared`.
-    *   e.g., `import { MarkdownRenderer, rateLimit } from '@sonnenreich/shared';`
+2.  **Re-build `@jazzmind/shared`** using `npm run build` in its directory (or rely on `turbo build` from root).
+3.  **Update import paths in `@sonnenreich/events`** to import these from the main entry of `@jazzmind/shared`.
+    *   e.g., `import { MarkdownRenderer, rateLimit } from '@jazzmind/shared';`
 
 Let's start by modifying `packages/shared/src/index.tsx`. I'll assume `rate-limit.ts` exports a function named `rateLimit`. If not, we'll adjust.
 
@@ -3677,17 +3677,17 @@ I've been thinking about this refactoring project. The goal is clear: moving the
 
 **Analyzing Import Path Issues**
 
-I'm currently working to fix the import path problems within `@sonnenreich/events` and the `website` app. I've pinpointed the issues: incorrect direct imports from subpaths of `@sonnenreich/shared` and missing exports from the main shared entry point. I'm focusing on resolving those to ensure smooth builds and proper package integration, particularly for `@sonnenreich/contact/action` and `@sonnenreich/contact/form` within the `website` app.
+I'm currently working to fix the import path problems within `@sonnenreich/events` and the `website` app. I've pinpointed the issues: incorrect direct imports from subpaths of `@jazzmind/shared` and missing exports from the main shared entry point. I'm focusing on resolving those to ensure smooth builds and proper package integration, particularly for `@sonnenreich/contact/action` and `@sonnenreich/contact/form` within the `website` app.
 
 
 **Examining Shared Exports**
 
-I'm currently reviewing the exports in `@sonnenreich/shared/src/index.tsx` to ensure all necessary components are available. I've confirmed `MarkdownRenderer` is correctly exported and will adjust any import paths in `@sonnenreich/events` to reflect that. Next, I'll analyze the build configuration of `@sonnenreich/contact` to understand why the `website` app encounters import issues during its build process, despite the dev server working.
+I'm currently reviewing the exports in `@jazzmind/shared/src/index.tsx` to ensure all necessary components are available. I've confirmed `MarkdownRenderer` is correctly exported and will adjust any import paths in `@sonnenreich/events` to reflect that. Next, I'll analyze the build configuration of `@sonnenreich/contact` to understand why the `website` app encounters import issues during its build process, despite the dev server working.
 
 
 **Refining Shared Package Exports**
 
-I've been going through the `@sonnenreich/shared/src/index.tsx` file, reviewing the exported components and utilities. I've also run a search for `ToggleableChatPanel` across the codebase. It seems it isn't currently a part of the shared components, so I need to clarify its intended location. Once I've confirmed that, I'll update `@sonnenreich/events`' import paths and adjust the package's `index.tsx` accordingly. I'm focusing on ensuring all essential components are readily available.
+I've been going through the `@jazzmind/shared/src/index.tsx` file, reviewing the exported components and utilities. I've also run a search for `ToggleableChatPanel` across the codebase. It seems it isn't currently a part of the shared components, so I need to clarify its intended location. Once I've confirmed that, I'll update `@sonnenreich/events`' import paths and adjust the package's `index.tsx` accordingly. I'm focusing on ensuring all essential components are readily available.
 
 
 </details></think>
@@ -3695,17 +3695,17 @@ I've been going through the `@sonnenreich/shared/src/index.tsx` file, reviewing 
 ---
 
 [Architect]
-Okay, I understand the current state of the refactoring. We've made good progress in modularizing the contact form and setting up the `@sonnenreich/contact` and `@sonnenreich/shared` packages.
+Okay, I understand the current state of the refactoring. We've made good progress in modularizing the contact form and setting up the `@sonnenreich/contact` and `@jazzmind/shared` packages.
 
 The immediate plan is:
-1.  **Finalize `@sonnenreich/shared` exports**: Ensure all necessary components and utilities, including `MarkdownRenderer` and potentially `ToggleableChatPanel` (if it's intended to be shared), are correctly exported from `packages/shared/src/index.tsx`.
-2.  **Fix `@sonnenreich/events` imports**: Update the import statements in `@sonnenreich/events` to correctly consume the exports from `@sonnenreich/shared`.
+1.  **Finalize `@jazzmind/shared` exports**: Ensure all necessary components and utilities, including `MarkdownRenderer` and potentially `ToggleableChatPanel` (if it's intended to be shared), are correctly exported from `packages/shared/src/index.tsx`.
+2.  **Fix `@sonnenreich/events` imports**: Update the import statements in `@sonnenreich/events` to correctly consume the exports from `@jazzmind/shared`.
 3.  **Resolve `website` build issues**: Investigate and fix the "Module not found" errors for `@sonnenreich/contact/action` and `@sonnenreich/contact/form` in the `website` app's build process.
 4.  **Full Monorepo Build**: Attempt a full `npm run build` from the root to ensure all packages build successfully and Turborepo caching is effective.
 
 I will be following the `001-architect` rule throughout this process.
 
-Let's start by examining the current exports of `@sonnenreich/shared`. I'll read `packages/shared/src/index.tsx`.
+Let's start by examining the current exports of `@jazzmind/shared`. I'll read `packages/shared/src/index.tsx`.
 
 ---
 
@@ -3762,7 +3762,7 @@ For now, let's fix the imports in `@sonnenreich/events` for `MarkdownRenderer` a
 [Architect]
 Okay, it looks like `packages/events/src/app/events/[eventId]/actions.ts` is importing `checkRateLimit` and `cleanupRateLimits` from ` '@/lib/rate-limit'`.
 
-I will now update this import to use `@sonnenreich/shared`.
+I will now update this import to use `@jazzmind/shared`.
 
 ---
 
@@ -3774,7 +3774,7 @@ I will now update this import to use `@sonnenreich/shared`.
 + import {
 +   checkRateLimit,
 +   cleanupRateLimits,
-+ } from '@sonnenreich/shared';
++ } from '@jazzmind/shared';
 + import { track } from '@vercel/analytics/server';
   
   // Initialize OpenAI client
@@ -3798,14 +3798,14 @@ It appears the previous edit was successful, and the file `packages/events/src/a
 import {
   checkRateLimit,
   cleanupRateLimits,
-} from '@sonnenreich/shared';
+} from '@jazzmind/shared';
 ```
 And it also has:
 ```typescript
 import { prisma } from '@/lib/prisma';
 import { track } from '@vercel/analytics/server';
 ```
-The linter error `Cannot find module '@vercel/analytics/server'` is pre-existing or unrelated to the specific change I was trying to make for `@sonnenreich/shared`.
+The linter error `Cannot find module '@vercel/analytics/server'` is pre-existing or unrelated to the specific change I was trying to make for `@jazzmind/shared`.
 
 Since the `rate-limit` import seems correct, let's move on to `MarkdownRenderer`.
 I need to find where `./MarkdownRenderer` is being imported in the `packages/events` module.
@@ -3829,7 +3829,7 @@ Okay, `MarkdownRenderer` is imported in:
 - `packages/events/src/components/EventTabs.tsx`
 - `packages/events/src/components/EventFiles.tsx`
 
-I will update these files to import `MarkdownRenderer` from `@sonnenreich/shared`.
+I will update these files to import `MarkdownRenderer` from `@jazzmind/shared`.
 
 First, `packages/events/src/components/EventTabs.tsx`:
 
@@ -3842,7 +3842,7 @@ First, `packages/events/src/components/EventTabs.tsx`:
 + import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 + import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 + import { ScrollArea } from "@/components/ui/scroll-area";
-+ import MarkdownRenderer from "@sonnenreich/shared";
++ import MarkdownRenderer from "@jazzmind/shared";
   import EventFiles from "./EventFiles";
 + import EventChat from "./EventChat";
   
@@ -3852,7 +3852,7 @@ First, `packages/events/src/components/EventTabs.tsx`:
 ---
 
 [Architect]
-It seems the edit was not applied correctly and introduced several new errors. The main issue is that `MarkdownRenderer` is a named export, not a default export from `@sonnenreich/shared`. It should be `import { MarkdownRenderer } from "@sonnenreich/shared";`.
+It seems the edit was not applied correctly and introduced several new errors. The main issue is that `MarkdownRenderer` is a named export, not a default export from `@jazzmind/shared`. It should be `import { MarkdownRenderer } from "@jazzmind/shared";`.
 
 Let's read the file and try the edit again for `packages/events/src/components/EventTabs.tsx`.
 
@@ -3862,7 +3862,7 @@ Read file: packages/events/src/components/EventTabs.tsx
 
 ---
 
-The file `packages/events/src/components/EventTabs.tsx` already has `import MarkdownRenderer from "@sonnenreich/shared";`. However, this is incorrect because `MarkdownRenderer` is a named export.
+The file `packages/events/src/components/EventTabs.tsx` already has `import MarkdownRenderer from "@jazzmind/shared";`. However, this is incorrect because `MarkdownRenderer` is a named export.
 
 I will correct this specific import.
 
@@ -3871,8 +3871,8 @@ I will correct this specific import.
 ```diff
   import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
   import { ScrollArea } from "@/components/ui/scroll-area";
-- import MarkdownRenderer from "@sonnenreich/shared";
-+ import { MarkdownRenderer } from "@sonnenreich/shared";
+- import MarkdownRenderer from "@jazzmind/shared";
++ import { MarkdownRenderer } from "@jazzmind/shared";
   import EventFiles from "./EventFiles";
   import EventChat from "./EventChat";
 ```
@@ -3923,13 +3923,13 @@ I'm now focused on the optimal approach for the user:  scoped `turbo run` comman
 ---
 
 [Architect]
-Understood. To focus our efforts, we'll ensure that only `@sonnenreich/shared`, `@sonnenreich/contact`, and the main `website` application are considered in the build process for now.
+Understood. To focus our efforts, we'll ensure that only `@jazzmind/shared`, `@sonnenreich/contact`, and the main `website` application are considered in the build process for now.
 
 **1. Scoping the Build with Turborepo:**
 
 Instead of modifying `turbo.json` directly, you can instruct Turborepo to only build these specific packages using filter flags. When you run your build command, use this:
 
-`npm run build -- --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website`
+`npm run build -- --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website`
 
 This will tell Turborepo to only execute the `build` task for these three projects and any of their local dependencies.
 
@@ -3985,12 +3985,12 @@ The `module` and `import` conditions in the `exports` map:
 Next.js (especially with App Router) generally prefers ESM (`.mjs`). The `tsup` config generates both `esm` and `cjs`.
 
 Could you try running the focused build command and share the specific error output from the `website` build?
-`npm run build -- --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website`
+`npm run build -- --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website`
 
 This will help pinpoint where the resolution is failing.
 
 Regarding the linter errors in `packages/events/src/components/EventTabs.tsx` and `packages/events/src/app/events/[eventId]/actions.ts`:
-- The errors like `Cannot find module '@/lib/types'`, `Cannot find module './ToggleableChatPanel'`, `Cannot find module '@/components/ui/tabs'` etc., in `EventTabs.tsx` are because this file is within the `packages/events` app, and these `@/...` paths are relative to its own `tsconfig.json`'s `baseUrl` and `paths`. These are not related to the `@sonnenreich/shared` package directly, but rather indicate missing internal components or incorrect path aliases within the `events` package itself.
+- The errors like `Cannot find module '@/lib/types'`, `Cannot find module './ToggleableChatPanel'`, `Cannot find module '@/components/ui/tabs'` etc., in `EventTabs.tsx` are because this file is within the `packages/events` app, and these `@/...` paths are relative to its own `tsconfig.json`'s `baseUrl` and `paths`. These are not related to the `@jazzmind/shared` package directly, but rather indicate missing internal components or incorrect path aliases within the `events` package itself.
 - The error `Cannot find module '@vercel/analytics/server'` in `actions.ts` means this dependency is missing from `packages/events/package.json`.
 
 Since you want to ignore packages other than `contact`, `shared`, and `website` for now, we can defer fixing these errors in `packages/events`. The Turborepo filter flag will prevent it from being built.
@@ -4014,7 +4014,7 @@ I've examined the build output, and it's clear the filter flags weren't effectiv
 
 **Analyzing Filter Implementation**
 
-I've re-examined the build output, and the filter flags *didn't* effectively exclude packages as intended. `@sonnenreich/events` and others still attempted to build, resulting in several "Module not found" errors. Specifically, issues arose in resolving dependencies within `@sonnenreich/events`, such as `./MarkdownRenderer` and `./ToggleableChatPanel`. I will revisit the Turborepo configuration to ensure the filter command, `npm run build -- --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website`, is applied correctly. The aim is to strictly build only the "contact" and "shared" packages, along with the "website" component.
+I've re-examined the build output, and the filter flags *didn't* effectively exclude packages as intended. `@sonnenreich/events` and others still attempted to build, resulting in several "Module not found" errors. Specifically, issues arose in resolving dependencies within `@sonnenreich/events`, such as `./MarkdownRenderer` and `./ToggleableChatPanel`. I will revisit the Turborepo configuration to ensure the filter command, `npm run build -- --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website`, is applied correctly. The aim is to strictly build only the "contact" and "shared" packages, along with the "website" component.
 
 
 </details></think>
@@ -4053,15 +4053,15 @@ This is correct and includes both the `packages/*` glob for libraries and `websi
 The Turborepo documentation states:
 > `--filter` - Filters the set of tasks that will be run. This flag is very powerful and can be used to select tasks based on a variety of criteria. ... Turborepo will also select all of the dependencies and dependents of the filtered tasks.
 
-This means if `website` depends on `@sonnenreich/contact`, and `@sonnenreich/contact` depends on `@sonnenreich/shared`, all three will be included. This is expected.
+This means if `website` depends on `@sonnenreich/contact`, and `@sonnenreich/contact` depends on `@jazzmind/shared`, all three will be included. This is expected.
 
 However, the log shows `@sonnenreich/events`, `@sonnenreich/template`, etc., are still being built.
-This implies that Turborepo believes `website`, `@sonnenreich/contact`, or `@sonnenreich/shared` somehow depend on these other packages.
+This implies that Turborepo believes `website`, `@sonnenreich/contact`, or `@jazzmind/shared` somehow depend on these other packages.
 
 Let's re-check the dependencies:
 1.  `website` depends on `@sonnenreich/contact` (confirmed).
-2.  Does `@sonnenreich/contact` depend on anything other than `@sonnenreich/shared`? (I'll check its `package.json` again).
-3.  Does `@sonnenreich/shared` depend on any other local packages? (I'll check its `package.json`).
+2.  Does `@sonnenreich/contact` depend on anything other than `@jazzmind/shared`? (I'll check its `package.json` again).
+3.  Does `@jazzmind/shared` depend on any other local packages? (I'll check its `package.json`).
 
 I'll re-read `packages/contact/package.json` and then read `packages/shared/package.json`.
 
@@ -4082,7 +4082,7 @@ This means the Turborepo filter *should* be working as intended and only buildin
 
 Let's re-examine the command you're running and the `turbo.json` configuration.
 
-1.  **Command Execution**: Are you running `npm run build -- --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website` exactly like that from the **root** of your monorepo? The double dash `--` is crucial for passing arguments to the `turbo build` script defined in your root `package.json`.
+1.  **Command Execution**: Are you running `npm run build -- --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website` exactly like that from the **root** of your monorepo? The double dash `--` is crucial for passing arguments to the `turbo build` script defined in your root `package.json`.
 
 2.  **`turbo.json` Configuration**: Let's look at your `turbo.json` file. It might have some global dependencies or pipeline configurations that are causing this.
 
@@ -4120,16 +4120,16 @@ Could not find file 'website/next.config.js' in the workspace.
 ---
 
 [Architect]
-It seems `website/next.config.js` does not exist. This is unusual for a Next.js project if it needs any custom configuration (like `transpilePackages` if it were to use a non-transpiled component from `@sonnenreich/shared`, though `shared` is being built by `tsup`).
+It seems `website/next.config.js` does not exist. This is unusual for a Next.js project if it needs any custom configuration (like `transpilePackages` if it were to use a non-transpiled component from `@jazzmind/shared`, though `shared` is being built by `tsup`).
 
 However, the core issue remains: why are packages outside the filter scope being built?
 
-If the command `npm run build -- --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website` is being run correctly from the root, and there are no explicit dependencies from `website`, `contact`, or `shared` to `events`, `meetings`, etc., then this behavior is unexpected for Turborepo.
+If the command `npm run build -- --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website` is being run correctly from the root, and there are no explicit dependencies from `website`, `contact`, or `shared` to `events`, `meetings`, etc., then this behavior is unexpected for Turborepo.
 
 Let's try a slightly different filter approach to be absolutely sure. Turborepo allows filtering by package name directly.
 
 Can you try this command from the root:
-`turbo build --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website`
+`turbo build --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website`
 
 This bypasses the npm script and calls `turbo` directly. Let me know if the output changes.
 
@@ -4157,7 +4157,7 @@ but now getting a "React not defined" error...
 _**Assistant**_
 
 [Architect]
-Excellent! The command `turbo build --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website` worked as expected, and only the specified packages were built. This is a much cleaner build log.
+Excellent! The command `turbo build --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website` worked as expected, and only the specified packages were built. This is a much cleaner build log.
 
 Now we have a new error during the `website` build, specifically when prerendering `/contact`:
 ```
@@ -4327,7 +4327,7 @@ I will create `website/next.config.js`.
 Okay, `website/next.config.js` has been created with `@sonnenreich/contact` in `transpilePackages`.
 
 Now, please try running the filtered build command again from the root:
-`turbo build --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website`
+`turbo build --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website`
 
 Let's see if this resolves the `React is not defined` error. If it doesn't, the next step would be to look into the `tsconfig.json` settings for both `packages/contact` and `website`, specifically the `jsx` compiler option. It should typically be `preserve` when `tsup` (or another bundler) is handling the JSX transformation, or `react-jsx` if TypeScript is doing it directly. Given you're using `tsup`, `preserve` is common in the package's `tsconfig.json`, and `website`'s Next.js setup would handle its own JSX.
 
@@ -4355,7 +4355,7 @@ So, the `tsconfig.json` settings seem correct.
 
 The addition of `transpilePackages: ['@sonnenreich/contact']` to `website/next.config.js` is the most likely fix for the "React is not defined" error in this context.
 
-Please run the build command: `turbo build --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website` and let's see the output.
+Please run the build command: `turbo build --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website` and let's see the output.
 
 ---
 
@@ -4446,7 +4446,7 @@ With these changes:
 3.  `packages/contact/tsup.config.ts` simplified, relying on the `'use client';` directive in `ContactForm.tsx`.
 
 Now, please try the build command again from the root of your project:
-`turbo build --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website`
+`turbo build --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website`
 
 This should hopefully resolve the `React is not defined` error and give us a clean build for these three packages.
 
@@ -4487,7 +4487,7 @@ I'll propose an edit to `packages/contact/tsup.config.ts` to add these esbuild o
 Okay, `packages/contact/tsup.config.ts` has been updated to include `options.jsx = 'automatic';` in `esbuildOptions`. This explicitly tells esbuild (which `tsup` uses under the hood) to use the modern JSX transform that doesn't require `React` to be in scope for JSX.
 
 Please run the build command again:
-`turbo build --filter=@sonnenreich/shared --filter=@sonnenreich/contact --filter=website`
+`turbo build --filter=@jazzmind/shared --filter=@sonnenreich/contact --filter=website`
 
 If this still doesn't resolve the issue, the problem might be deeper in the interaction of Next.js's build process with the specific output of `tsup` for the `@sonnenreich/contact` package, or a very specific way React/Next.js expects external client components to be structured or imported.
 
@@ -4563,9 +4563,9 @@ Read file: packages/meetings/next.config.js
 
 The `package.json` and `next.config.js` for `@sonnenreich/meetings` look reasonable.
 The `next.config.js` already correctly uses `serverExternalPackages` instead of the older `experimental.serverComponentsExternalPackages`.
-The dependency on `@sonnenreich/shared` is set to `*`. While this often works, it's generally better to use `workspace:*` for local workspace packages or a specific version. Given the issues we've had with `workspace:*` and your npm version, we should ensure `@sonnenreich/shared` has a version in its `package.json` (e.g., "0.1.0") and then use that version here.
+The dependency on `@jazzmind/shared` is set to `*`. While this often works, it's generally better to use `workspace:*` for local workspace packages or a specific version. Given the issues we've had with `workspace:*` and your npm version, we should ensure `@jazzmind/shared` has a version in its `package.json` (e.g., "0.1.0") and then use that version here.
 
-Let's first check the version of `@sonnenreich/shared`.
+Let's first check the version of `@jazzmind/shared`.
 
 ---
 
@@ -4573,17 +4573,17 @@ Read file: packages/shared/package.json
 
 ---
 
-`@sonnenreich/shared` is version `0.1.0`.
+`@jazzmind/shared` is version `0.1.0`.
 
-I'll update `packages/meetings/package.json` to use this specific version for `@sonnenreich/shared`.
+I'll update `packages/meetings/package.json` to use this specific version for `@jazzmind/shared`.
 
 ---
 
 ```diff
     },
     "dependencies": {
--     "@sonnenreich/shared": "*",
-+     "@sonnenreich/shared": "0.1.0",
+-     "@jazzmind/shared": "*",
++     "@jazzmind/shared": "0.1.0",
       "@prisma/client": "^6.6.0",
       "next": "^15.3.0",
 ```
@@ -4611,27 +4611,27 @@ turbo 2.5.3
 • Packages in scope: @sonnenreich/meetings
 • Running build in 1 packages
 • Remote caching disabled
-@sonnenreich/shared:build: cache miss, executing 0f9fb4ba5aa894ab
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: > @sonnenreich/shared@0.1.0 build
-@sonnenreich/shared:build: > tsup src/index.tsx --format esm,cjs --dts --externa
+@jazzmind/shared:build: cache miss, executing 0f9fb4ba5aa894ab
+@jazzmind/shared:build: 
+@jazzmind/shared:build: 
+@jazzmind/shared:build: > @jazzmind/shared@0.1.0 build
+@jazzmind/shared:build: > tsup src/index.tsx --format esm,cjs --dts --externa
 l react
-@sonnenreich/shared:build: 
+@jazzmind/shared:build: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:build: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:build: CLI tsup v8.5.0
-@sonnenreich/shared:build: CLI Target: es2017
-@sonnenreich/shared:build: ESM Build start
-@sonnenreich/shared:build: CJS Build start
-@sonnenreich/shared:build: DTS Build start
-@sonnenreich/shared:build: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:build: ESM ⚡️ Build success in 447ms
-@sonnenreich/shared:build: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:build: CJS ⚡️ Build success in 448ms
-@sonnenreich/shared:build: DTS ⚡️ Build success in 972ms
-@sonnenreich/shared:build: DTS dist/index.d.mts 925.00 B
-@sonnenreich/shared:build: DTS dist/index.d.ts  925.00 B
+@jazzmind/shared:build: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:build: CLI tsup v8.5.0
+@jazzmind/shared:build: CLI Target: es2017
+@jazzmind/shared:build: ESM Build start
+@jazzmind/shared:build: CJS Build start
+@jazzmind/shared:build: DTS Build start
+@jazzmind/shared:build: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:build: ESM ⚡️ Build success in 447ms
+@jazzmind/shared:build: CJS dist/index.js 1.50 MB
+@jazzmind/shared:build: CJS ⚡️ Build success in 448ms
+@jazzmind/shared:build: DTS ⚡️ Build success in 972ms
+@jazzmind/shared:build: DTS dist/index.d.mts 925.00 B
+@jazzmind/shared:build: DTS dist/index.d.ts  925.00 B
 
 @sonnenreich/meetings:build: cache miss, executing 711c9e69891c16e2
 @sonnenreich/meetings:build: 
@@ -4750,12 +4750,12 @@ There is also an interface `SchedulerEventPreferences` in `packages/meetings/src
 
 It seems like the `models/scheduler.ts` file, which should define `SchedulerEvent`, `UserAvailability`, and `ScheduledMeeting`, is missing from the `packages/meetings/src/` directory.
 
-Given that this package is supposed to be standalone, these models should either be defined within it, or if they are truly shared, they should be part of `@sonnenreich/shared` and imported from there.
+Given that this package is supposed to be standalone, these models should either be defined within it, or if they are truly shared, they should be part of `@jazzmind/shared` and imported from there.
 
 Looking at the names (`SchedulerEvent`, `UserAvailability`, `ScheduledMeeting`), these seem specific to the `meetings` functionality.
 
 Do you have the definitions for these types, or should I try to infer them and create a `packages/meetings/src/models/scheduler.ts` file?
-Alternatively, if these are meant to be in `@sonnenreich/shared`, we need to locate them there and adjust the imports.
+Alternatively, if these are meant to be in `@jazzmind/shared`, we need to locate them there and adjust the imports.
 
 Let's quickly check if `SchedulerEvent` or `scheduler.ts` exists in the shared package.
 
@@ -4819,26 +4819,26 @@ turbo 2.5.3
 • Packages in scope: @sonnenreich/meetings
 • Running build in 1 packages
 • Remote caching disabled
-@sonnenreich/shared:build: cache miss, executing 2916d1153a4bc574
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: > @sonnenreich/shared@0.1.0 build
-@sonnenreich/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
-@sonnenreich/shared:build: 
+@jazzmind/shared:build: cache miss, executing 2916d1153a4bc574
+@jazzmind/shared:build: 
+@jazzmind/shared:build: 
+@jazzmind/shared:build: > @jazzmind/shared@0.1.0 build
+@jazzmind/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
+@jazzmind/shared:build: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:build: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:build: CLI tsup v8.5.0
-@sonnenreich/shared:build: CLI Target: es2017
-@sonnenreich/shared:build: ESM Build start
-@sonnenreich/shared:build: CJS Build start
-@sonnenreich/shared:build: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:build: ESM ⚡️ Build success in 189ms
-@sonnenreich/shared:build: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:build: CJS ⚡️ Build success in 190ms
-@sonnenreich/shared:build: DTS Build start
-@sonnenreich/shared:build: DTS ⚡️ Build success in 1017ms
-@sonnenreich/shared:build: DTS dist/index.d.mts 925.00 B
-@sonnenreich/shared:build: DTS dist/index.d.ts  925.00 B
+@jazzmind/shared:build: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:build: CLI tsup v8.5.0
+@jazzmind/shared:build: CLI Target: es2017
+@jazzmind/shared:build: ESM Build start
+@jazzmind/shared:build: CJS Build start
+@jazzmind/shared:build: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:build: ESM ⚡️ Build success in 189ms
+@jazzmind/shared:build: CJS dist/index.js 1.50 MB
+@jazzmind/shared:build: CJS ⚡️ Build success in 190ms
+@jazzmind/shared:build: DTS Build start
+@jazzmind/shared:build: DTS ⚡️ Build success in 1017ms
+@jazzmind/shared:build: DTS dist/index.d.mts 925.00 B
+@jazzmind/shared:build: DTS dist/index.d.ts  925.00 B
 
 @sonnenreich/meetings:build: cache miss, executing c3e8f74ca1e719f9
 @sonnenreich/meetings:build: 
@@ -4997,26 +4997,26 @@ turbo 2.5.3
 • Packages in scope: @sonnenreich/meetings
 • Running build in 1 packages
 • Remote caching disabled
-@sonnenreich/shared:build: cache miss, executing 58b7d87d7c2032aa
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: > @sonnenreich/shared@0.1.0 build
-@sonnenreich/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
-@sonnenreich/shared:build: 
+@jazzmind/shared:build: cache miss, executing 58b7d87d7c2032aa
+@jazzmind/shared:build: 
+@jazzmind/shared:build: 
+@jazzmind/shared:build: > @jazzmind/shared@0.1.0 build
+@jazzmind/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
+@jazzmind/shared:build: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:build: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:build: CLI tsup v8.5.0
-@sonnenreich/shared:build: CLI Target: es2017
-@sonnenreich/shared:build: ESM Build start
-@sonnenreich/shared:build: CJS Build start
-@sonnenreich/shared:build: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:build: CJS ⚡️ Build success in 172ms
-@sonnenreich/shared:build: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:build: ESM ⚡️ Build success in 174ms
-@sonnenreich/shared:build: DTS Build start
-@sonnenreich/shared:build: DTS ⚡️ Build success in 979ms
-@sonnenreich/shared:build: DTS dist/index.d.mts 925.00 B
-@sonnenreich/shared:build: DTS dist/index.d.ts  925.00 B
+@jazzmind/shared:build: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:build: CLI tsup v8.5.0
+@jazzmind/shared:build: CLI Target: es2017
+@jazzmind/shared:build: ESM Build start
+@jazzmind/shared:build: CJS Build start
+@jazzmind/shared:build: CJS dist/index.js 1.50 MB
+@jazzmind/shared:build: CJS ⚡️ Build success in 172ms
+@jazzmind/shared:build: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:build: ESM ⚡️ Build success in 174ms
+@jazzmind/shared:build: DTS Build start
+@jazzmind/shared:build: DTS ⚡️ Build success in 979ms
+@jazzmind/shared:build: DTS dist/index.d.mts 925.00 B
+@jazzmind/shared:build: DTS dist/index.d.ts  925.00 B
 
 @sonnenreich/meetings:build: cache miss, executing 2354ef4106427d65
 @sonnenreich/meetings:build: 
@@ -5172,26 +5172,26 @@ turbo 2.5.3
 • Packages in scope: @sonnenreich/meetings
 • Running build in 1 packages
 • Remote caching disabled
-@sonnenreich/shared:build: cache miss, executing 1f0752f057990839
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: > @sonnenreich/shared@0.1.0 build
-@sonnenreich/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
-@sonnenreich/shared:build: 
+@jazzmind/shared:build: cache miss, executing 1f0752f057990839
+@jazzmind/shared:build: 
+@jazzmind/shared:build: 
+@jazzmind/shared:build: > @jazzmind/shared@0.1.0 build
+@jazzmind/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
+@jazzmind/shared:build: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:build: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:build: CLI tsup v8.5.0
-@sonnenreich/shared:build: CLI Target: es2017
-@sonnenreich/shared:build: ESM Build start
-@sonnenreich/shared:build: CJS Build start
-@sonnenreich/shared:build: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:build: ESM ⚡️ Build success in 145ms
-@sonnenreich/shared:build: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:build: CJS ⚡️ Build success in 146ms
-@sonnenreich/shared:build: DTS Build start
-@sonnenreich/shared:build: DTS ⚡️ Build success in 913ms
-@sonnenreich/shared:build: DTS dist/index.d.mts 925.00 B
-@sonnenreich/shared:build: DTS dist/index.d.ts  925.00 B
+@jazzmind/shared:build: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:build: CLI tsup v8.5.0
+@jazzmind/shared:build: CLI Target: es2017
+@jazzmind/shared:build: ESM Build start
+@jazzmind/shared:build: CJS Build start
+@jazzmind/shared:build: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:build: ESM ⚡️ Build success in 145ms
+@jazzmind/shared:build: CJS dist/index.js 1.50 MB
+@jazzmind/shared:build: CJS ⚡️ Build success in 146ms
+@jazzmind/shared:build: DTS Build start
+@jazzmind/shared:build: DTS ⚡️ Build success in 913ms
+@jazzmind/shared:build: DTS dist/index.d.mts 925.00 B
+@jazzmind/shared:build: DTS dist/index.d.ts  925.00 B
 
 @sonnenreich/meetings:build: cache miss, executing cf1b79f6efb3d906
 @sonnenreich/meetings:build: 
@@ -5823,26 +5823,26 @@ turbo 2.5.3
 • Packages in scope: @sonnenreich/meetings
 • Running build in 1 packages
 • Remote caching disabled
-@sonnenreich/shared:build: cache miss, executing e8368d4d0849df5c
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: > @sonnenreich/shared@0.1.0 build
-@sonnenreich/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
-@sonnenreich/shared:build: 
+@jazzmind/shared:build: cache miss, executing e8368d4d0849df5c
+@jazzmind/shared:build: 
+@jazzmind/shared:build: 
+@jazzmind/shared:build: > @jazzmind/shared@0.1.0 build
+@jazzmind/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
+@jazzmind/shared:build: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:build: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:build: CLI tsup v8.5.0
-@sonnenreich/shared:build: CLI Target: es2017
-@sonnenreich/shared:build: ESM Build start
-@sonnenreich/shared:build: CJS Build start
-@sonnenreich/shared:build: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:build: ESM ⚡️ Build success in 152ms
-@sonnenreich/shared:build: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:build: CJS ⚡️ Build success in 153ms
-@sonnenreich/shared:build: DTS Build start
-@sonnenreich/shared:build: DTS ⚡️ Build success in 926ms
-@sonnenreich/shared:build: DTS dist/index.d.mts 925.00 B
-@sonnenreich/shared:build: DTS dist/index.d.ts  925.00 B
+@jazzmind/shared:build: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:build: CLI tsup v8.5.0
+@jazzmind/shared:build: CLI Target: es2017
+@jazzmind/shared:build: ESM Build start
+@jazzmind/shared:build: CJS Build start
+@jazzmind/shared:build: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:build: ESM ⚡️ Build success in 152ms
+@jazzmind/shared:build: CJS dist/index.js 1.50 MB
+@jazzmind/shared:build: CJS ⚡️ Build success in 153ms
+@jazzmind/shared:build: DTS Build start
+@jazzmind/shared:build: DTS ⚡️ Build success in 926ms
+@jazzmind/shared:build: DTS dist/index.d.mts 925.00 B
+@jazzmind/shared:build: DTS dist/index.d.ts  925.00 B
 
 @sonnenreich/meetings:build: cache miss, executing 92a54587c0e57a97
 @sonnenreich/meetings:build: 
@@ -6014,26 +6014,26 @@ turbo 2.5.3
 • Packages in scope: @sonnenreich/meetings
 • Running build in 1 packages
 • Remote caching disabled
-@sonnenreich/shared:build: cache miss, executing 1970ebee97aa5e5c
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: > @sonnenreich/shared@0.1.0 build
-@sonnenreich/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
-@sonnenreich/shared:build: 
+@jazzmind/shared:build: cache miss, executing 1970ebee97aa5e5c
+@jazzmind/shared:build: 
+@jazzmind/shared:build: 
+@jazzmind/shared:build: > @jazzmind/shared@0.1.0 build
+@jazzmind/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
+@jazzmind/shared:build: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:build: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:build: CLI tsup v8.5.0
-@sonnenreich/shared:build: CLI Target: es2017
-@sonnenreich/shared:build: ESM Build start
-@sonnenreich/shared:build: CJS Build start
-@sonnenreich/shared:build: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:build: ESM ⚡️ Build success in 143ms
-@sonnenreich/shared:build: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:build: CJS ⚡️ Build success in 143ms
-@sonnenreich/shared:build: DTS Build start
-@sonnenreich/shared:build: DTS ⚡️ Build success in 933ms
-@sonnenreich/shared:build: DTS dist/index.d.mts 925.00 B
-@sonnenreich/shared:build: DTS dist/index.d.ts  925.00 B
+@jazzmind/shared:build: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:build: CLI tsup v8.5.0
+@jazzmind/shared:build: CLI Target: es2017
+@jazzmind/shared:build: ESM Build start
+@jazzmind/shared:build: CJS Build start
+@jazzmind/shared:build: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:build: ESM ⚡️ Build success in 143ms
+@jazzmind/shared:build: CJS dist/index.js 1.50 MB
+@jazzmind/shared:build: CJS ⚡️ Build success in 143ms
+@jazzmind/shared:build: DTS Build start
+@jazzmind/shared:build: DTS ⚡️ Build success in 933ms
+@jazzmind/shared:build: DTS dist/index.d.mts 925.00 B
+@jazzmind/shared:build: DTS dist/index.d.ts  925.00 B
 
 @sonnenreich/meetings:build: cache miss, executing daeb2bf4b99b66f6
 @sonnenreich/meetings:build: 
@@ -6269,26 +6269,26 @@ turbo 2.5.3
 • Packages in scope: @sonnenreich/meetings
 • Running build in 1 packages
 • Remote caching disabled
-@sonnenreich/shared:build: cache miss, executing 96327f40119c3535
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: > @sonnenreich/shared@0.1.0 build
-@sonnenreich/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
-@sonnenreich/shared:build: 
+@jazzmind/shared:build: cache miss, executing 96327f40119c3535
+@jazzmind/shared:build: 
+@jazzmind/shared:build: 
+@jazzmind/shared:build: > @jazzmind/shared@0.1.0 build
+@jazzmind/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
+@jazzmind/shared:build: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:build: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:build: CLI tsup v8.5.0
-@sonnenreich/shared:build: CLI Target: es2017
-@sonnenreich/shared:build: ESM Build start
-@sonnenreich/shared:build: CJS Build start
-@sonnenreich/shared:build: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:build: ESM ⚡️ Build success in 150ms
-@sonnenreich/shared:build: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:build: CJS ⚡️ Build success in 149ms
-@sonnenreich/shared:build: DTS Build start
-@sonnenreich/shared:build: DTS ⚡️ Build success in 914ms
-@sonnenreich/shared:build: DTS dist/index.d.mts 925.00 B
-@sonnenreich/shared:build: DTS dist/index.d.ts  925.00 B
+@jazzmind/shared:build: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:build: CLI tsup v8.5.0
+@jazzmind/shared:build: CLI Target: es2017
+@jazzmind/shared:build: ESM Build start
+@jazzmind/shared:build: CJS Build start
+@jazzmind/shared:build: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:build: ESM ⚡️ Build success in 150ms
+@jazzmind/shared:build: CJS dist/index.js 1.50 MB
+@jazzmind/shared:build: CJS ⚡️ Build success in 149ms
+@jazzmind/shared:build: DTS Build start
+@jazzmind/shared:build: DTS ⚡️ Build success in 914ms
+@jazzmind/shared:build: DTS dist/index.d.mts 925.00 B
+@jazzmind/shared:build: DTS dist/index.d.ts  925.00 B
 
 @sonnenreich/meetings:build: cache miss, executing ce02d51607f0c214
 @sonnenreich/meetings:build: 
@@ -6404,26 +6404,26 @@ turbo 2.5.3
 • Packages in scope: @sonnenreich/meetings
 • Running build in 1 packages
 • Remote caching disabled
-@sonnenreich/shared:build: cache miss, executing 78cc7e9f64bacfba
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: > @sonnenreich/shared@0.1.0 build
-@sonnenreich/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
-@sonnenreich/shared:build: 
+@jazzmind/shared:build: cache miss, executing 78cc7e9f64bacfba
+@jazzmind/shared:build: 
+@jazzmind/shared:build: 
+@jazzmind/shared:build: > @jazzmind/shared@0.1.0 build
+@jazzmind/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
+@jazzmind/shared:build: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:build: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:build: CLI tsup v8.5.0
-@sonnenreich/shared:build: CLI Target: es2017
-@sonnenreich/shared:build: ESM Build start
-@sonnenreich/shared:build: CJS Build start
-@sonnenreich/shared:build: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:build: CJS ⚡️ Build success in 219ms
-@sonnenreich/shared:build: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:build: ESM ⚡️ Build success in 220ms
-@sonnenreich/shared:build: DTS Build start
-@sonnenreich/shared:build: DTS ⚡️ Build success in 925ms
-@sonnenreich/shared:build: DTS dist/index.d.mts 925.00 B
-@sonnenreich/shared:build: DTS dist/index.d.ts  925.00 B
+@jazzmind/shared:build: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:build: CLI tsup v8.5.0
+@jazzmind/shared:build: CLI Target: es2017
+@jazzmind/shared:build: ESM Build start
+@jazzmind/shared:build: CJS Build start
+@jazzmind/shared:build: CJS dist/index.js 1.50 MB
+@jazzmind/shared:build: CJS ⚡️ Build success in 219ms
+@jazzmind/shared:build: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:build: ESM ⚡️ Build success in 220ms
+@jazzmind/shared:build: DTS Build start
+@jazzmind/shared:build: DTS ⚡️ Build success in 925ms
+@jazzmind/shared:build: DTS dist/index.d.mts 925.00 B
+@jazzmind/shared:build: DTS dist/index.d.ts  925.00 B
 
 @sonnenreich/meetings:build: cache miss, executing 6803cb89a21d7bd5
 @sonnenreich/meetings:build: 
@@ -6547,26 +6547,26 @@ turbo 2.5.3
 • Packages in scope: @sonnenreich/meetings
 • Running build in 1 packages
 • Remote caching disabled
-@sonnenreich/shared:build: cache miss, executing cb025459619748c9
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: 
-@sonnenreich/shared:build: > @sonnenreich/shared@0.1.0 build
-@sonnenreich/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
-@sonnenreich/shared:build: 
+@jazzmind/shared:build: cache miss, executing cb025459619748c9
+@jazzmind/shared:build: 
+@jazzmind/shared:build: 
+@jazzmind/shared:build: > @jazzmind/shared@0.1.0 build
+@jazzmind/shared:build: > tsup src/index.tsx --format esm,cjs --dts --external react
+@jazzmind/shared:build: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:build: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:build: CLI tsup v8.5.0
-@sonnenreich/shared:build: CLI Target: es2017
-@sonnenreich/shared:build: ESM Build start
-@sonnenreich/shared:build: CJS Build start
-@sonnenreich/shared:build: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:build: CJS ⚡️ Build success in 145ms
-@sonnenreich/shared:build: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:build: ESM ⚡️ Build success in 146ms
-@sonnenreich/shared:build: DTS Build start
-@sonnenreich/shared:build: DTS ⚡️ Build success in 928ms
-@sonnenreich/shared:build: DTS dist/index.d.mts 925.00 B
-@sonnenreich/shared:build: DTS dist/index.d.ts  925.00 B
+@jazzmind/shared:build: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:build: CLI tsup v8.5.0
+@jazzmind/shared:build: CLI Target: es2017
+@jazzmind/shared:build: ESM Build start
+@jazzmind/shared:build: CJS Build start
+@jazzmind/shared:build: CJS dist/index.js 1.50 MB
+@jazzmind/shared:build: CJS ⚡️ Build success in 145ms
+@jazzmind/shared:build: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:build: ESM ⚡️ Build success in 146ms
+@jazzmind/shared:build: DTS Build start
+@jazzmind/shared:build: DTS ⚡️ Build success in 928ms
+@jazzmind/shared:build: DTS dist/index.d.mts 925.00 B
+@jazzmind/shared:build: DTS dist/index.d.ts  925.00 B
 
 @sonnenreich/meetings:build: cache miss, executing 502478151be26465
 @sonnenreich/meetings:build: 
@@ -7197,7 +7197,7 @@ This is a crucial and common challenge in monorepos. Your idea for a standalone 
 *   **Key Components:**
     *   NextAuth.js API routes (`[...nextauth].ts`) for handling OAuth callbacks, credentials, etc.
     *   Prisma schema for NextAuth.js models (`User`, `Account`, `Session`, `VerificationToken`). This schema would live in `packages/auth/prisma`.
-    *   Shared UI components for sign-in buttons, user profile display (optional, could also be in `@sonnenreich/shared-ui`).
+    *   Shared UI components for sign-in buttons, user profile display (optional, could also be in `@jazzmind/shared-ui`).
     *   Client-side hooks (`useSession`) and server-side utilities (`getServerSession`) for accessing session data.
 *   **Functionality:**
     *   Provides standard OAuth sign-in (Google, etc.) and potentially email/password.
@@ -7654,7 +7654,7 @@ Next, `packages/auth/next.config.js`:
 + const nextConfig = {
 +   // React Strict Mode is true by default in Next.js 15
 +   // output: 'standalone', // Consider this for deployments if needed
-+   transpilePackages: ["@sonnenreich/shared"], // If it uses shared components
++   transpilePackages: ["@jazzmind/shared"], // If it uses shared components
 +   serverExternalPackages: ["@prisma/client"], // For Prisma
 + };
 + 
@@ -8225,15 +8225,15 @@ I suggest you adopt the filtering approach. You can create more specific npm scr
   "dev:website": "turbo dev --filter=website...", // You might need to add filters for its direct deps
   "dev:meetings": "turbo dev --filter=@sonnenreich/meetings...",
   "dev:auth": "turbo dev --filter=@sonnenreich/auth",
-  "dev:essential": "turbo dev --filter=website --filter=@sonnenreich/auth --filter=@sonnenreich/shared", // Example
+  "dev:essential": "turbo dev --filter=website --filter=@sonnenreich/auth --filter=@jazzmind/shared", // Example
   "lint": "turbo lint",
   "format": "prettier --write \\\"**/*.{ts,tsx,md}\\\"\"
 }
 ```
-When using `dev:website` or `dev:essential` you'd chain filters. For example, if `website` depends on `@sonnenreich/contact` and `@sonnenreich/shared` (and those also need to be "running" or at least built), you might do:
-`"dev:website": "turbo dev --filter=website --filter=@sonnenreich/contact --filter=@sonnenreich/shared"`
+When using `dev:website` or `dev:essential` you'd chain filters. For example, if `website` depends on `@sonnenreich/contact` and `@jazzmind/shared` (and those also need to be "running" or at least built), you might do:
+`"dev:website": "turbo dev --filter=website --filter=@sonnenreich/contact --filter=@jazzmind/shared"`
 
-However, for Next.js apps that import from local packages (like `@sonnenreich/shared` or `@sonnenreich/contact`), those packages don't necessarily need their own `dev` server running *if they are just libraries being built*. The `build` output of those libraries is what `website` would consume. The `dev` script in `turbo.json` usually includes `dependsOn: ["^build"]` (implicitly or explicitly for `dev` tasks), meaning dependent packages are built first.
+However, for Next.js apps that import from local packages (like `@jazzmind/shared` or `@sonnenreich/contact`), those packages don't necessarily need their own `dev` server running *if they are just libraries being built*. The `build` output of those libraries is what `website` would consume. The `dev` script in `turbo.json` usually includes `dependsOn: ["^build"]` (implicitly or explicitly for `dev` tasks), meaning dependent packages are built first.
 
 Let's check the `dependsOn` for your `dev` task in `turbo.json`. It's currently not set, meaning it doesn't explicitly depend on the build outputs of its dependencies.
 
@@ -14297,7 +14297,7 @@ turbo 2.5.3
 
 • Packages in scope: @sonnenreich/auth, @sonnenreich/contact, @sonnenreich/event
 s, @sonnenreich/feedback, @s
-onnenreich/meetings, @sonnenreich/presentations, @sonnenreich/shared, @sonnenrei
+onnenreich/meetings, @sonnenreich/presentations, @jazzmind/shared, @sonnenrei
 ch/teams, @sonnenreich/template, website
                                                         • Running dev in 10 pack
 ages
@@ -14307,7 +14307,7 @@ ages
 @sonnenreich/meetings:dev: cache bypass, force executing d5ca680ff16d751d
 @sonnenreich/auth:dev: cache bypass, force executing 29919e7ccf2024c6
 @sonnenreich/events:dev: cache bypass, force executing be21587ee06b20d9
-@sonnenreich/shared:dev: cache bypass, force executing d6c08bae43df7ed6
+@jazzmind/shared:dev: cache bypass, force executing d6c08bae43df7ed6
 website:dev: cache bypass, force executing 9b33ed6177f83d8d
 @sonnenreich/contact:dev: cache bypass, force executing cd861f64d12c3eba
 @sonnenreich/presentations:dev: cache bypass, force executing 44cd77f029fb55f8
@@ -14340,11 +14340,11 @@ website:dev:
 @sonnenreich/presentations:dev: > @sonnenreich/presentations@0.1.0 dev
 @sonnenreich/presentations:dev: > next dev -p 3004
 @sonnenreich/presentations:dev: 
-@sonnenreich/shared:dev: 
-@sonnenreich/shared:dev: > @sonnenreich/shared@0.1.0 dev
-@sonnenreich/shared:dev: > tsup src/index.tsx --format esm,cjs --watch --dts --e
+@jazzmind/shared:dev: 
+@jazzmind/shared:dev: > @jazzmind/shared@0.1.0 dev
+@jazzmind/shared:dev: > tsup src/index.tsx --format esm,cjs --watch --dts --e
 xternal react
-@sonnenreich/shared:dev: 
+@jazzmind/shared:dev: 
 @sonnenreich/teams:dev: 
 @sonnenreich/teams:dev: > @sonnenreich/teams@0.1.0 dev
 @sonnenreich/teams:dev: > next dev -p 3005
@@ -14354,20 +14354,20 @@ xternal react
 @sonnenreich/meetings:dev: > next dev -p 3003
 @sonnenreich/meetings:dev: 
 CLI Building entry: src/index.tsx
-@sonnenreich/shared:dev: CLI Using tsconfig: tsconfig.json
-@sonnenreich/shared:dev: CLI tsup v8.5.0
-@sonnenreich/shared:dev: CLI Running in watch mode
-@sonnenreich/shared:dev: CLI Target: es2017
-@sonnenreich/shared:dev: ESM Build start
-@sonnenreich/shared:dev: CJS Build start
-@sonnenreich/shared:dev: CJS dist/index.js 1.50 MB
-@sonnenreich/shared:dev: CJS ⚡️ Build success in 418ms
-@sonnenreich/shared:dev: ESM dist/index.mjs 1.49 MB
-@sonnenreich/shared:dev: ESM ⚡️ Build success in 421ms
-@sonnenreich/shared:dev: CLI Watching for changes in "."
-@sonnenreich/shared:dev: CLI Ignoring changes in "**/{.git,node_modules}/**" | "
+@jazzmind/shared:dev: CLI Using tsconfig: tsconfig.json
+@jazzmind/shared:dev: CLI tsup v8.5.0
+@jazzmind/shared:dev: CLI Running in watch mode
+@jazzmind/shared:dev: CLI Target: es2017
+@jazzmind/shared:dev: ESM Build start
+@jazzmind/shared:dev: CJS Build start
+@jazzmind/shared:dev: CJS dist/index.js 1.50 MB
+@jazzmind/shared:dev: CJS ⚡️ Build success in 418ms
+@jazzmind/shared:dev: ESM dist/index.mjs 1.49 MB
+@jazzmind/shared:dev: ESM ⚡️ Build success in 421ms
+@jazzmind/shared:dev: CLI Watching for changes in "."
+@jazzmind/shared:dev: CLI Ignoring changes in "**/{.git,node_modules}/**" | "
 dist"
-@sonnenreich/shared:dev: DTS Build start
+@jazzmind/shared:dev: DTS Build start
  ⨯ Failed to start server
  ⨯ Failed to start server
 @sonnenreich/auth:dev: Error: listen EADDRINUSE: address already in use :::3001
@@ -14440,7 +14440,7 @@ website:dev:  ✓ Starting...
 @sonnenreich/teams:dev:    - Network:      http://192.168.1.146:3005
 @sonnenreich/teams:dev: 
 @sonnenreich/teams:dev:  ✓ Starting...
-@sonnenreich/shared:dev: DTS ⚡️ Build success in 1516ms
+@jazzmind/shared:dev: DTS ⚡️ Build success in 1516ms
 @sonnenreich/template:dev:  ✓ Ready in 2.1s
 @sonnenreich/meetings:dev:  ✓ Ready in 2.1s
 @sonnenreich/presentations:dev:  ✓ Ready in 2.2s

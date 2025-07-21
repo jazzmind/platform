@@ -56,7 +56,7 @@ This repository is a monorepo managed with npm workspaces and Turborepo. It cont
 
 - **`website/`**: The main Next.js application for viewing presentations and other content.
 - **`packages/*`**: Contains reusable packages and smaller, standalone Next.js applications. Each Next.js application within `packages/` (e.g., `@sonnenreich/contact`) manages its own `next`, `react`, and `react-dom` dependencies.
-- **`@sonnenreich/shared`** (planned): A future package for shared React components, hooks, utilities, and types across different Next.js applications in this monorepo. Packages consuming shared components will list `react` as a `peerDependency`.
+- **`@jazzmind/shared`** (planned): A future package for shared React components, hooks, utilities, and types across different Next.js applications in this monorepo. Packages consuming shared components will list `react` as a `peerDependency`.
 
 ### Key Development Scripts (run from the root):
 

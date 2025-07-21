@@ -11,7 +11,7 @@ This project utilizes a monorepo structure managed by **npm workspaces** and orc
     - **`website/`**: The primary Next.js application serving the main public-facing website.
     - **`packages/*/`**: This directory contains other independent Next.js applications or JavaScript/TypeScript packages. Each sub-directory within `packages/` that is a Next.js app (e.g., `packages/contact`) is a self-contained Next.js project.
 - **Shared Packages**:
-    - **`@sonnenreich/shared`** (conceptual, to be created): This package is intended to house shared React components, hooks, utility functions, and TypeScript types that can be consumed by any of the Next.js applications within the monorepo.
+    - **`@jazzmind/shared`** (conceptual, to be created): This package is intended to house shared React components, hooks, utility functions, and TypeScript types that can be consumed by any of the Next.js applications within the monorepo.
 
 ## 2. Next.js Application Strategy
 
@@ -29,7 +29,7 @@ Each distinct Next.js application (e.g., `website/`, `packages/contact/`) is tre
 
 - **Workspaces**: `npm` workspaces are defined in the root `package.json` to link local packages.
 - **Application Dependencies**: As stated above, core Next.js dependencies (`next`, `react`, `react-dom`) are project-local.
-- **Shared Code (`@sonnenreich/shared`)**:
+- **Shared Code (`@jazzmind/shared`)**:
     - This package will export common UI components, hooks, and utilities.
     - It will list `react` and `react-dom` as `peerDependencies` to avoid version conflicts with the consuming Next.js applications. Consuming applications must have `react` and `react-dom` as direct dependencies.
 - **Development Dependencies**: Common development tools like `typescript`, `eslint`, `prettier`, and global type definitions (e.g., `@types/node`) can be defined in the root `package.json`'s `devDependencies` section to ensure consistency. Project-specific types (e.g., `@types/nodemailer` for a package using nodemailer) should be in that package's `devDependencies`.

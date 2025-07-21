@@ -708,7 +708,7 @@ Now I'll create a comprehensive requirements document and authorization system a
   - Manage permission caching
   - Provide authorization APIs
 
-### Shared Auth Utils (`@sonnenreich/shared`)
+### Shared Auth Utils (`@jazzmind/shared`)
 - **Purpose**: Common authorization utilities and React hooks
 - **Implementation**: TypeScript utilities and React components
 - **Key Responsibilities**:
@@ -955,7 +955,7 @@ I've created a comprehensive authorization architecture that addresses your requ
 
 ### Phase 1: Core Infrastructure (Recommended First)
 1. **Update Authorization Schema** in `@sonnenreich/auth/prisma/schema.prisma`
-2. **Create Permission Engine** in `@sonnenreich/shared/src/lib/authorization.ts`
+2. **Create Permission Engine** in `@jazzmind/shared/src/lib/authorization.ts`
 3. **Build Authorization Middleware** for API route protection
 4. **Register Meetings Package** with its permission scopes
 
@@ -3064,7 +3064,7 @@ Now let's create a demonstration of how to integrate this with the meetings pack
 +   checkAuthorizationSetup,
 +   type MeetingPermissions,
 +   type AccessType
-+ } from '@sonnenreich/shared';
++ } from '@jazzmind/shared';
 + 
 + // Initialize authorization with meetings database
 + const prisma = new PrismaClient();
@@ -3444,7 +3444,7 @@ The linter errors are due to the Prisma client not recognizing the models. This 
 + 
 + 2. **Run Setup Script**
 +    ```typescript
-+    import { setupAuthorizationSystem } from '@sonnenreich/shared';
++    import { setupAuthorizationSystem } from '@jazzmind/shared';
 +    import { PrismaClient } from '@prisma/client';
 +    
 +    const prisma = new PrismaClient();
@@ -3466,7 +3466,7 @@ The linter errors are due to the Prisma client not recognizing the models. This 
 + 
 + 4. **Protect API Routes**
 +    ```typescript
-+    import { withMeetingAuthorization } from '@sonnenreich/shared';
++    import { withMeetingAuthorization } from '@jazzmind/shared';
 +    
 +    // Protect meeting edit endpoint
 +    export const PUT = withMeetingAuthorization('edit')(async (req, { params }) => {
@@ -3499,7 +3499,7 @@ The linter errors are due to the Prisma client not recognizing the models. This 
 + ### 1. Creating a Meeting with Authorization
 + 
 + ```typescript
-+ import { MeetingAuthService, AccessType } from '@sonnenreich/shared';
++ import { MeetingAuthService, AccessType } from '@jazzmind/shared';
 + 
 + // Create meeting
 + const { meeting, permissions } = await MeetingAuthService.createMeetingWithOwnership({
@@ -3534,7 +3534,7 @@ The linter errors are due to the Prisma client not recognizing the models. This 
 + ### 2. Checking Meeting Permissions
 + 
 + ```typescript
-+ import { checkMeetingPermissions } from '@sonnenreich/shared';
++ import { checkMeetingPermissions } from '@jazzmind/shared';
 + 
 + const permissions = await checkMeetingPermissions(userId, meetingId);
 + 
@@ -3560,7 +3560,7 @@ The linter errors are due to the Prisma client not recognizing the models. This 
 + 
 + ```typescript
 + // pages/api/meetings/[meetingId]/route.ts
-+ import { withMeetingAuthorization, type AuthorizedRequest } from '@sonnenreich/shared';
++ import { withMeetingAuthorization, type AuthorizedRequest } from '@jazzmind/shared';
 + 
 + // View meeting (requires view permission)
 + export const GET = withMeetingAuthorization('view')(
@@ -3678,7 +3678,7 @@ The linter errors are due to the Prisma client not recognizing the models. This 
 + 
 + ### For Existing Packages
 + 
-+ - [ ] **Install Dependencies**: Add `@sonnenreich/shared` dependency
++ - [ ] **Install Dependencies**: Add `@jazzmind/shared` dependency
 + - [ ] **Initialize Authorization**: Run setup script for your package
 + - [ ] **Update Database**: Add resource access tracking
 + - [ ] **Retrofit APIs**: Add authorization checks to existing endpoints
@@ -3802,7 +3802,7 @@ I have successfully implemented a comprehensive authorization system for your pl
 
 2. **Initialize Authorization System**:
    ```typescript
-   import { setupAuthorizationSystem } from '@sonnenreich/shared';
+   import { setupAuthorizationSystem } from '@jazzmind/shared';
    import { PrismaClient } from '@prisma/client';
    
    const prisma = new PrismaClient();
@@ -3945,7 +3945,7 @@ Now I'll create the admin console. First, I need to add the shared package depen
 ```diff
       "@simplewebauthn/browser": "^9.0.1",
       "@simplewebauthn/server": "^9.0.3",
-+     "@sonnenreich/shared": "workspace:*",
++     "@jazzmind/shared": "workspace:*",
       "@tailwindcss/postcss": "^4.1.7",
       "next": "^15.3.0",
 ```
@@ -4018,7 +4018,7 @@ Now I'll create the AdminDashboard component:
 +   type Package,
 +   type Role,
 +   type UserPermissions
-+ } from '@sonnenreich/shared';
++ } from '@jazzmind/shared';
 + import { PrismaClient } from '@prisma/client';
 + 
 + import PackagesManager from './PackagesManager';
@@ -4328,7 +4328,7 @@ Now let me fix the imports and create the missing components:
     type Package,
     type Role,
     type UserPermissions
-  } from '@sonnenreich/shared';
+  } from '@jazzmind/shared';
 - import { PrismaClient } from '@prisma/client';
   
   import PackagesManager from './PackagesManager';
@@ -5577,7 +5577,7 @@ Now let me create a simplified AdminDashboard component that doesn't depend on t
 -   type Package,
 -   type Role,
 -   type UserPermissions
-- } from '@sonnenreich/shared';
+- } from '@jazzmind/shared';
   
   import PackagesManager from './PackagesManager';
 ```

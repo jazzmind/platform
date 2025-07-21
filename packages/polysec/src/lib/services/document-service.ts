@@ -9,7 +9,7 @@ import {
   type SearchResult,
   MODELS,
   generateText
-} from '@platform/knowledgebase';
+} from '@jazzmind/knowledgebase';
 import { PolicyDocument, DocumentUploadRequest, DocumentUploadResponse, ProcessingStatus } from '../../types';
 
 export class PolicyDocumentService {

@@ -10,7 +10,7 @@ import {
   checkAuthorizationSetup,
   type MeetingPermissions,
   type AccessType
-} from '@sonnenreich/shared';
+} from '@jazzmind/shared';
 
 // Initialize authorization with meetings database
 const prisma = new PrismaClient();

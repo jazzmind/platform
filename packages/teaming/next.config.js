@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@sonnenreich/shared"],
+  transpilePackages: ["@jazzmind/shared"],
   serverExternalPackages: ["@prisma/client"],
   // Using experimental flag to enable Next.js 15 features
   // experimental: {

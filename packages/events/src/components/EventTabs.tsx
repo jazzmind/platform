@@ -7,7 +7,7 @@ import { askEventQuestion } from "@/app/events/[eventId]/actions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MarkdownRenderer } from "@sonnenreich/shared";
+import { MarkdownRenderer } from "@jazzmind/shared";
 import EventFiles from "./EventFiles";
 import EventChat from "./EventChat";
 

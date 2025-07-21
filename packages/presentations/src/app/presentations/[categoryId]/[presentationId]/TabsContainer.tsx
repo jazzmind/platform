@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import NotesPanel from "../../../../../../shared/src/components/NotesPanel";
 import dynamic from "next/dynamic";
-import ToggleableChatPanel from "@sonnenreich/shared/src/components/AIChat/ToggleableAIChatPanel";
+import ToggleableChatPanel from "@jazzmind/shared/src/components/AIChat/ToggleableAIChatPanel";
 import { askQuestion } from "./actions";
 import { Laptop, Smartphone, Info } from "lucide-react";
 

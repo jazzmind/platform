@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
 import {
   checkRateLimit,
   cleanupRateLimits,
-} from '@sonnenreich/shared';
+} from '@jazzmind/shared';
 import { track } from '@vercel/analytics/server';
 
 // Initialize OpenAI client

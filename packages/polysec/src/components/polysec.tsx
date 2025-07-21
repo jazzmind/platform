@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { DocumentUpload } from '../../../knowledgebase/src/components/DocumentUpload';
-import { DocumentList } from '../../../knowledgebase/src/components/DocumentList';
-import { DocumentViewer } from '../../../knowledgebase/src/components/DocumentViewer';
+import { DocumentUpload } from '@jazzmind/knowledgebase/components/DocumentUpload';
+import { DocumentList } from '@jazzmind/knowledgebase/components/DocumentList';
+import { DocumentViewer } from '@jazzmind/knowledgebase/components/DocumentViewer';
 import { Compliance } from './compliance';
-import type { ProcessingResult } from '../../../knowledgebase/src/lib/types';
+import type { ProcessingResult } from '@jazzmind/knowledgebase/lib/types';
 import Ask from './ask';
 
 interface PolySecProps {
