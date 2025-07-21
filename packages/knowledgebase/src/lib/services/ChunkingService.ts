@@ -15,12 +15,12 @@ export class ChunkingService {
 
   constructor(config: Partial<ChunkingConfig> = {}) {
     this.config = {
-      chunkSize: 1000,
-      chunkOverlap: 200,
+      chunkSize: 800,      // Reduced from 1000 to be safer for OpenAI limits
+      chunkOverlap: 100,   // Reduced overlap 
       separators: ['\n\n', '\n', '.', '!', '?', ';', ':', ' '],
       keepSeparator: true,
-      minChunkSize: 100,
-      maxChunkSize: 2000,
+      minChunkSize: 50,    // Reduced minimum
+      maxChunkSize: 1200,  // Much smaller max (OpenAI limit is ~8000 chars, so be conservative)
       ...config,
     };
   }
@@ -42,27 +42,38 @@ export class ChunkingService {
         throw new Error('No text content to chunk');
       }
 
+      console.log(`📝 ChunkingService: Input text length: ${text.length} characters`);
+
       const chunks = await this.splitText(text);
       
-      return chunks.map((chunk, index) => ({
-        id: this.generateChunkId(fileId, index),
-        content: chunk.trim(),
-        chunkIndex: index,
-        totalChunks: chunks.length,
-        startOffset: this.calculateStartOffset(text, chunk, index),
-        endOffset: this.calculateEndOffset(text, chunk, index),
-        contentHash: this.generateContentHash(chunk),
-        metadata: {
-          fileId,
-          entityType,
-          entityId,
-          fileType: fileType || 'unknown',
-          chunkSize: chunk.length,
-          wordsCount: this.countWords(chunk),
-          extractedFrom: extractedContent.metadata.title,
-          createdAt: new Date().toISOString(),
-        },
-      }));
+      console.log(`📝 ChunkingService: Created ${chunks.length} chunks`);
+      chunks.forEach((chunk, index) => {
+        console.log(`📝 Chunk ${index + 1}: ${chunk.length} characters`);
+        if (chunk.length > this.config.maxChunkSize) {
+          console.error(`❌ ChunkingService: Chunk ${index + 1} is too large (${chunk.length} > ${this.config.maxChunkSize})`);
+        }
+      });
+
+      // Validate all chunks are within size limits
+      const oversizedChunks = chunks.filter(chunk => chunk.length > this.config.maxChunkSize);
+      if (oversizedChunks.length > 0) {
+        console.error(`❌ ChunkingService: ${oversizedChunks.length} chunks exceed maxChunkSize`);
+        // Force split oversized chunks
+        const validChunks: string[] = [];
+        for (const chunk of chunks) {
+          if (chunk.length <= this.config.maxChunkSize) {
+            validChunks.push(chunk);
+          } else {
+            const splitChunks = this.forceSplitLargeChunk(chunk);
+            validChunks.push(...splitChunks);
+          }
+        }
+        console.log(`📝 ChunkingService: After force splitting: ${validChunks.length} chunks`);
+        return this.createContentChunks(validChunks, fileId, entityType, entityId, fileType);
+      }
+      
+      return this.createContentChunks(chunks, fileId, entityType, entityId, fileType);
+
     } catch (error) {
       throw this.createError(
         'CHUNKING_FAILED',
@@ -70,6 +81,66 @@ export class ChunkingService {
         error
       );
     }
+  }
+
+  private createContentChunks(
+    chunks: string[],
+    fileId: string,
+    entityType: string,
+    entityId: string,
+    fileType?: string
+  ): ContentChunk[] {
+    return chunks.map((chunk, index) => ({
+      id: this.generateChunkId(fileId, index),
+      content: chunk.trim(),
+      chunkIndex: index,
+      totalChunks: chunks.length,
+      startOffset: this.calculateStartOffset(chunks.join(''), chunk, index),
+      endOffset: this.calculateEndOffset(chunks.join(''), chunk, index),
+      contentHash: this.generateContentHash(chunk),
+      metadata: {
+        fileId,
+        entityType,
+        entityId,
+        fileType: fileType || 'unknown',
+        chunkSize: chunk.length,
+        wordsCount: this.countWords(chunk),
+        extractedFrom: fileId,
+        createdAt: new Date().toISOString(),
+      },
+    }));
+  }
+
+  /**
+   * Force split chunks that are still too large
+   */
+  private forceSplitLargeChunk(chunk: string): string[] {
+    const maxSize = Math.floor(this.config.maxChunkSize * 0.9); // 90% of max for safety
+    const chunks: string[] = [];
+    
+    let remaining = chunk;
+    while (remaining.length > maxSize) {
+      // Find the last sentence boundary before maxSize
+      let splitPoint = maxSize;
+      const sentenceEnders = ['.', '!', '?', '\n'];
+      
+      for (let i = maxSize - 1; i > maxSize - 200 && i > 0; i--) {
+        if (sentenceEnders.includes(remaining[i])) {
+          splitPoint = i + 1;
+          break;
+        }
+      }
+      
+      chunks.push(remaining.substring(0, splitPoint).trim());
+      remaining = remaining.substring(splitPoint).trim();
+    }
+    
+    if (remaining.length > 0) {
+      chunks.push(remaining);
+    }
+    
+    console.log(`🔧 ChunkingService: Force split large chunk into ${chunks.length} smaller chunks`);
+    return chunks;
   }
 
   /**

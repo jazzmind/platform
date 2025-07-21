@@ -1,78 +1,36 @@
-// Main exports for knowledgebase package
-// Supports both standalone and composition modes
-
-// Export all components
-export { default as KnowledgebaseApp } from './components/KnowledgebaseApp';
-export { default as DocumentUpload } from './components/DocumentUpload';
-export { default as SearchInterface } from './components/SearchInterface';
-export { default as DocumentViewer } from './components/DocumentViewer';
-export { default as DocumentList } from './components/DocumentList';
-
-// Export all services
+// Export main components for external use
 export {
-  DocumentService,
-  TextExtractionService,
-  EmbeddingService,
-  SemanticAnalysisService,
-  SearchService,
-} from './lib/services';
+  DocumentUpload,
+  DocumentList,
+  DocumentPreview,
+  DocumentViewer,
+  SearchInterface,
+  SearchResults,
+  TextDiffViewer,
+  KnowledgebaseApp,
+} from './components';
 
-// Export all types
+// Export types for external use
 export type {
-  // Core types
-  EntityType,
-  FileType,
-  ProcessingStatus,
-  DataType,
-  
-  // Content types
   FileMetadata,
-  ExtractedContent,
-  ContentChunk,
-  
-  // Processing types
-  ProcessingProgress,
   ProcessingResult,
-  
-  // Search types
-  SearchQuery,
-  SearchFilters,
   SearchResult,
-  SearchResponse,
-  
-  // Analysis types
-  SemanticSection,
-  DocumentClassification,
-  
-  // Configuration types
-  DocumentServiceConfig,
-  EmbeddingServiceConfig,
-  SearchServiceConfig,
-  KnowledgebaseConfig,
-  
-  // API types
-  UploadRequest,
-  UploadResponse,
-  ProcessingStatusResponse,
-  
-  // Component prop types
-  DocumentUploadProps,
-  SearchInterfaceProps,
+  EntityType,
+  DocumentListProps,
   DocumentViewerProps,
-  
-  // Database types
-  FileDataRecord,
-  SectionRecord,
-  VectorRecord,
-  
-  // Error types
-  KnowledgebaseError,
-  ValidationError,
-  
-  // Event types
-  ProcessingEvent,
-  SearchEvent,
+  SearchInterfaceProps,
 } from './lib/types';
+
+// Export services for advanced usage
+export { DocumentService } from './lib/services/DocumentService';
+export { SearchService } from './lib/services/SearchService';
+export { ProcessingService } from './lib/services/ProcessingService';
+
+// Export AI utilities
+export { MODELS, generateText } from './lib/ai';
+
+// Export database client
+export { prisma } from './lib/db';
 
 // Default export for easy standalone usage
 export { default } from './components/KnowledgebaseApp';

@@ -6,6 +6,7 @@ import { ProcessingService } from '../ProcessingService';
 import { prisma } from '../../db';
 import type { ContentChunk, EntityType } from '../../types';
 
+
 // Mock OpenAI
 jest.mock('openai', () => ({
   __esModule: true,

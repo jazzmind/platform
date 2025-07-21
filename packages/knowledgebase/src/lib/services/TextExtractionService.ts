@@ -2,6 +2,7 @@ import * as mammoth from 'mammoth';
 import * as cheerio from 'cheerio';
 import TurndownService from 'turndown';
 import type { FileType, ExtractedContent, KnowledgebaseError } from '../types';
+import { MODELS, generateText } from '../ai';
 
 export interface TextExtractionConfig {
   maxFileSize: number;
@@ -151,29 +152,59 @@ export class TextExtractionService {
           htmlContent += `<h2>Page ${i}</h2>\n`;
         }
         
-        // Process text items with positioning and styling
-        let currentY = -1;
+        // Enhanced text processing with better spacing detection
+        const textItems: any[] = content.items;
         let currentParagraph = '';
         
-        for (const item of content.items) {
-          const textItem = item as any;
-          const text = textItem.str;
+        // Sort items by Y position first, then X position for reading order
+        textItems.sort((a, b) => {
+          const yDiff = Math.round(b.transform[5]) - Math.round(a.transform[5]); // Y descending (top to bottom)
+          if (Math.abs(yDiff) > 2) return yDiff;
+          return Math.round(a.transform[4]) - Math.round(b.transform[4]); // X ascending (left to right)
+        });
+        
+        let lastY = null;
+        let lastX = null;
+        let lastTextEndX = null;
+        
+        for (let idx = 0; idx < textItems.length; idx++) {
+          const item = textItems[idx];
+          const text = item.str;
           
           if (!text.trim()) continue;
           
-          // Simple paragraph detection based on Y position changes
-          const itemY = Math.round(textItem.transform[5]);
+          const x = Math.round(item.transform[4]);
+          const y = Math.round(item.transform[5]);
+          const fontSize = Math.abs(item.transform[0]) || 12;
+          const textWidth = text.length * fontSize * 0.5; // Approximate text width
           
-          if (currentY !== -1 && Math.abs(itemY - currentY) > 5) {
-            // New line/paragraph detected
+          // Check if this is a new line (significant Y change)
+          const isNewLine = lastY !== null && Math.abs(y - lastY) > fontSize * 0.3;
+          
+          // Conservative spacing detection - avoid breaking words
+          const needsSpace = !isNewLine && 
+            lastTextEndX !== null && 
+            lastY === y &&
+            x > lastTextEndX + fontSize * 0.4; // Conservative threshold to avoid breaking words
+          
+          if (isNewLine) {
+            // Finish current paragraph and start new line
             if (currentParagraph.trim()) {
               htmlContent += this.formatTextAsHtml(currentParagraph.trim());
               currentParagraph = '';
             }
+          } else if (needsSpace && currentParagraph.length > 0) {
+            // Add space between words on same line
+            currentParagraph += ' ';
           }
           
-          currentParagraph += (currentParagraph ? ' ' : '') + text;
-          currentY = itemY;
+          // Add the text
+          currentParagraph += text;
+          
+          // Update position tracking
+          lastX = x;
+          lastY = y;
+          lastTextEndX = x + textWidth;
         }
         
         // Add remaining paragraph
@@ -192,7 +223,21 @@ export class TextExtractionService {
       
       // Convert HTML to markdown
       const markdownText = this.turndownService.turndown(htmlContent);
-      const cleanedText = this.cleanText(markdownText);
+      
+      // Apply targeted post-processing for specific known issues
+      let processedText = markdownText;
+      
+      // Only fix very specific known broken patterns
+      processedText = processedText
+        // Fix missing spaces after punctuation only when clearly needed
+        .replace(/([a-zA-Z]):([A-Z])/g, '$1: $2')
+        .replace(/([a-zA-Z])\.([A-Z])/g, '$1. $2')
+        .replace(/([a-zA-Z]),([A-Z])/g, '$1, $2')
+        // Clean up multiple spaces
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      const cleanedText = this.cleanText(processedText);
       const wordCount = this.countWords(cleanedText);
       
       console.log(`📄 TextExtractionService: Converted to ${cleanedText.length} characters of markdown`);
@@ -332,7 +377,7 @@ Note: PDF text extraction is being enhanced to handle various PDF formats and co
       $('script, style').remove();
       
       // Extract text content
-      const text = this.cleanText($('body').text() || $.text());
+      const text = this.cleanText($('body').text() || $('*').text());
       const wordCount = this.countWords(text);
 
       return {
@@ -474,6 +519,40 @@ Note: PDF text extraction is being enhanced to handle various PDF formats and co
       .trim();
 
     return markdown;
+  }
+
+  /**
+   * Clean up text spacing and formatting using AI
+   */
+  async cleanupTextWithAI(text: string, fileName?: string): Promise<string> {
+    try {
+      console.log('🤖 TextExtractionService: Starting AI cleanup for text');
+      
+      const prompt = `You are a document formatting expert. Your task is to fix spacing and formatting issues in extracted text while preserving the original content and structure.
+
+Rules:
+1. Fix spacing issues (missing spaces between words, extra spaces)
+2. Preserve all original content - don't add, remove, or change words
+3. Maintain paragraph breaks and section headings
+4. Keep numbered lists and bullet points intact
+5. Preserve technical terms, names, and acronyms exactly as written
+6. Don't add punctuation that wasn't there originally
+7. Return only the cleaned text, no explanations
+
+${fileName ? `Document name: ${fileName}` : ''}
+
+Original text to clean:
+${text.substring(0, 8000)}${text.length > 8000 ? '\n\n[Content truncated for processing]' : ''}`;
+
+      const cleanedText = await generateText(prompt, MODELS.fast);
+      
+      console.log('✅ TextExtractionService: AI cleanup completed');
+      return cleanedText;
+      
+    } catch (error) {
+      console.error('❌ TextExtractionService: AI cleanup failed:', error);
+      throw this.createError('AI_CLEANUP_FAILED', `Failed to cleanup text with AI: ${error instanceof Error ? error.message : 'Unknown error'}`, error);
+    }
   }
 
   /**

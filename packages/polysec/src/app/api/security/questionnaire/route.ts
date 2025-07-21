@@ -4,74 +4,95 @@ import { PolicyDocumentService } from '../../../../lib/services/document-service
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { questions, organizationId = 'default-org' } = body;
+    const { questions, question, organizationId = 'default-org', context } = body;
 
-    if (!questions || !Array.isArray(questions)) {
+    // Handle both single question and array of questions
+    let questionsToProcess: string[] = [];
+    
+    if (question && typeof question === 'string') {
+      // Single question from bulk processor
+      questionsToProcess = [question];
+    } else if (questions && Array.isArray(questions)) {
+      // Array of questions from original interface
+      questionsToProcess = questions.filter(q => typeof q === 'string');
+    } else {
       return NextResponse.json(
-        { error: 'Questions array is required' },
+        { error: 'Question or questions array is required' },
         { status: 400 }
       );
     }
 
-    console.log(`🔐 Security Questionnaire: Processing ${questions.length} questions`);
+    console.log(`🔐 Security Questionnaire: Processing ${questionsToProcess.length} questions`);
 
     const policyService = new PolicyDocumentService();
-    const answers = [];
-
-    for (const question of questions) {
-      if (typeof question !== 'string') {
-        continue;
-      }
-
-      console.log(`❓ Processing question: "${question}"`);
-
+    
+    // For single question, return single response
+    if (questionsToProcess.length === 1) {
+      const singleQuestion = questionsToProcess[0];
+      console.log(`❓ Processing single question: "${singleQuestion}"`);
+      
       try {
-        const response = await policyService.answerSecurityQuestion(question, organizationId);
+        const response = await policyService.answerSecurityQuestion(singleQuestion, organizationId);
         
-        answers.push({
-          question,
+        console.log(`✅ Question processed. Confidence: ${response.confidence}`);
+        
+        return NextResponse.json({
+          question: singleQuestion,
           answer: response.answer,
           confidence: response.confidence,
-          sources: response.sources,
-          timestamp: new Date().toISOString()
+          sources: response.sources
         });
-
-        console.log(`✅ Question answered with confidence: ${response.confidence.toFixed(2)}`);
-
-      } catch (error) {
-        console.error(`❌ Failed to answer question: "${question}"`, error);
         
-        answers.push({
-          question,
-          answer: "I encountered an error while processing this question.",
+      } catch (error) {
+        console.error('Failed to process question:', error);
+        return NextResponse.json({
+          question: singleQuestion,
+          answer: 'Failed to generate answer. Please try again.',
           confidence: 0,
           sources: [],
-          error: error instanceof Error ? error.message : 'Unknown error',
-          timestamp: new Date().toISOString()
+          error: error instanceof Error ? error.message : 'Unknown error'
         });
       }
     }
 
-    console.log(`✅ Security Questionnaire: Completed ${answers.length} answers`);
+    // For multiple questions, return array (original behavior)
+    const answers = [];
 
-    return NextResponse.json({
-      success: true,
-      questionnaire: {
-        totalQuestions: questions.length,
-        answeredQuestions: answers.filter(a => a.confidence > 0).length,
-        averageConfidence: answers.reduce((sum, a) => sum + a.confidence, 0) / answers.length,
-        completedAt: new Date().toISOString(),
-        organizationId
-      },
-      answers
-    });
+    for (const questionText of questionsToProcess) {
+      console.log(`❓ Processing question: "${questionText}"`);
+
+      try {
+        const response = await policyService.answerSecurityQuestion(questionText, organizationId);
+        
+        answers.push({
+          question: questionText,
+          answer: response.answer,
+          confidence: response.confidence,
+          sources: response.sources
+        });
+
+        console.log(`✅ Question processed. Confidence: ${response.confidence}`);
+
+      } catch (error) {
+        console.error('Failed to process question:', error);
+        
+        answers.push({
+          question: questionText,
+          answer: 'Failed to generate answer. Please try again.',
+          confidence: 0,
+          sources: [],
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+
+    return NextResponse.json({ answers });
 
   } catch (error) {
-    console.error('Security questionnaire error:', error);
-    
+    console.error('Security questionnaire API error:', error);
     return NextResponse.json(
       { 
-        error: 'Security questionnaire processing failed',
+        error: 'Failed to process security questionnaire',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }

@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 
-interface QuestionnaireTemplate {
+interface ComplianceTemplate {
   name: string;
   description: string;
   questions: string[];
 }
 
-interface QuestionAnswer {
+interface ComplianceAnswer {
   question: string;
   answer: string;
   confidence: number;
@@ -22,15 +22,15 @@ interface QuestionAnswer {
   error?: string;
 }
 
-interface SecurityQuestionnaireProps {
+interface ComplianceProps {
   organizationId?: string;
 }
 
-export function SecurityQuestionnaire({ organizationId = 'default-org' }: SecurityQuestionnaireProps) {
+export function Compliance({ organizationId = 'default-org' }: ComplianceProps) {
   const [frameworks, setFrameworks] = useState<string[]>([]);
   const [selectedFramework, setSelectedFramework] = useState<string>('general');
-  const [questionnaire, setQuestionnaire] = useState<QuestionnaireTemplate | null>(null);
-  const [answers, setAnswers] = useState<QuestionAnswer[]>([]);
+  const [complianceQuestionnaire, setComplianceQuestionnaire] = useState<ComplianceTemplate | null>(null);
+  const [answers, setAnswers] = useState<ComplianceAnswer[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [customQuestion, setCustomQuestion] = useState('');
@@ -43,7 +43,7 @@ export function SecurityQuestionnaire({ organizationId = 'default-org' }: Securi
   // Load questionnaire when framework changes
   useEffect(() => {
     if (selectedFramework) {
-      loadQuestionnaire(selectedFramework);
+      loadCompliance(selectedFramework);
     }
   }, [selectedFramework]);
 
@@ -57,11 +57,11 @@ export function SecurityQuestionnaire({ organizationId = 'default-org' }: Securi
     }
   };
 
-  const loadQuestionnaire = async (framework: string) => {
+  const loadCompliance = async (framework: string) => {
     try {
       const response = await fetch(`/api/security/questionnaire?framework=${framework}`);
       const data = await response.json();
-      setQuestionnaire(data.questionnaire);
+      setComplianceQuestionnaire(data.questionnaire);
       setAnswers([]);
       setSelectedQuestions([]);
     } catch (error) {
@@ -162,16 +162,16 @@ export function SecurityQuestionnaire({ organizationId = 'default-org' }: Securi
           ))}
         </div>
 
-        {questionnaire && (
+        {complianceQuestionnaire && (
           <div className="mt-4 p-4 bg-gray-50 rounded">
-            <h4 className="font-medium text-gray-900">{questionnaire.name}</h4>
-            <p className="text-sm text-gray-600 mt-1">{questionnaire.description}</p>
+            <h4 className="font-medium text-gray-900">{complianceQuestionnaire.name}</h4>
+            <p className="text-sm text-gray-600 mt-1">{complianceQuestionnaire.description}</p>
           </div>
         )}
       </div>
 
       {/* Question Selection */}
-      {questionnaire && (
+      {complianceQuestionnaire && (
         <div className="bg-white rounded-lg border shadow-sm p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-gray-900">Select Questions</h3>
@@ -181,7 +181,7 @@ export function SecurityQuestionnaire({ organizationId = 'default-org' }: Securi
           </div>
 
           <div className="space-y-2 mb-4">
-            {questionnaire.questions.map((question, index) => (
+            {complianceQuestionnaire.questions.map((question, index) => (
               <label key={index} className="flex items-start space-x-3 p-3 rounded hover:bg-gray-50">
                 <input
                   type="checkbox"

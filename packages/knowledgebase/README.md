@@ -15,6 +15,8 @@ A comprehensive document management and semantic search package designed for AI-
 
 ## Quick Start
 
+> ℹ️ **Note:** For PDF processing setup, see the [PDF Processing Setup Guide](./docs/pdf-processing-setup.md) for complete configuration instructions.
+
 ### Standalone Mode
 
 ```tsx
@@ -99,6 +101,93 @@ const searchResults = await searchService.search('data protection', {
   threshold: 0.7,
 });
 ```
+
+## Setup & Configuration
+
+### Prerequisites
+
+- Node.js 18+
+- Next.js 15.4.1+
+- PostgreSQL (for vector storage)
+- Vercel Blob Storage (for file storage)
+
+### Installation
+
+```bash
+npm install @platform/knowledgebase
+```
+
+### Required Dependencies
+
+The package requires several peer dependencies:
+
+```bash
+npm install pdfjs-dist turndown @types/turndown
+```
+
+### Next.js Configuration
+
+> 🚨 **Important:** PDF processing requires specific webpack configuration for Next.js compatibility.
+
+Add to your `next.config.js`:
+
+```javascript
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push({
+        canvas: 'commonjs canvas',
+      });
+      
+      config.externals.push(function ({ request }, callback) {
+        if (request === 'pdfjs-dist/legacy/build/pdf.mjs') {
+          return callback(null, `commonjs ${request}`);
+        }
+        callback();
+      });
+    }
+    return config;
+  },
+};
+module.exports = nextConfig;
+```
+
+### Environment Variables
+
+```bash
+# Required
+DATABASE_URL="postgresql://..."
+BLOB_READ_WRITE_TOKEN="vercel_blob_token"
+OPENAI_API_KEY="sk-..."
+
+# Optional
+NEXT_PUBLIC_APP_NAME="My Knowledge Base"
+MAX_FILE_SIZE="104857600" # 100MB
+```
+
+### Database Setup
+
+Run Prisma migrations:
+
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+### Complete Setup Guide
+
+For detailed PDF processing configuration, troubleshooting, and advanced setup options, see:
+
+📚 **[PDF Processing Setup Guide](./docs/pdf-processing-setup.md)**
+
+This guide covers:
+- Webpack configuration details
+- DOM polyfills for server-side rendering
+- Worker configuration
+- Common issues and solutions
+- Performance optimization
 
 ## Architecture
 

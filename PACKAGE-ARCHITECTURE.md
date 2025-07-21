@@ -78,7 +78,7 @@ export default function MyApp() {
 **Private registry setup:**
 ```json
 {
-  "name": "@mycompany/security-suite",
+  "name": "@sonnenreich/platform",
   "dependencies": {
     "@platform/polysec": "^1.0.0",
     "@platform/knowledgebase": "^1.0.0"

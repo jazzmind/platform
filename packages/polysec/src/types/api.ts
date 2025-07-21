@@ -81,7 +81,10 @@ export interface DocumentSearchResult {
   title: string;
   fileName: string;
   fileType: FileType;
+  fileSize: number;
+  fileUrl: string;
   status: ProcessingStatus;
+  version?: string;
   uploadDate: string;
   sectionsCount: number;
   relevanceScore?: number; // For semantic search

@@ -31,18 +31,19 @@
     "mime-types": "^2.1.35",
     "next": "15.x",
     "openai": "^4.20.0",
-    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^4.10.38",
+    "turndown": "^7.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.0.0",
     "zod": "^3.22.0",
-    "@platform/knowledgebase": "workspace:*"
+    "@platform/knowledgebase": "*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
     "@types/mime-types": "^2.1.4",
     "@types/node": "^20",
-    "@types/pdf-parse": "^1.1.1",
+    "@types/turndown": "^5.0.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "eslint": "^9",

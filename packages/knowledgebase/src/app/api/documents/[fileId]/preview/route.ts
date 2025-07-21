@@ -119,6 +119,36 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       fullText = reassembleChunksWithoutOverlap(chunks.map(chunk => chunk.content || ''));
     }
 
+    // Convert chunks to navigable sections
+    const sections = chunks.map((chunk, index) => {
+      const content = chunk.content || '';
+      // Extract title from first line or first 50 chars
+      const lines = content.split('\n').filter(line => line.trim());
+      let title = `Section ${index + 1}`;
+      
+      if (lines.length > 0) {
+        const firstLine = lines[0].trim();
+        // If first line looks like a heading (short and not a full sentence)
+        if (firstLine.length < 100 && !firstLine.endsWith('.')) {
+          title = firstLine;
+        } else {
+          // Use first 50 chars as title
+          title = firstLine.substring(0, 50) + (firstLine.length > 50 ? '...' : '');
+        }
+      }
+
+      return {
+        id: `chunk-${chunk.chunkIndex || index}`,
+        title,
+        content,
+        order: chunk.chunkIndex || index,
+        level: 1,
+        startIndex: 0, // We don't have character positions for chunks
+        endIndex: content.length,
+        pageNumber: undefined, // Chunks don't have page info
+      };
+    });
+
     // Return document preview data
     return NextResponse.json({
       fileId,
@@ -131,6 +161,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       previewContent: previewContent, // First chunk with markdown formatting
       downloadUrl: (document.metadata as any).blobUrl, // URL for downloading original file
       chunkCount: chunks.length,
+      sections, // Include navigable sections
       previewAvailable: previewContent.length > 0,
       wordCount: fullText.split(/\s+/).filter(word => word.length > 0).length,
     });

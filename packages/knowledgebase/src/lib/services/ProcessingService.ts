@@ -139,17 +139,40 @@ export class ProcessingService {
       });
       console.log(`✅ ProcessingService: Retrieved ${storedChunks.length} stored chunks for embedding`);
 
-      const embeddingIds = await this.embeddingService.generateEmbeddings(
-        storedChunks.map((chunk, index) => ({
+      // Validate chunks before generating embeddings
+      if (storedChunks.length === 0) {
+        throw new Error('No chunks found in database for embedding generation');
+      }
+
+      // Check chunk content
+      const chunksWithContent = storedChunks.filter(chunk => chunk.content && chunk.content.trim().length > 0);
+      console.log(`📊 ProcessingService: ${chunksWithContent.length}/${storedChunks.length} chunks have content`);
+      
+      if (chunksWithContent.length === 0) {
+        throw new Error('No chunks contain valid content for embedding generation');
+      }
+
+      // Prepare chunks for embedding with validation
+      const chunksForEmbedding = chunksWithContent.map((chunk, index) => {
+        const chunkData = {
           id: chunk.id,
           content: chunk.content || '',
           chunkIndex: index,
-          totalChunks: storedChunks.length,
+          totalChunks: chunksWithContent.length,
           startOffset: 0,
           endOffset: chunk.content?.length || 0,
           contentHash: chunk.contentHash || '',
           metadata: chunk.metadata as any,
-        })),
+        };
+        
+        console.log(`📝 ProcessingService: Chunk ${index + 1} - ID: ${chunk.id}, Content length: ${chunkData.content.length}`);
+        return chunkData;
+      });
+
+      console.log(`🔧 ProcessingService: About to generate embeddings for ${chunksForEmbedding.length} chunks`);
+
+      const embeddingIds = await this.embeddingService.generateEmbeddings(
+        chunksForEmbedding,
         entityType,
         entityId,
         organizationId

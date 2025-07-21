@@ -230,6 +230,10 @@ export interface DocumentUploadProps {
   maxFileSize?: number;
   allowedFileTypes?: FileType[];
   className?: string;
+  // Enhanced props for cross-package compatibility
+  uploadEndpoint?: string;
+  enableMultiple?: boolean;
+  showRequirements?: boolean;
 }
 
 export interface SearchInterfaceProps {
@@ -244,6 +248,22 @@ export interface SearchInterfaceProps {
   className?: string;
 }
 
+export interface DocumentListProps {
+  entityType: EntityType;
+  entityId: string;
+  organizationId: string;
+  refreshKey?: number;
+  className?: string;
+  onDocumentSelect?: (fileId: string, document?: any) => void;
+  onDocumentDelete?: (fileId: string) => void;
+  // Enhanced props for cross-package compatibility
+  enableSearch?: boolean;
+  enableFilters?: boolean;
+  searchEndpoint?: string;
+  documentsEndpoint?: string;
+  mode?: 'knowledgebase' | 'polysec';
+}
+
 export interface DocumentViewerProps {
   fileId: string;
   organizationId: string;
@@ -252,6 +272,11 @@ export interface DocumentViewerProps {
   showSections?: boolean;
   enableSearch?: boolean;
   className?: string;
+  // Enhanced props for cross-package compatibility
+  onDelete?: (fileId: string) => void;
+  enableAICleanup?: boolean;
+  mode?: 'knowledgebase' | 'polysec';
+  previewEndpoint?: string;
 }
 
 // Database record interfaces (matching Prisma schema)

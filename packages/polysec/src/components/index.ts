@@ -1,11 +1,7 @@
-// Main components
-export { default } from './polysec';
+// Export polysec-specific components
+export { Compliance } from './compliance';
+export { default as Ask } from './ask';
 export { default as PolySec } from './polysec';
 
-// Document management components
-export { DocumentUpload } from './document-upload';
-export { DocumentList } from './document-list';
-export { DocumentViewer } from './document-viewer';
-
-// Security compliance components
-export { SecurityQuestionnaire } from './security-questionnaire';
+// Main component
+export { default as default } from './polysec';

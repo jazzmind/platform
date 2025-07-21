@@ -54,21 +54,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     
     console.log(`🗑️ PolySec API: Deleting document ${id} for organization ${organizationId}`);
     
-    // Delete document
-    const success = await policyService.deleteDocument(id, organizationId);
+    // Delete document using policy service
+    await policyService.deleteDocument(id, organizationId);
 
-    if (!success) {
-      return NextResponse.json<ApiResponse<never>>({
-        success: false,
-        error: 'Policy document not found or could not be deleted'
-      }, { status: 404 });
-    }
+    console.log(`✅ PolySec API: Successfully deleted document ${id}`);
 
-    console.log(`✅ PolySec API: Deleted document ${id}`);
-
-    return NextResponse.json<ApiResponse<{ id: string }>>({
+    return NextResponse.json<ApiResponse<{ documentId: string }>>({
       success: true,
-      data: { id },
+      data: { documentId: id },
       message: 'Policy document deleted successfully'
     });
 

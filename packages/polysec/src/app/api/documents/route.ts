@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PolicyDocumentService } from '../../../lib/services/document-service';
 import { FileType, ProcessingStatus } from '../../../types';
-import type { ApiResponse, DocumentSearchResponse, DocumentSearchResult } from '../../../types';
 
 const policyService = new PolicyDocumentService();
 
@@ -15,17 +14,19 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
     const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : undefined;
     const organizationId = searchParams.get('organizationId') || 'default-org';
+    const entityType = searchParams.get('entityType') || 'polysec';
+    const entityId = searchParams.get('entityId') || 'policy-database';
 
     console.log(`📚 PolySec API: Fetching documents for organization ${organizationId}`);
 
     // Get documents from policy service
-    const documents = await policyService.listDocuments(organizationId, {
+    const policyDocuments = await policyService.listDocuments(organizationId, {
       limit,
       offset
     });
 
-    // Apply client-side filtering (since knowledgebase integration handles basic filtering)
-    let filteredDocuments = documents;
+    // Apply client-side filtering
+    let filteredDocuments = policyDocuments;
     
     if (fileType) {
       filteredDocuments = filteredDocuments.filter(doc => doc.fileType === fileType);
@@ -35,37 +36,41 @@ export async function GET(request: NextRequest) {
       filteredDocuments = filteredDocuments.filter(doc => doc.status === status);
     }
 
-    // Transform to search results
-    const searchResults: DocumentSearchResult[] = filteredDocuments.map(doc => ({
-      id: doc.id,
+    // Transform to knowledgebase format
+    const documents = filteredDocuments.map(doc => ({
+      fileId: doc.id,
+      metadata: {
+        filename: doc.fileName || doc.title,
+        fileType: doc.fileType,
+        mimeType: `application/${doc.fileType}`,
+        size: doc.fileSize || 0,
+        uploadedAt: doc.uploadDate.toISOString(),
+        organizationId,
+      },
+      uploadedAt: doc.uploadDate.toISOString(),
       title: doc.title,
       fileName: doc.fileName,
       fileType: doc.fileType,
+      fileSize: doc.fileSize || 0,
       status: doc.status,
-      uploadDate: doc.uploadDate.toISOString(),
-      sectionsCount: Array.isArray(doc.sections) ? doc.sections.length : 0
+      version: doc.version,
     }));
 
-    const response: DocumentSearchResponse = {
-      documents: searchResults,
-      total: filteredDocuments.length,
-      hasMore: false // Simple implementation
-    };
+    console.log(`✅ PolySec API: Retrieved ${documents.length} documents`);
 
-    console.log(`✅ PolySec API: Retrieved ${searchResults.length} documents`);
-
-    return NextResponse.json<ApiResponse<DocumentSearchResponse>>({
-      success: true,
-      data: response,
-      message: 'Policy documents retrieved successfully'
+    // Return in knowledgebase format
+    return NextResponse.json({
+      documents,
+      total: documents.length,
+      hasMore: false,
     });
 
   } catch (error) {
     console.error('PolySec documents list error:', error);
     
-    return NextResponse.json<ApiResponse<never>>({
-      success: false,
-      error: error instanceof Error ? error.message : 'Failed to retrieve documents'
+    return NextResponse.json({
+      error: error instanceof Error ? error.message : 'Failed to retrieve documents',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }

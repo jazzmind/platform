@@ -1,9 +1,12 @@
-// Core UI components for knowledgebase
+// Enhanced components with improved UI and cross-package compatibility
+export { DocumentUpload } from './DocumentUpload';
+export { DocumentList } from './DocumentList';
+export { DocumentPreview } from './DocumentPreview';
+export { DocumentViewer } from './DocumentViewer';
+export { SearchInterface } from './SearchInterface';
+export { SearchResults } from './SearchResults';
+export { TextDiffViewer } from './TextDiffViewer';
 export { default as KnowledgebaseApp } from './KnowledgebaseApp';
-export { default as DocumentUpload } from './DocumentUpload';
-export { default as SearchInterface } from './SearchInterface';
-export { default as DocumentViewer } from './DocumentViewer';
-export { default as DocumentList } from './DocumentList';
 
 // Re-export types for convenience
 export type {
