@@ -2,11 +2,23 @@
   "name": "@sonnenreich/auth",
   "version": "0.1.0",
   "private": true,
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./components": "./components/index.ts",
+    "./lib": "./lib/index.ts",
+    "./prisma": "./prisma/index.ts",
+    "./styles": "./src/app/globals.css"
+  },
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:lib": "tsc --declaration --emitDeclarationOnly --outDir dist",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.1",
@@ -17,7 +29,9 @@
     "next": "^15.3.0",
     "next-auth": "^5.0.0-beta.19",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@prisma/client": "^5.0.0",
+    "prisma": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.31",
@@ -28,5 +42,10 @@
     "postcss": "^8",
     "tailwindcss": "^4.1.7",
     "typescript": "^5"
+  },
+  "peerDependencies": {
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }
