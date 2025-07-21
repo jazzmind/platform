@@ -9,3 +9,16 @@ export const config = {
   version: '0.1.0',
   mode: 'dual' // supports both standalone and composition
 };
+
+
+
+export const getFileIcon = (fileType: string): string => {
+  switch (fileType?.toLowerCase()) {
+    case 'pdf': return '📄';
+    case 'docx': return '📝';
+    case 'txt': return '📃';
+    case 'html': return '🌐';
+    case 'md': return '📋';
+    default: return '📄';
+  }
+};

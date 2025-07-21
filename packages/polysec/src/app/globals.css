@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Tell Tailwind to scan knowledgebase components for CSS classes */
+@source "../../../knowledgebase/src/components";
+@source "../../../knowledgebase/src/app";
+
 @theme {
   --color-primary-50: #eff6ff;
   --color-primary-500: #3b82f6;

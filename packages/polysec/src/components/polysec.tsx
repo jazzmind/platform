@@ -129,29 +129,32 @@ export default function PolySec({ organizationId = 'default-org' }: PolySecProps
           />
         ) : (
           <>
-            {activeTab === 'upload' && (
+           {activeTab === 'ask' && (
               <div>
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                    Upload Policy Documents
+                    Ask Questions
                   </h2>
                   <p className="text-gray-600">
-                    Upload your security policies, procedures, and documentation. 
-                    Supported formats: PDF, DOCX, TXT, HTML, MD
+                    Process multiple security questions at once with AI-powered analysis and verification workflow
                   </p>
                 </div>
-                <DocumentUpload
-                  entityType="polysec"
-                  entityId="default-polysec"
-                  organizationId={organizationId}
-                  onUploadComplete={handleUploadComplete}
-                  maxFileSize={100 * 1024 * 1024} // 100MB
-                  allowedFileTypes={['pdf', 'docx', 'txt', 'html', 'md']}
-                  className="bg-white rounded-lg border border-gray-200 p-6"
-                />
+                <Ask organizationId={organizationId} />
               </div>
             )}
-
+                {activeTab === 'compliance' && (
+              <div>
+                <div className="mb-8">
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                    AI Compliance Checker
+                  </h2>
+                  <p className="text-gray-600">
+                    Ask security questions and get AI-powered answers based on your policy documents
+                  </p>
+                </div>
+                <Compliance organizationId={organizationId} />
+              </div>
+            )}
             {activeTab === 'library' && (
               <div>
                 <div className="mb-8">
@@ -176,33 +179,31 @@ export default function PolySec({ organizationId = 'default-org' }: PolySecProps
               </div>
             )}
 
-            {activeTab === 'compliance' && (
+        
+            {activeTab === 'upload' && (
               <div>
                 <div className="mb-8">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                    AI Compliance Checker
+                    Upload Policy Documents
                   </h2>
                   <p className="text-gray-600">
-                    Ask security questions and get AI-powered answers based on your policy documents
+                    Upload your security policies, procedures, and documentation. 
+                    Supported formats: PDF, DOCX, TXT, HTML, MD
                   </p>
                 </div>
-                <Compliance organizationId={organizationId} />
+                <DocumentUpload
+                  entityType="polysec"
+                  entityId="polysec-database"
+                  organizationId={organizationId}
+                  onUploadComplete={handleUploadComplete}
+                  maxFileSize={100 * 1024 * 1024} // 100MB
+                  allowedFileTypes={['pdf', 'docx', 'txt', 'html', 'md']}
+                  className="bg-white rounded-lg border border-gray-200 p-6"
+                />
               </div>
             )}
 
-            {activeTab === 'ask' && (
-              <div>
-                <div className="mb-8">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                    Ask Questions
-                  </h2>
-                  <p className="text-gray-600">
-                    Process multiple security questions at once with AI-powered analysis and verification workflow
-                  </p>
-                </div>
-                <Ask organizationId={organizationId} />
-              </div>
-            )}
+           
           </>
         )}
       </div>

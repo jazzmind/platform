@@ -21,7 +21,7 @@ export default function KnowledgebaseApp({
   organizationId = 'default-org',
   className = '',
 }: KnowledgebaseAppProps) {
-  const [selectedTab, setSelectedTab] = useState<'upload' | 'search' | 'documents'>('upload');
+  const [selectedTab, setSelectedTab] = useState<'upload' | 'search' | 'documents'>('search');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
@@ -138,9 +138,9 @@ export default function KnowledgebaseApp({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav className="flex space-x-8">
               {[
-                { id: 'upload', label: 'Upload Documents', icon: '📤' },
                 { id: 'search', label: 'Search', icon: '🔍' },
-                { id: 'documents', label: 'Documents', icon: '📋' },
+                { id: 'documents', label: 'Document Library', icon: '📋' },
+                { id: 'upload', label: 'Upload Documents', icon: '📤' },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -196,7 +196,7 @@ export default function KnowledgebaseApp({
               onResultSelect={handleResultSelect}
               showFilters={true}
               showSuggestions={true}
-              className="bg-white rounded-lg border border-gray-200"
+              className=""
             />
             
             <SearchResults
