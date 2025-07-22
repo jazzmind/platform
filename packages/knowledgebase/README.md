@@ -1,4 +1,4 @@
-# @platform/knowledgebase
+# @jazzmind/knowledgebase
 
 A comprehensive document management and semantic search package designed for AI-powered knowledge bases. Built for dual-mode operation: standalone application or composable package for integration into larger platforms.
 
@@ -20,7 +20,7 @@ A comprehensive document management and semantic search package designed for AI-
 ### Standalone Mode
 
 ```tsx
-import { KnowledgebaseApp } from '@platform/knowledgebase';
+import { KnowledgebaseApp } from '@jazzmind/knowledgebase';
 
 export default function Page() {
   return (
@@ -36,7 +36,7 @@ export default function Page() {
 ### Component Mode
 
 ```tsx
-import { DocumentUpload, SearchInterface } from '@platform/knowledgebase';
+import { DocumentUpload, SearchInterface } from '@jazzmind/knowledgebase';
 
 export default function MyApp() {
   const handleUploadComplete = (result) => {
@@ -74,7 +74,7 @@ export default function MyApp() {
 ### Service Integration
 
 ```tsx
-import { DocumentService, SearchService } from '@platform/knowledgebase';
+import { DocumentService, SearchService } from '@jazzmind/knowledgebase';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -114,7 +114,7 @@ const searchResults = await searchService.search('data protection', {
 ### Installation
 
 ```bash
-npm install @platform/knowledgebase
+npm install @jazzmind/knowledgebase
 ```
 
 ### Required Dependencies
@@ -322,7 +322,7 @@ DATABASE_URL=your_database_url
 ### Configuration Object
 
 ```tsx
-import { createKnowledgebaseConfig } from '@platform/knowledgebase';
+import { createKnowledgebaseConfig } from '@jazzmind/knowledgebase';
 
 const config = createKnowledgebaseConfig({
   document: {
@@ -404,7 +404,7 @@ GET /api/processing/{processingId}/status
 ### PolySec Integration
 
 ```tsx
-import { DocumentUpload, SearchInterface } from '@platform/knowledgebase';
+import { DocumentUpload, SearchInterface } from '@jazzmind/knowledgebase';
 
 export default function PolicyManager() {
   return (
@@ -438,7 +438,7 @@ export default function PolicyManager() {
 ### ProposalHub Integration
 
 ```tsx
-import { DocumentService, SearchService } from '@platform/knowledgebase';
+import { DocumentService, SearchService } from '@jazzmind/knowledgebase';
 
 // Service-level integration
 export class ProposalKnowledgeManager {
@@ -522,7 +522,7 @@ npm run type-check
 
 ```tsx
 // This works immediately for PolySec:
-import { DocumentUpload, SearchInterface } from '@platform/knowledgebase';
+import { DocumentUpload, SearchInterface } from '@jazzmind/knowledgebase';
 
 export default function PolicyManager() {
   return (

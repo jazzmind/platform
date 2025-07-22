@@ -462,7 +462,7 @@ import {
   KnowledgebaseApp, 
   DocumentUpload, 
   SearchInterface 
-} from '@platform/knowledgebase';
+} from '@jazzmind/knowledgebase';
 
 // This works today:
 <DocumentUpload 

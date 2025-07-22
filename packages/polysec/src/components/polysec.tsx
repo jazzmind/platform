@@ -1,18 +1,47 @@
 'use client';
 
 import React, { useState } from 'react';
-import { DocumentUpload } from '@jazzmind/knowledgebase/components/DocumentUpload';
-import { DocumentList } from '@jazzmind/knowledgebase/components/DocumentList';
-import { DocumentViewer } from '@jazzmind/knowledgebase/components/DocumentViewer';
 import { Compliance } from './compliance';
-import type { ProcessingResult } from '@jazzmind/knowledgebase/lib/types';
 import Ask from './ask';
+import dynamic from 'next/dynamic';
 
-interface PolySecProps {
-  organizationId?: string;
+// Dynamically import knowledgebase components to prevent SSR issues
+const DocumentUpload = dynamic(
+  () => import('@jazzmind/knowledgebase').then(mod => ({ default: mod.DocumentUpload })),
+  { 
+    ssr: false,
+    loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded"></div>
+  }
+);
+
+const DocumentList = dynamic(
+  () => import('@jazzmind/knowledgebase').then(mod => ({ default: mod.DocumentList })),
+  { 
+    ssr: false,
+    loading: () => <div className="animate-pulse bg-gray-200 h-64 rounded"></div>
+  }
+);
+
+const DocumentViewer = dynamic(
+  () => import('@jazzmind/knowledgebase').then(mod => ({ default: mod.DocumentViewer })),
+  { 
+    ssr: false,
+    loading: () => <div className="animate-pulse bg-gray-200 h-96 rounded"></div>
+  }
+);
+
+interface ProcessingResult {
+  success: boolean;
+  fileId?: string;
+  error?: string;
 }
 
-export default function PolySec({ organizationId = 'default-org' }: PolySecProps) {
+export interface PolySecProps {
+  organizationId?: string;
+  header?: boolean;
+}
+
+export default function PolySec({ organizationId = 'default-org', header = true }: PolySecProps) {
   const [activeTab, setActiveTab] = useState('ask');
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -62,6 +91,7 @@ export default function PolySec({ organizationId = 'default-org' }: PolySecProps
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
+      {header && (
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -75,7 +105,7 @@ export default function PolySec({ organizationId = 'default-org' }: PolySecProps
           </div>
         </div>
       </div>
-
+      )}
       {/* Navigation Tabs */}
       {selectedFileId ? (
         // Document Viewer Mode

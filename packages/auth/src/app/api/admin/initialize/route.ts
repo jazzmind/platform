@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, RegistrationType } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -10,19 +10,19 @@ const DEFAULT_PACKAGES = [
     name: 'meetings',
     displayName: 'Meeting Scheduler',
     description: 'Schedule and manage meetings with participants',
-    registrationType: 'APPROVAL_REQUIRED'
+    registrationType: RegistrationType.APPROVAL_REQUIRED
   },
   {
     name: 'presentations',
     displayName: 'Presentations',
     description: 'Create and manage presentations',
-    registrationType: 'SELF_REGISTER'
+    registrationType: RegistrationType.SELF_REGISTER
   },
   {
     name: 'events',
     displayName: 'Events',
     description: 'Event management and coordination',
-    registrationType: 'SELF_REGISTER'
+    registrationType: RegistrationType.SELF_REGISTER
   }
 ];
 
@@ -117,11 +117,17 @@ export async function POST(req: NextRequest) {
         where: {
           name_packageId: {
             name: roleData.name,
-            packageId: null
+            packageId: "system"
           }
         },
         update: {},
-        create: roleData
+        create: {
+          name: roleData.name,
+          displayName: roleData.displayName,
+          description: roleData.description,
+          isSystemRole: roleData.isSystemRole,
+          packageId: "system"
+        }
       });
     }
 

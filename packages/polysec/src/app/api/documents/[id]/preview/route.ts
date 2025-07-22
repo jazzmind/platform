@@ -27,6 +27,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     // Transform sections to the format expected by knowledgebase DocumentViewer
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sections = (document.sections || []).map((section: any, index: number) => ({
       id: section.id || `section-${index}`,
       title: section.title || `Section ${index + 1}`,

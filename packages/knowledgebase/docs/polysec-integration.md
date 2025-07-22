@@ -30,7 +30,7 @@ import {
   DocumentUpload, 
   SearchInterface,
   DocumentList 
-} from '@platform/knowledgebase';
+} from '@jazzmind/knowledgebase';
 
 // Option 1: Use the complete app (fastest setup)
 export default function PolicyDatabase() {
@@ -125,7 +125,7 @@ export default function CustomPolicyManager() {
 ### For Security Questionnaire Processor
 
 ```tsx
-import { SearchInterface } from '@platform/knowledgebase';
+import { SearchInterface } from '@jazzmind/knowledgebase';
 
 export default function QuestionnaireProcessor() {
   const [currentQuestion, setCurrentQuestion] = useState('');
@@ -182,7 +182,7 @@ export default function QuestionnaireProcessor() {
 ### For Compliance Analysis
 
 ```tsx
-import { DocumentList, SearchInterface } from '@platform/knowledgebase';
+import { DocumentList, SearchInterface } from '@jazzmind/knowledgebase';
 
 export default function ComplianceGapAnalysis() {
   const [framework, setFramework] = useState('SOC2');

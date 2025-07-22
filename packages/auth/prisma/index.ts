@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 // Export Prisma client and schema for other packages
 export { PrismaClient } from '@prisma/client';
 

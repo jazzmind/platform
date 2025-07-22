@@ -480,7 +480,7 @@ import {
   DocumentService, 
   SearchService, 
   DocumentUpload 
-} from '@platform/knowledgebase';
+} from '@jazzmind/knowledgebase';
 
 // Use for R&D evidence management
 <DocumentUpload 

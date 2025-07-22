@@ -22,8 +22,8 @@ export interface PolicyDocument {
   fileName: string;
   fileSize: number;
   fileUrl: string;
-  content: any; // JSON
-  sections: any; // JSON
+  content: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  sections: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   status: ProcessingStatus;
   createdAt: Date;
   updatedAt: Date;
@@ -35,7 +35,7 @@ export interface SecurityQuestion {
   category?: string;
   framework?: string;
   answer?: string;
-  sources?: any; // JSON
+  sources?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   confidence?: number;
   documentId?: string;
   createdAt: Date;
@@ -45,8 +45,8 @@ export interface SecurityQuestion {
 export interface ComplianceFramework {
   id: string;
   name: string;
-  requirements: any; // JSON
-  controls: any; // JSON
+  requirements: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  controls: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   version: string;
   createdAt: Date;
   updatedAt: Date;

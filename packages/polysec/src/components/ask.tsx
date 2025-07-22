@@ -53,7 +53,7 @@ export default function Ask({ organizationId }: AskProps) {
 
   const generateMarkdown = (questions: ParsedQuestion[], answers: AIAnswer[]): string => {
     const now = new Date();
-    const timestamp = now.toISOString().split('T')[0];
+    // timestamp variable is available but using now directly for formatting
     
     let markdown = `# Security Questionnaire Responses\n\n`;
     markdown += `**Generated:** ${now.toLocaleDateString()} ${now.toLocaleTimeString()}\n`;
@@ -220,7 +220,7 @@ export default function Ask({ organizationId }: AskProps) {
             </div>
             <div>
               <h3 className="font-medium text-gray-900 mb-2">✅ Human Verification</h3>
-              <p>Review, approve, or flag answers for regeneration. Export only when you're satisfied with the quality.</p>
+              <p>Review, approve, or flag answers for regeneration. Export only when you&apos;re satisfied with the quality.</p>
             </div>
             <div>
               <h3 className="font-medium text-gray-900 mb-2">📄 Source Attribution</h3>

@@ -1,6 +1,6 @@
 {
   "name": "@jazzmind/auth",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": false,
   "main": "index.ts",
   "exports": {
@@ -22,14 +22,14 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.1",
-    "@prisma/client": "^5.0.0",
+    "@jazzmind/shared": "*",
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "^9.0.3",
-    "@jazzmind/shared": "*",
     "@tailwindcss/postcss": "^4.1.7",
+    "@types/nodemailer": "^6.4.7",
     "next": "^15.0.0",
     "next-auth": "^5.0.0-beta.19",
-    "prisma": "^5.0.0",
+    "nodemailer": "^6.9.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

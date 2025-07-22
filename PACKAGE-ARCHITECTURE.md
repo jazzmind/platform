@@ -9,11 +9,11 @@
 ```
 platform/
 ├── packages/
-│   ├── knowledgebase/           # @platform/knowledgebase
-│   │   ├── package.json         # "name": "@platform/knowledgebase"
+│   ├── knowledgebase/           # @jazzmind/knowledgebase
+│   │   ├── package.json         # "name": "@jazzmind/knowledgebase"
 │   │   └── src/
-│   └── polysec/                 # @platform/polysec  
-│       ├── package.json         # "name": "@platform/polysec"
+│   └── polysec/                 # @jazzmind/polysec  
+│       ├── package.json         # "name": "@jazzmind/polysec"
 │       └── src/
 ```
 
@@ -21,7 +21,7 @@ platform/
 ```json
 {
   "dependencies": {
-    "@platform/knowledgebase": "workspace:*"  // Monorepo reference
+    "@jazzmind/knowledgebase": "workspace:*"  // Monorepo reference
   }
 }
 ```
@@ -33,14 +33,14 @@ platform/
 **Step 1: Publish knowledgebase**
 ```bash
 cd packages/knowledgebase
-npm publish  # Publishes @platform/knowledgebase@1.0.0
+npm publish  # Publishes @jazzmind/knowledgebase@1.0.0
 ```
 
 **Step 2: Update PolySec dependency**
 ```json
 {
   "dependencies": {
-    "@platform/knowledgebase": "^1.0.0"  // Published package
+    "@jazzmind/knowledgebase": "^1.0.0"  // Published package
   }
 }
 ```
@@ -48,20 +48,20 @@ npm publish  # Publishes @platform/knowledgebase@1.0.0
 **Step 3: Publish PolySec**
 ```bash
 cd packages/polysec  
-npm publish  # Publishes @platform/polysec@1.0.0
+npm publish  # Publishes @jazzmind/polysec@1.0.0
 ```
 
 ### Scenario 2: End User Integration
 
 **End user installs PolySec:**
 ```bash
-npm install @platform/polysec
-# Automatically installs @platform/knowledgebase as dependency
+npm install @jazzmind/polysec
+# Automatically installs @jazzmind/knowledgebase as dependency
 ```
 
 **End user uses PolySec:**
 ```tsx
-import { PolySec, SecurityQuestionnaire } from '@platform/polysec';
+import { PolySec, SecurityQuestionnaire } from '@jazzmind/polysec';
 
 export default function MyApp() {
   return (
@@ -78,10 +78,10 @@ export default function MyApp() {
 **Private registry setup:**
 ```json
 {
-  "name": "@sonnenreich/platform",
+  "name": "@jazzmind/platform",
   "dependencies": {
-    "@platform/polysec": "^1.0.0",
-    "@platform/knowledgebase": "^1.0.0"
+    "@jazzmind/polysec": "^1.0.0",
+    "@jazzmind/knowledgebase": "^1.0.0"
   }
 }
 ```
@@ -98,7 +98,7 @@ import { DocumentService } from '../../../knowledgebase/src/lib/services/Documen
 
 **✅ Solution 1:** Proper package imports (when ready)
 ```tsx
-import { DocumentService, SearchService } from '@platform/knowledgebase';
+import { DocumentService, SearchService } from '@jazzmind/knowledgebase';
 ```
 
 **✅ Solution 2:** Current working approach (development)
@@ -148,7 +148,7 @@ npm link
 
 # Link in polysec
 cd ../polysec
-npm link @platform/knowledgebase
+npm link @jazzmind/knowledgebase
 ```
 
 ## **Current Status**

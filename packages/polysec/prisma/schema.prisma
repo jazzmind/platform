@@ -2,12 +2,14 @@
 // Learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
 }
 
 model PolicyDocument {
@@ -62,6 +64,49 @@ model ComplianceFramework {
   updatedAt DateTime @updatedAt
 
   @@map("compliance_frameworks")
+}
+
+// Models needed from knowledgebase for document processing
+model FileData {
+  id             String   @id @default(cuid())
+  fileId         String
+  entityType     String
+  entityId       String
+  dataType       String
+  chunkIndex     Int?
+  totalChunks    Int?
+  content        String?
+  contentHash    String?
+  metadata       Json?
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([fileId, entityType, entityId])
+  @@index([organizationId, dataType])
+  @@index([entityType, entityId])
+  @@index([fileId, dataType])
+  @@index([contentHash])
+  @@index([fileId, chunkIndex])
+  @@map("file_data")
+}
+
+model Vector {
+  id               String                @id @default(cuid())
+  entityType       String
+  entityId         String
+  sourceEntityType String?
+  sourceEntityId   String?
+  contentHash      String?
+  metadata         Json?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  embedding        Unsupported("vector")
+
+  @@index([entityType, entityId])
+  @@index([sourceEntityType, sourceEntityId])
+  @@index([contentHash])
+  @@map("vectors")
 }
 
 enum FileType {

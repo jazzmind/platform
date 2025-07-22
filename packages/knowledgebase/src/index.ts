@@ -37,7 +37,7 @@ export { default } from './components/KnowledgebaseApp';
 
 // Package version and metadata
 export const version = '0.1.0';
-export const packageName = '@platform/knowledgebase';
+export const packageName = '@jazzmind/knowledgebase';
 
 // Utility functions for external integrations
 export const createKnowledgebaseConfig = (overrides: Partial<any> = {}) => ({

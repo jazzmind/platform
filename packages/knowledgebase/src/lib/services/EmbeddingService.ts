@@ -10,7 +10,7 @@ import type {
 import { prisma as defaultPrisma } from '../db';
 
 export class EmbeddingService {
-  private openai: OpenAI;
+  private openai: OpenAI | null = null;
   private prisma: PrismaClient;
   private config: EmbeddingServiceConfig;
 
@@ -30,14 +30,23 @@ export class EmbeddingService {
       timeout: 30000,
       ...config,
     };
+  }
 
-    if (!process.env.OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY environment variable is required');
+  private getOpenAIClient(): OpenAI {
+    if (!this.openai) {
+      if (typeof window !== 'undefined') {
+        throw new Error('OpenAI client cannot be initialized on the client side');
+      }
+      
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error('OPENAI_API_KEY environment variable is required');
+      }
+
+      this.openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
     }
-
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    return this.openai;
   }
 
   /**
@@ -110,7 +119,8 @@ export class EmbeddingService {
 
           // Call OpenAI API
           const response = await this.retryOperation(async () => {
-            return this.openai.embeddings.create({
+            const client = this.getOpenAIClient();
+            return client.embeddings.create({
               model: this.config.model,
               input: texts,
               dimensions: this.config.dimensions,
@@ -169,7 +179,8 @@ export class EmbeddingService {
   async generateSingleEmbedding(text: string): Promise<number[]> {
     try {
       const response = await this.retryOperation(async () => {
-        return this.openai.embeddings.create({
+        const client = this.getOpenAIClient();
+        return client.embeddings.create({
           model: this.config.model,
           input: text,
           dimensions: this.config.dimensions,

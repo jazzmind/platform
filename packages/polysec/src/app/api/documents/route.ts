@@ -14,8 +14,9 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
     const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : undefined;
     const organizationId = searchParams.get('organizationId') || 'default-org';
-    const entityType = searchParams.get('entityType') || 'polysec';
-    const entityId = searchParams.get('entityId') || 'policy-database';
+    // entityType and entityId are parsed but not currently used in this implementation
+    // const entityType = searchParams.get('entityType') || 'polysec';
+    // const entityId = searchParams.get('entityId') || 'policy-database';
 
     console.log(`📚 PolySec API: Fetching documents for organization ${organizationId}`);
 

@@ -5,7 +5,7 @@ import NodemailerProvider from "next-auth/providers/nodemailer";
 import PasskeyProvider from "next-auth/providers/passkey";
 
 // Import the Edge-compatible base configuration
-import { authConfig } from "@/auth.config";
+import { authConfig } from "./auth.config";
 
 // Detect if we're in an Edge runtime environment
 const isEdgeRuntime = typeof process.env.NEXT_RUNTIME === 'string' && 
@@ -13,13 +13,7 @@ const isEdgeRuntime = typeof process.env.NEXT_RUNTIME === 'string' &&
 
 const prisma = new PrismaClient();
 
-console.log(
-  "[AUTH.TS] AUTH_SECRET:",
-  process.env.AUTH_SECRET ? "Set" : "NOT SET",
-  process.env.AUTH_SECRET
-    ? process.env.AUTH_SECRET.substring(0, 5) + "..."
-    : "N/A"
-);
+process.env.AUTH_SECRET ? '' : console.log("[AUTH.TS] AUTH_SECRET: NOT SET");
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // Spread the base config

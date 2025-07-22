@@ -4,7 +4,9 @@ import { PolicyDocumentService } from '../../../../lib/services/document-service
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { questions, question, organizationId = 'default-org', context } = body;
+    const { questions, question, organizationId = 'default-org' } = body;
+    // context parameter is available but not currently used in this implementation
+    // const context = body.context;
 
     // Handle both single question and array of questions
     let questionsToProcess: string[] = [];

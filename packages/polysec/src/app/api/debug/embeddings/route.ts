@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@platform/knowledgebase';
+import { prisma } from '@jazzmind/knowledgebase';
 
 export async function GET(request: NextRequest) {
   try {

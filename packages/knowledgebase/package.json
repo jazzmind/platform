@@ -1,6 +1,6 @@
 {
   "name": "@jazzmind/knowledgebase",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "private": false,
   "main": "src/index.ts",
   "types": "src/index.ts",

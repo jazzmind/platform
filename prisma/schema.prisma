@@ -277,20 +277,19 @@ model ScheduledMeeting {
 // ============================================================================
 
 model FileData {
-  id                String   @id @default(cuid())
-  fileId            String   // Reference to the original file in blob storage
-  entityType        String   // 'knowledgebase' | 'polysec' | 'opportunity' | 'proposal'
-  entityId          String   // ID of the parent entity
-  dataType          String   // 'extractedText' | 'semanticSection' | 'fileMetadata' | 'chunk'
-  chunkIndex        Int?     // For chunks, the index within the file
-  totalChunks       Int?     // Total number of chunks in the file
-  content           String?  // The actual text content (for chunks and sections)
-  contentHash       String?  // Hash of the content for deduplication
-  metadata          Json?    // Optional metadata about the chunk/section
-  organizationId    String   // For multi-tenant isolation
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  // Indexes for performance
+  id             String   @id @default(cuid())
+  fileId         String
+  entityType     String
+  entityId       String
+  dataType       String
+  chunkIndex     Int?
+  totalChunks    Int?
+  content        String?
+  contentHash    String?
+  metadata       Json?
+  organizationId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   @@index([fileId, entityType, entityId])
   @@index([organizationId, dataType])
   @@index([entityType, entityId])
@@ -301,16 +300,16 @@ model FileData {
 }
 
 model Vector {
-  id               String                    @id @default(cuid())
-  entityType       String                   // 'knowledgebase' | 'polysec' | 'opportunity' | 'proposal'
-  entityId         String                   // ID of the entity this vector belongs to
-  sourceEntityType String?                  // 'FileData' | 'Section' | 'Document'
-  sourceEntityId   String?                  // ID of the source entity (e.g., FileData ID for chunks)
-  contentHash      String?                  // Hash of the content for deduplication
-  embedding        Unsupported("vector(1536)") // pgvector embedding (OpenAI ada-002 dimensions)
-  metadata         Json?                    // Additional metadata about the chunk/content
-  createdAt        DateTime                 @default(now())
-  updatedAt        DateTime                 @updatedAt
+  id               String                @id @default(cuid())
+  entityType       String
+  entityId         String
+  sourceEntityType String?
+  sourceEntityId   String?
+  contentHash      String?
+  metadata         Json?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  embedding        Unsupported("vector")
   @@index([entityType, entityId])
   @@index([sourceEntityType, sourceEntityId])
   @@index([contentHash])
@@ -318,50 +317,49 @@ model Vector {
 }
 
 model Section {
-  id               String   @id @default(cuid())
-  sectionGroupId   String   // UUID to group all versions of the same logical section
-  entityType       String   // 'knowledgebase' | 'polysec' | 'opportunity' | 'proposal'
-  entityId         String   // ID of the parent entity
-  organizationId   String   // Multi-tenant isolation
-  type             String   // 'text' | 'fields' | 'metadata'
-  title            String   
-  content          String?  @db.Text // The section content
-  version          Int      @default(1) // Version number for this section
-  order            Int      @default(0) // Display order within the entity
-  isActive         Boolean  @default(true) // Whether this is the current version
-  createdBy        String?  // Contact ID of who created this version
-  createdAt        DateTime @default(now())
-  modifiedAt       DateTime @updatedAt
-  // Indexes for performance
+  id             String   @id @default(cuid())
+  sectionGroupId String
+  entityType     String
+  entityId       String
+  organizationId String
+  type           String
+  title          String
+  content        String?
+  version        Int      @default(1)
+  order          Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdBy      String?
+  createdAt      DateTime @default(now())
+  modifiedAt     DateTime @updatedAt
   @@index([entityType, entityId, isActive])
   @@index([organizationId])
   @@index([entityType, entityId, order])
-  @@index([sectionGroupId]) // For finding all versions of the same section
-  @@index([entityType, entityId, sectionGroupId, version]) // For finding specific versions
-  @@index([createdBy]) // For tracking who created versions
+  @@index([sectionGroupId])
+  @@index([entityType, entityId, sectionGroupId, version])
+  @@index([createdBy])
   @@map("sections")
 }
 
 model ProcessingJob {
-  id               String   @id @default(cuid())
-  processingId     String   @unique // External processing ID for tracking
-  fileId           String   // Reference to the file being processed
-  entityType       String   // 'knowledgebase' | 'polysec'
-  entityId         String   // Parent entity ID
-  organizationId   String   // Multi-tenant isolation
-  status           ProcessingStatus @default(PENDING)
-  stage            ProcessingStage @default(UPLOADING)
-  progress         Int      @default(0) // 0-100 percentage
-  totalSteps       Int      @default(5) // Total processing steps
-  currentStep      Int      @default(0) // Current step number
-  message          String?  // Current status message
-  result           Json?    // Final processing result
-  error            String?  // Error message if failed
-  metadata         Json?    // Additional processing metadata
-  startedAt        DateTime?
-  completedAt      DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id             String           @id @default(cuid())
+  processingId   String           @unique
+  fileId         String
+  entityType     String
+  entityId       String
+  organizationId String
+  status         ProcessingStatus @default(PENDING)
+  stage          ProcessingStage  @default(UPLOADING)
+  progress       Int              @default(0)
+  totalSteps     Int              @default(5)
+  currentStep    Int              @default(0)
+  message        String?
+  result         Json?
+  error          String?
+  metadata       Json?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
   @@index([processingId])
   @@index([fileId])
   @@index([organizationId, status])
@@ -370,26 +368,26 @@ model ProcessingJob {
 }
 
 model Document {
-  id               String   @id @default(cuid())
-  fileId           String   @unique // Blob storage reference
-  filename         String
-  originalName     String   // Original filename from upload
-  fileType         DocumentFileType
-  mimeType         String
-  fileSize         Int      // Size in bytes
-  blobUrl          String   // Vercel blob URL
-  entityType       String   // 'knowledgebase' | 'polysec'
-  entityId         String   // Parent entity ID
-  organizationId   String   // Multi-tenant isolation
-  uploadedBy       String?  // Contact ID who uploaded
-  status           DocumentStatus @default(UPLOADED)
-  extractedAt      DateTime? // When text extraction completed
-  processedAt      DateTime? // When full processing completed
-  tags             String[] // Document tags for categorization
-  classification   Json?    // AI classification results
-  metadata         Json?    // Additional file metadata
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id             String           @id @default(cuid())
+  fileId         String           @unique
+  filename       String
+  originalName   String
+  fileType       DocumentFileType
+  mimeType       String
+  fileSize       Int
+  blobUrl        String
+  entityType     String
+  entityId       String
+  organizationId String
+  uploadedBy     String?
+  status         DocumentStatus   @default(UPLOADED)
+  extractedAt    DateTime?
+  processedAt    DateTime?
+  tags           String[]
+  classification Json?
+  metadata       Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
   @@index([fileId])
   @@index([entityType, entityId])
   @@index([organizationId])
@@ -397,6 +395,346 @@ model Document {
   @@index([fileType])
   @@index([uploadedBy])
   @@map("documents")
+}
+
+model Account {
+  id                String  @id
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model AuthAuditLog {
+  id           String      @id
+  userId       String?
+  targetUserId String?
+  packageId    String?
+  action       AuditAction
+  resourceType String?
+  resourceId   String?
+  details      Json?
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime    @default(now())
+  Package      Package?    @relation(fields: [packageId], references: [id])
+  User         User?       @relation(fields: [userId], references: [id])
+  @@index([action])
+  @@index([createdAt])
+  @@index([packageId])
+  @@index([targetUserId])
+  @@index([userId])
+}
+
+model Authenticator {
+  id                   String   @id
+  userId               String
+  counter              BigInt
+  credentialDeviceType String?  @default("platform")
+  credentialBackedUp   Boolean? @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime
+  credentialPublicKey  Bytes
+  credentialID         Bytes    @unique
+  transports           String[]
+  User                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Package {
+  id               String           @id
+  name             String           @unique
+  displayName      String
+  description      String?
+  registrationType RegistrationType @default(APPROVAL_REQUIRED)
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime
+  AuthAuditLog     AuthAuditLog[]
+  Permission       Permission[]
+  ResourceAccess   ResourceAccess[]
+  Role             Role[]
+  RoleAssignment   RoleAssignment[]
+  @@index([isActive])
+  @@index([name])
+}
+
+model PasskeyChallenge {
+  id        String   @id
+  userId    String   @unique
+  challenge String
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Permission {
+  id             String           @id
+  name           String
+  displayName    String
+  description    String?
+  packageId      String
+  category       String?
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  Package        Package          @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  RolePermission RolePermission[]
+  @@unique([name, packageId])
+  @@index([category])
+  @@index([packageId])
+}
+
+model ResourceAccess {
+  id                                  String     @id
+  userId                              String
+  packageId                           String
+  resourceType                        String
+  resourceId                          String
+  accessType                          AccessType
+  grantedBy                           String?
+  expiresAt                           DateTime?
+  isActive                            Boolean    @default(true)
+  metadata                            Json?
+  createdAt                           DateTime   @default(now())
+  updatedAt                           DateTime
+  User_ResourceAccess_grantedByToUser User?      @relation("ResourceAccess_grantedByToUser", fields: [grantedBy], references: [id])
+  Package                             Package    @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  User_ResourceAccess_userIdToUser    User       @relation("ResourceAccess_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, packageId, resourceType, resourceId, accessType])
+  @@index([accessType])
+  @@index([isActive])
+  @@index([packageId])
+  @@index([resourceType, resourceId])
+  @@index([userId])
+}
+
+model Role {
+  id             String           @id
+  name           String
+  displayName    String
+  description    String?
+  packageId      String?
+  isSystemRole   Boolean          @default(false)
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  Package        Package?         @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  RoleAssignment RoleAssignment[]
+  RolePermission RolePermission[]
+  @@unique([name, packageId])
+  @@index([isSystemRole])
+  @@index([packageId])
+}
+
+model RoleAssignment {
+  id                                  String    @id
+  userId                              String
+  roleId                              String
+  packageId                           String?
+  resourceType                        String?
+  resourceId                          String?
+  grantedBy                           String?
+  expiresAt                           DateTime?
+  isActive                            Boolean   @default(true)
+  metadata                            Json?
+  createdAt                           DateTime  @default(now())
+  updatedAt                           DateTime
+  User_RoleAssignment_grantedByToUser User?     @relation("RoleAssignment_grantedByToUser", fields: [grantedBy], references: [id])
+  Package                             Package?  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  Role                                Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  User_RoleAssignment_userIdToUser    User      @relation("RoleAssignment_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, roleId, packageId, resourceType, resourceId])
+  @@index([isActive])
+  @@index([packageId])
+  @@index([resourceType, resourceId])
+  @@index([roleId])
+  @@index([userId])
+}
+
+model RolePermission {
+  id           String     @id
+  roleId       String
+  permissionId String
+  createdAt    DateTime   @default(now())
+  Permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  Role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  @@unique([roleId, permissionId])
+  @@index([permissionId])
+  @@index([roleId])
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model User {
+  id                                            String            @id
+  name                                          String?
+  email                                         String?           @unique
+  emailVerified                                 DateTime?
+  image                                         String?
+  createdAt                                     DateTime          @default(now())
+  updatedAt                                     DateTime
+  Account                                       Account[]
+  AuthAuditLog                                  AuthAuditLog[]
+  Authenticator                                 Authenticator[]
+  PasskeyChallenge                              PasskeyChallenge?
+  ResourceAccess_ResourceAccess_grantedByToUser ResourceAccess[]  @relation("ResourceAccess_grantedByToUser")
+  ResourceAccess_ResourceAccess_userIdToUser    ResourceAccess[]  @relation("ResourceAccess_userIdToUser")
+  RoleAssignment_RoleAssignment_grantedByToUser RoleAssignment[]  @relation("RoleAssignment_grantedByToUser")
+  RoleAssignment_RoleAssignment_userIdToUser    RoleAssignment[]  @relation("RoleAssignment_userIdToUser")
+  Session                                       Session[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  id         String   @id
+  @@unique([identifier, token])
+}
+
+model compliance_frameworks {
+  id           String   @id
+  name         String   @unique
+  requirements Json
+  controls     Json
+  version      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+}
+
+model evidence {
+  id            String         @id
+  projectId     String
+  activityId    String?
+  fileId        String
+  type          EvidenceType
+  description   String
+  uploadedAt    DateTime       @default(now())
+  uploadedBy    String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime
+  rd_activities rd_activities? @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  projects      projects       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model policy_documents {
+  id                 String               @id
+  title              String
+  version            String?
+  uploadDate         DateTime             @default(now())
+  fileType           FileType
+  fileName           String
+  fileSize           Int
+  fileUrl            String
+  content            Json
+  sections           Json
+  status             ProcessingStatus     @default(PROCESSING)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime
+  security_questions security_questions[]
+}
+
+model projects {
+  id             String          @id
+  name           String
+  reference      String?
+  startDate      DateTime
+  endDate        DateTime
+  totalBudget    Decimal?        @db.Decimal(15, 2)
+  description    String
+  primaryContact String?
+  status         ProjectStatus   @default(ACTIVE)
+  organizationId String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime
+  createdBy      String?
+  evidence       evidence[]
+  rd_activities  rd_activities[]
+  rd_narratives  rd_narratives[]
+}
+
+model rd_activities {
+  id            String          @id
+  projectId     String
+  type          ActivityType
+  name          String
+  hypothesis    String?
+  experiments   String?
+  results       String?
+  startDate     DateTime
+  endDate       DateTime
+  expenditure   Decimal?        @db.Decimal(15, 2)
+  status        ActivityStatus  @default(PLANNED)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime
+  evidence      evidence[]
+  projects      projects        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  rd_narratives rd_narratives[]
+  time_entries  time_entries[]
+}
+
+model rd_narratives {
+  id            String         @id
+  projectId     String
+  activityId    String?
+  type          NarrativeType
+  content       String
+  version       Int            @default(1)
+  generatedAt   DateTime       @default(now())
+  approved      Boolean        @default(false)
+  approvedBy    String?
+  approvedAt    DateTime?
+  metadata      Json?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime
+  rd_activities rd_activities? @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  projects      projects       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model security_questions {
+  id               String            @id
+  question         String
+  category         String?
+  framework        String?
+  answer           String?
+  sources          Json?
+  confidence       Float?
+  documentId       String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime
+  policy_documents policy_documents? @relation(fields: [documentId], references: [id])
+}
+
+model time_entries {
+  id             String        @id
+  activityId     String
+  userId         String
+  date           DateTime      @db.Date
+  hours          Decimal       @db.Decimal(5, 2)
+  description    String
+  approved       Boolean       @default(false)
+  approvedBy     String?
+  approvedAt     DateTime?
+  evidenceFileId String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime
+  rd_activities  rd_activities @relation(fields: [activityId], references: [id], onDelete: Cascade)
 }
 
 enum ProcessingStage {
@@ -426,245 +764,15 @@ enum DocumentFileType {
   CSV
   XLSX
   PPTX
-} 
-
-// ============================================================================
-// AUTH/PRISMA PACKAGE MODELS
-// ============================================================================
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([provider, providerAccountId])
-  @@index([userId]) // Index for faster queries on userId
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId]) // Index for faster queries on userId
-}
-
-model User {
-  id            String          @id @default(cuid())
-  name          String?
-  email         String?         @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  authenticators Authenticator[]
-  passkeyChallenge PasskeyChallenge?
-  // Authorization relationships
-  roleAssignments   RoleAssignment[]
-  resourceAccess    ResourceAccess[]
-  grantedRoles      RoleAssignment[] @relation("GrantedRoles")
-  grantedAccess     ResourceAccess[] @relation("GrantedAccess")
-  auditLogs         AuthAuditLog[]
-  // Add other global user profile fields here if necessary
-  // Example: role String? @default("user")
-}
-
-model VerificationToken {
-  id                  String   @id @default(cuid())
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  @@unique([identifier, token])
-}
-
-model Authenticator {
-  id                  String   @id @default(cuid())
-  userId              String
-  credentialID        Bytes    @unique
-  credentialPublicKey Bytes
-  counter             BigInt
-  credentialDeviceType String? @default("platform")
-  credentialBackedUp   Boolean? @default(false)
-  transports          String[]
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model PasskeyChallenge {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  challenge String
-  createdAt DateTime @default(now())
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Package {
-  id                String @id @default(cuid())
-  name              String @unique  // e.g., "meetings", "presentations"
-  displayName       String          // e.g., "Meeting Scheduler"
-  description       String?
-  registrationType  RegistrationType @default(APPROVAL_REQUIRED)
-  isActive          Boolean @default(true)
-  // Relationships
-  permissions       Permission[]
-  roles             Role[]
-  roleAssignments   RoleAssignment[]
-  resourceAccess    ResourceAccess[]
-  auditLogs         AuthAuditLog[]
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  @@index([name])
-  @@index([isActive])
-}
-
-model Role {
-  id                String @id @default(cuid())
-  name              String                    // e.g., "meeting-owner", "viewer"
-  displayName       String                    // e.g., "Meeting Owner"
-  description       String?
-  packageId         String?                   // null for system-wide roles
-  isSystemRole      Boolean @default(false)  // true for global roles like ADMIN
-  isActive          Boolean @default(true)
-  // Relationships
-  package           Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  permissions       RolePermission[]
-  assignments       RoleAssignment[]
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  @@unique([name, packageId])
-  @@index([packageId])
-  @@index([isSystemRole])
-}
-
-model Permission {
-  id                String @id @default(cuid())
-  name              String              // e.g., "meeting:read", "meeting:write"
-  displayName       String              // e.g., "View Meetings"
-  description       String?
-  packageId         String
-  category          String?             // e.g., "read", "write", "admin"
-  isActive          Boolean @default(true)
-  // Relationships
-  package           Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  rolePermissions   RolePermission[]
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  @@unique([name, packageId])
-  @@index([packageId])
-  @@index([category])
-}
-
-model RolePermission {
-  id          String @id @default(cuid())
-  roleId      String
-  permissionId String
-  role        Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission  Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  @@unique([roleId, permissionId])
-  @@index([roleId])
-  @@index([permissionId])
-}
-
-model RoleAssignment {
-  id                String @id @default(cuid())
-  userId            String
-  roleId            String
-  packageId         String?             // for package-specific role assignments
-  resourceType      String?             // e.g., "meeting", "presentation"
-  resourceId        String?             // specific resource ID
-  grantedBy         String?             // who granted this role
-  expiresAt         DateTime?           // optional expiration
-  isActive          Boolean @default(true)
-  metadata          Json?               // additional context data
-  // Relationships
-  user              User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  role              Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  package           Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  grantedByUser     User? @relation("GrantedRoles", fields: [grantedBy], references: [id])
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  @@unique([userId, roleId, packageId, resourceType, resourceId])
-  @@index([userId])
-  @@index([roleId])
-  @@index([packageId])
-  @@index([resourceType, resourceId])
-  @@index([isActive])
-}
-
-model ResourceAccess {
-  id                String @id @default(cuid())
-  userId            String
-  packageId         String
-  resourceType      String              // e.g., "meeting", "presentation"
-  resourceId        String              // specific resource ID
-  accessType        AccessType
-  grantedBy         String?             // who granted this access
-  expiresAt         DateTime?           // optional expiration
-  isActive          Boolean @default(true)
-  metadata          Json?               // additional context data
-  // Relationships
-  user              User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  package           Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  grantedByUser     User? @relation("GrantedAccess", fields: [grantedBy], references: [id])
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  @@unique([userId, packageId, resourceType, resourceId, accessType])
-  @@index([userId])
-  @@index([packageId])
-  @@index([resourceType, resourceId])
-  @@index([accessType])
-  @@index([isActive])
-}
-
-model AuthAuditLog {
-  id                String @id @default(cuid())
-  userId            String?             // user who performed the action
-  targetUserId      String?             // user who was affected
-  packageId         String?
-  action            AuditAction
-  resourceType      String?
-  resourceId        String?
-  details           Json?               // additional details about the action
-  ipAddress         String?
-  userAgent         String?
-  // Relationships
-  user              User? @relation(fields: [userId], references: [id])
-  package           Package? @relation(fields: [packageId], references: [id])
-  createdAt         DateTime @default(now())
-  @@index([userId])
-  @@index([targetUserId])
-  @@index([packageId])
-  @@index([action])
-  @@index([createdAt])
-}
-
-enum RegistrationType {
-  SELF_REGISTER      // Users can automatically get access
-  APPROVAL_REQUIRED  // Requires admin approval
-  ADMIN_ONLY         // Only admins can grant access
 }
 
 enum AccessType {
-  OWNER              // Full control over resource
-  EDITOR             // Can edit resource
-  VIEWER             // Read-only access
-  LIMITED_EDITOR     // Restricted editing (e.g., booking only)
-  COLLABORATOR       // Can contribute/comment
-  CUSTOM             // Custom access level
+  OWNER
+  EDITOR
+  VIEWER
+  LIMITED_EDITOR
+  COLLABORATOR
+  CUSTOM
 }
 
 enum AuditAction {
@@ -678,5 +786,11 @@ enum AuditAction {
   PACKAGE_DEACTIVATED
   USER_APPROVED
   USER_DENIED
+}
+
+enum RegistrationType {
+  SELF_REGISTER
+  APPROVAL_REQUIRED
+  ADMIN_ONLY
 }
 

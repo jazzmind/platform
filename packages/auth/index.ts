@@ -1,6 +1,12 @@
-// Export the main NextAuth configuration and utilities
-export { auth, signIn, signOut, handlers } from './src/auth';
+// Edge-compatible exports (for middleware, client components)
 export { authConfig } from './src/auth.config';
+
+// Server-side auth exports (for API routes, server components)
+export { auth, signIn, signOut, handlers } from './src/auth';
+
+// Convenience re-exports for different use cases
+export { authConfig as edgeAuth } from './src/auth.config';
+export { auth as serverAuth, signIn as serverSignIn, signOut as serverSignOut, handlers as serverHandlers } from './src/auth';
 
 // Export reusable components
 export { default as ProviderButton } from './src/components/ProviderButton';
