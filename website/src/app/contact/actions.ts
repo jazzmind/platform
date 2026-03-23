@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 // Define form validation schema
 const contactFormSchema = z.object({
@@ -25,22 +25,14 @@ export async function sendContactEmail(formData: FormData) {
 
     // Validate the form data
     const validationResult = contactFormSchema.safeParse(data);
-    
+
     if (!validationResult.success) {
       const errors = validationResult.error.flatten().fieldErrors;
       return { success: false, errors };
     }
 
-    // Create email transport
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_SERVER || "smtp.gmail.com",
-      port: parseInt(process.env.EMAIL_PORT || "587"),
-      secure: process.env.EMAIL_SECURE === "true",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const fromEmail = process.env.EMAIL_FROM || "website@sonnenreich.com";
 
     // Prepare email content
     const emailContent = `
@@ -48,26 +40,34 @@ export async function sendContactEmail(formData: FormData) {
       Email: ${data.email}
       Organization: ${data.organization || "Not provided"}
       Event Type: ${data.event}
-      
+
       Message:
       ${data.message}
     `;
 
     // Send email
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM || "website@sonnenreich.com",
+    const { error } = await resend.emails.send({
+      from: fromEmail,
       to: "wes@sonnenreich.com",
       subject: "Contact from sonnenreich.com website",
       text: emailContent,
       replyTo: data.email,
     });
 
+    if (error) {
+      console.error("Error sending email:", error);
+      return {
+        success: false,
+        errors: { _form: ["Failed to send email. Please try again later."] },
+      };
+    }
+
     return { success: true };
   } catch (error) {
     console.error("Error sending email:", error);
-    return { 
-      success: false, 
-      errors: { _form: ["Failed to send email. Please try again later."] } 
+    return {
+      success: false,
+      errors: { _form: ["Failed to send email. Please try again later."] },
     };
   }
-} 
+}
