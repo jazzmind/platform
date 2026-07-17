@@ -21,6 +21,9 @@ node_modules/
 dist/
 **/dist/**
 
+# Prisma generated client (recreated by `npm run db:generate`)
+**/generated/prisma/
+
 # Turborepo cache
 .turbo/
 

@@ -1,5 +1,6 @@
 // Authorization integration for meetings package
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../auth/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { 
   getAuthorizationEngine, 
   checkMeetingPermissions,
@@ -13,7 +14,8 @@ import {
 } from '@jazzmind/shared';
 
 // Initialize authorization with meetings database
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 // Setup authorization engine with Prisma client
 const authEngine = getAuthorizationEngine();

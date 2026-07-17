@@ -1,5 +1,5 @@
 import { DocumentService } from '../DocumentService';
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '../../../../../auth/generated/prisma/client';
 import { put, del } from '@vercel/blob';
 import type { UploadRequest, FileMetadata } from '../../types';
 

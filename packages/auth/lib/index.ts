@@ -1,38 +1,81 @@
-// Database utilities
-import { PrismaClient } from '@prisma/client';
+import type { NextRequest } from 'next/server';
 
-// Shared Prisma client instance
-export const createPrismaClient = () => {
-  return new PrismaClient();
+/**
+ * Admin check based ONLY on the configured `ADMIN_USERS` env variable.
+ * Prefer `session.user.role === 'admin'` where possible; keep this helper
+ * for paths where a session isn't available (background jobs, seeds).
+ */
+export const isAdmin = (email: string | null | undefined): boolean => {
+  if (!email) return false;
+  const adminUsers = (process.env.ADMIN_USERS ?? '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  return adminUsers.includes(email.toLowerCase());
 };
 
-// Admin utilities
-export const isAdmin = (email: string): boolean => {
-  const adminUsers = process.env.ADMIN_USERS?.split(',').map(email => email.trim()) || [];
-  return adminUsers.includes(email);
+/**
+ * Shared Prisma client for legacy consumers. New code should import `prisma`
+ * from '@jazzmind/auth' (internal) or their own `@/lib/db` helper.
+ */
+export const createPrismaClient = async () => {
+  const { prisma } = await import('../src/db');
+  return prisma;
 };
 
-// Check if user has package access
-export const hasPackageAccess = async (userId: string, packageName: string): Promise<boolean> => {
-  // TODO: Implement package access check using authorization system
-  // This would query the RoleAssignment and ResourceAccess tables
-  return true; // Placeholder
-};
+export { prisma } from '../src/db';
 
-// API utilities for other packages to use
-export const createAdminApiHandler = (handler: Function) => {
-  return async (req: any) => {
-    // Common admin authentication logic
-    // Return 401/403 if not admin
-    // Otherwise call the handler
-    return handler(req);
-  };
-};
+/**
+ * Check whether a user has any active access grant for the given package.
+ */
+export async function hasPackageAccess(
+  userId: string,
+  packageName: string,
+): Promise<boolean> {
+  const { prisma } = await import('../src/db');
 
-// Middleware utilities
-export const createAuthMiddleware = (options?: any) => {
-  // Return middleware function that other packages can use
-  return (req: any) => {
-    // Common authentication middleware logic
-  };
-}; 
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, email: true, role: true, banned: true },
+  });
+  if (!user || user.banned) return false;
+  if (user.role === 'admin') return true;
+  if (isAdmin(user.email)) return true;
+
+  const pkg = await prisma.package.findUnique({
+    where: { name: packageName },
+    select: { id: true, isActive: true },
+  });
+  if (!pkg || !pkg.isActive) return false;
+
+  const [roleCount, accessCount] = await Promise.all([
+    prisma.roleAssignment.count({
+      where: {
+        userId,
+        packageId: pkg.id,
+        isActive: true,
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      },
+    }),
+    prisma.resourceAccess.count({
+      where: {
+        userId,
+        packageId: pkg.id,
+        isActive: true,
+        OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+      },
+    }),
+  ]);
+
+  return roleCount + accessCount > 0;
+}
+
+/**
+ * Resolve the current session on the server side. Thin wrapper around
+ * `auth.api.getSession` that accepts either a `NextRequest` or raw `Headers`.
+ */
+export async function getServerSession(input: NextRequest | Headers) {
+  const { auth } = await import('../src/auth');
+  const headers = input instanceof Headers ? input : input.headers;
+  return auth.api.getSession({ headers });
+}

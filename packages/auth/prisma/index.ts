@@ -1,42 +1,52 @@
-import { PrismaClient } from '@prisma/client';
-// Export Prisma client and schema for other packages
-export { PrismaClient } from '@prisma/client';
+export { PrismaClient } from '../generated/prisma/client';
 
-// Export commonly used Prisma types
 export type {
   User,
   Account,
   Session,
+  Verification,
+  Passkey,
   Package,
   Role,
   Permission,
   RoleAssignment,
   ResourceAccess,
   AuthAuditLog,
-  Authenticator,
-  PasskeyChallenge,
   RegistrationType,
   AccessType,
-  AuditAction
-} from '@prisma/client';
+  AuditAction,
+} from '../generated/prisma/client';
 
-// Create a shared Prisma client instance
+import { PrismaClient } from '../generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+/**
+ * Shared Prisma client factory for consumers that want their own instance.
+ * Most consumers should import `prisma` from `@jazzmind/auth/lib` instead
+ * so they share the package's singleton.
+ */
 export const createSharedPrismaClient = () => {
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL!,
+  });
   return new PrismaClient({
-    // Add any shared configuration here
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    adapter,
+    log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
   });
 };
 
-// Database utilities
-export const ensureAuthSchema = async (prisma: any) => {
-  // This could check if auth tables exist and create them if needed
-  // For now, assumes schema is already applied via migrations
+/**
+ * Smoke-test that the auth schema is reachable. Returns false if the `user`
+ * table is missing (e.g. `prisma db push` has not been run).
+ */
+export const ensureAuthSchema = async (
+  prisma: InstanceType<typeof PrismaClient>,
+): Promise<boolean> => {
   try {
     await prisma.user.findFirst();
     return true;
   } catch (error) {
-    console.error('Auth schema not found:', error);
+    console.error('[@jazzmind/auth/prisma] Auth schema not reachable:', error);
     return false;
   }
-}; 
+};

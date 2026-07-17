@@ -4,6 +4,12 @@ import { NextResponse } from 'next/server';
 import { UserProfile } from '@/src/types/user';
 import { headers } from 'next/headers';
 
+// NOTE: `@/src/auth` is resolved by the *consuming application* and is
+// expected to export a better-auth `auth` instance (see @jazzmind/auth for a
+// reference implementation). The consumer's auth must expose
+// `auth.api.getSession({ headers })` — this was migrated from the legacy
+// NextAuth v5 `auth()` helper during the better-auth migration.
+
 export interface ValidationResult {
   success: boolean;
   user?: {
@@ -60,8 +66,8 @@ export async function validateApiAccess(requiredRole?: string, requirePlatformRo
     }
   }
 
-  const session = await auth();
-  
+  const session = await auth.api.getSession({ headers: await headers() });
+
   if (!session?.user?.id) {
     return {
       success: false,

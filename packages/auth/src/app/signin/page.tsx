@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { signIn } from 'next-auth/react';
+import { authClient } from '@/client';
 import { useSearchParams } from 'next/navigation';
 
 function SignInForm() {
@@ -43,11 +43,14 @@ function SignInForm() {
       const tryPasskeyAuth = async () => {
         try {
           setStatus('checking');
-          await signIn('passkey', { callbackUrl });
-          // If the above doesn't redirect, fall back to showing the sign-in options
+          const res = await authClient.signIn.passkey();
+          if (res?.data) {
+            window.location.href = callbackUrl;
+            return;
+          }
           setStatus('idle');
-        } catch (error) {
-          console.error('Passkey auth failed, showing manual options', error);
+        } catch (err) {
+          console.error('Passkey auth failed, showing manual options', err);
           setStatus('idle');
         }
       };
@@ -64,10 +67,15 @@ function SignInForm() {
     try {
       setIsSubmitting(true);
       setStatus('checking');
-      await signIn('nodemailer', { email, callbackUrl, redirect: false });
-      setStatus('email-sent');
-    } catch (error) {
-      console.error('Sign-in error:', error);
+      const res = await authClient.signIn.magicLink({ email, callbackURL: callbackUrl });
+      if (res?.error) {
+        setStatus('error');
+        setErrorMessage(res.error.message ?? 'Failed to send login email.');
+      } else {
+        setStatus('email-sent');
+      }
+    } catch (err) {
+      console.error('Sign-in error:', err);
       setStatus('error');
       setErrorMessage('Failed to send login email. Please try again.');
     } finally {
@@ -79,9 +87,12 @@ function SignInForm() {
   const handlePasskeySignIn = async () => {
     try {
       setIsSubmitting(true);
-      await signIn('passkey', { callbackUrl });
-    } catch (error) {
-      console.error('Passkey sign-in error:', error);
+      const res = await authClient.signIn.passkey();
+      if (res?.data) {
+        window.location.href = callbackUrl;
+      }
+    } catch (err) {
+      console.error('Passkey sign-in error:', err);
       setStatus('error');
       setErrorMessage('Passkey authentication failed. Please try another method.');
     } finally {

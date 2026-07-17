@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { signOut } from 'next-auth/react';
+import { useSession, signOut } from '@/client';
 import { startRegistration } from '@simplewebauthn/browser';
 import Link from 'next/link';
 
@@ -14,7 +13,7 @@ interface PasskeyDevice {
 }
 
 export default function Profile() {
-  const { data: session, status } = useSession();
+  const { data: session, isPending } = useSession();
   const [supportsPasskeys, setSupportsPasskeys] = useState(false);
   const [hasPasskey, setHasPasskey] = useState(false);
   const [passkeyDevices, setPasskeyDevices] = useState<PasskeyDevice[]>([]);
@@ -77,10 +76,10 @@ export default function Profile() {
       }
     };
 
-    if (status === 'authenticated') {
+    if (!isPending && session) {
       checkForPasskey();
     }
-  }, [session, status]);
+  }, [session, isPending]);
 
   const registerPasskey = async () => {
     if (!session?.user?.id || !session?.user?.email) {
@@ -198,7 +197,7 @@ export default function Profile() {
     });
   };
 
-  if (status === 'loading') {
+  if (isPending) {
     return (
       <div className="min-h-screen auth-gradient flex items-center justify-center p-4">
         <div className="auth-card rounded-2xl p-8 max-w-md w-full shadow-2xl">
@@ -213,7 +212,7 @@ export default function Profile() {
     );
   }
 
-  if (status === 'unauthenticated') {
+  if (!isPending && !session) {
     return (
       <div className="min-h-screen auth-gradient flex items-center justify-center p-4">
         <div className="auth-card rounded-2xl p-8 max-w-md w-full shadow-2xl">
@@ -431,7 +430,7 @@ export default function Profile() {
         
         <div className="border-t border-gray-200 pt-6">
           <button
-            onClick={() => signOut({ callbackUrl: '/' })}
+            onClick={async () => { await signOut(); window.location.href = '/'; }}
             className="w-full py-3 px-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg"
           >
             Sign Out

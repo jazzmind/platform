@@ -1,15 +1,12 @@
-// Export all reusable components
 export { default as ProviderButton } from '../src/components/ProviderButton';
 export { default as Providers } from '../src/components/Providers';
 
-// Admin components
 export { default as AdminDashboard } from '../src/components/admin/AdminDashboard';
 export { default as SystemStatus } from '../src/components/admin/SystemStatus';
 export { default as PackagesManager } from '../src/components/admin/PackagesManager';
 export { default as UsersManager } from '../src/components/admin/UsersManager';
 export { default as RolesManager } from '../src/components/admin/RolesManager';
 
-// Export component types directly
 export interface Package {
   id: string;
   name: string;
@@ -37,14 +34,15 @@ export interface User {
   id: string;
   name?: string;
   email?: string;
-  emailVerified?: Date;
+  emailVerified?: boolean;
   image?: string;
+  role?: string | null;
+  banned?: boolean | null;
   createdAt: Date;
   updatedAt: Date;
   [key: string]: any;
 }
 
-// Component prop types
 export interface AdminDashboardProps {
   userEmail: string;
 }
@@ -72,5 +70,4 @@ export interface RolesManagerProps {
   onRolesChange: () => void;
 }
 
-// Re-export commonly used types
-export type { ReactNode } from 'react'; 
+export type { ReactNode } from 'react';

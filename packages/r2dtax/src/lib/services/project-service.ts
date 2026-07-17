@@ -1,5 +1,5 @@
 import { prisma } from '../db';
-import { ProjectStatus } from '@prisma/client';
+import { ProjectStatus } from '../../../../auth/generated/prisma/client';
 import { z } from 'zod';
 
 // Validation schemas

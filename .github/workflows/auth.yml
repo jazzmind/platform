@@ -1,0 +1,82 @@
+name: Auth package CI
+
+on:
+  pull_request:
+    paths:
+      - 'packages/auth/**'
+      - 'packages/shared/**'
+      - 'prisma/**'
+      - 'scripts/consolidate-schemas.js'
+      - 'package*.json'
+      - '.github/workflows/auth.yml'
+  push:
+    branches: [packages, feat/**]
+    paths:
+      - 'packages/auth/**'
+      - 'packages/shared/**'
+      - 'prisma/**'
+
+concurrency:
+  group: auth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-typecheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run db:consolidate
+      - name: Validate consolidated schema
+        run: npx prisma validate --schema packages/auth/prisma/schema.prisma
+      - run: npm --workspace=@jazzmind/auth run lint
+      - run: npm --workspace=@jazzmind/auth run typecheck
+
+  unit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm --workspace=@jazzmind/auth run test:coverage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: auth-coverage
+          path: packages/auth/coverage/
+
+  integration:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: better_auth_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      mailhog:
+        image: mailhog/mailhog:latest
+        ports: ['1025:1025', '8025:8025']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm --workspace=@jazzmind/auth run test:integration
+        env:
+          BETTER_AUTH_TEST_DATABASE_URL: postgres://test:test@localhost:5432/better_auth_test
+          DATABASE_URL: postgres://test:test@localhost:5432/better_auth_test

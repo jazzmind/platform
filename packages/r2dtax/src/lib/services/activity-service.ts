@@ -1,5 +1,5 @@
 import { prisma } from '../db';
-import { ActivityType, ActivityStatus } from '@prisma/client';
+import { ActivityType, ActivityStatus } from '../../../../auth/generated/prisma/client';
 import { z } from 'zod';
 
 // Validation schemas

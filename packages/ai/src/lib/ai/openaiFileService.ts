@@ -1,12 +1,15 @@
 import OpenAI from 'openai';
 import crypto from 'crypto';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../../auth/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
+});
 
 export interface OpenAIFileResult {
   fileId: string;

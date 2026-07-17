@@ -18,7 +18,7 @@ import {
   createTestFileData, 
   PERFORMANCE_BENCHMARKS 
 } from '../setup/testData';
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '../../../../../../auth/generated/prisma/client';
 
 describe('Document to Vector Store Integration', () => {
   let embeddingService: EmbeddingService;

@@ -1,5 +1,5 @@
 import { put, del } from '@vercel/blob';
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '../../../../auth/generated/prisma/client';
 import crypto from 'crypto';
 import {
   type FileMetadata,

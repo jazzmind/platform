@@ -1,13 +1,13 @@
 ---
-description: Use when writing Next.js 15 API routes and handlers to ensure proper patterns
+description: Use when writing Next.js 16 API routes and handlers to ensure proper patterns
 globs: website/src/**/*.ts
 alwaysApply: false
 ---
 
-# Next.js 15 Patterns and Best Practices
+# Next.js 16 Patterns and Best Practices
 
 ## Context
-- Working with Next.js 15 app structure
+- Working with Next.js 16 app structure
 - Creating dynamic routes with parameters
 - Developing API routes and handlers
 
@@ -40,10 +40,21 @@ alwaysApply: false
 - Direct fetch calls in server components
 - `notFound()` for missing data
 
+### Proxy (replaces middleware)
+- `proxy.ts` replaces `middleware.ts` (deprecated)
+- Export `default function proxy(request: NextRequest)`
+- Runs on Node.js runtime (not Edge)
+- `config.matcher` still works the same way
+
+### Prisma 7
+- Import from generated client path, NOT `@prisma/client`
+- All PrismaClient instances require a driver adapter
+- Use `PrismaPg` from `@prisma/adapter-pg` for PostgreSQL
+
 ## Examples
 
 <example>
-// Dynamic route parameter in Next.js 15
+// Dynamic route parameter in Next.js 16
 export default async function ProductPage({
   params,
 }: {
@@ -75,18 +86,16 @@ export default async function ProductPage({
 </example>
 
 <example>
-// Proper API route in Next.js 15
+// Proper API route in Next.js 16
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  // Use established auth patterns
-  const session = await getSession(); // or auth() function
+  const session = await getSession();
   
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   
-  // Process request
   return NextResponse.json({ data: "Success" });
 }
 </example>
@@ -94,7 +103,6 @@ export async function GET(request: Request) {
 <example type="invalid">
 // INCORRECT: Using deprecated patterns
 export async function GET(request: Request) {
-  // Using deprecated session handling
   const session = await getServerSession(authOptions);
   
   // Rest of handler
@@ -102,8 +110,10 @@ export async function GET(request: Request) {
 </example>
 
 <critical>
-- NEVER forget to await params in Next.js 15 route handlers and pages
+- NEVER forget to await params in Next.js 16 route handlers and pages
 - ALWAYS implement proper error handling
 - Type params as Promise<{ [param]: string }> to ensure correct usage
 - Use modern authentication patterns appropriate to your setup
+- Use `proxy.ts` instead of `middleware.ts`
+- Import Prisma from generated path, not `@prisma/client`
 </critical>

@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+// NOTE: `@/src/auth/client` is resolved by the consuming application and is
+// expected to export a better-auth React client (see @jazzmind/auth/client
+// for a reference implementation). Migrated from `next-auth/react` during
+// the better-auth migration.
+import { useSession } from '@/src/auth/client';
 import ChatContainer from './ChatContainer';
 
 interface DashboardChatContainerProps {

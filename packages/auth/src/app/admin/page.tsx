@@ -1,9 +1,10 @@
 import { auth } from "@/auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 
 export default async function AdminPage() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
   // Check if user is logged in
   if (!session?.user?.email) {

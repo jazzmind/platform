@@ -1,4 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../../../../auth/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { MODELS } from '../../../../lib/ai/models';
 
 // Test configuration and environment setup
@@ -61,8 +62,9 @@ export function validateTestEnvironment(): void {
 
 // Test database setup
 export async function setupTestDatabase(): Promise<PrismaClient> {
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
   const prisma = new PrismaClient({
-    datasourceUrl: process.env.DATABASE_URL,
+    adapter,
     log: process.env.NODE_ENV === 'test' ? [] : ['query', 'error'],
   });
   

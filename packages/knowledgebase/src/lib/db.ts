@@ -1,26 +1,33 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../auth/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 declare global {
   // eslint-disable-next-line no-var
   var __knowledgebase_prisma: PrismaClient | undefined;
 }
 
+function createClient(): PrismaClient {
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  return new PrismaClient({
+    adapter,
+    log: ['query', 'info', 'warn', 'error'],
+  });
+}
+
 let prisma: PrismaClient;
 
 if (process.env.NODE_ENV === 'production') {
-  prisma = new PrismaClient();
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  prisma = new PrismaClient({ adapter });
 } else {
   if (!global.__knowledgebase_prisma) {
-    global.__knowledgebase_prisma = new PrismaClient({
-      log: ['query', 'info', 'warn', 'error'],
-    });
+    global.__knowledgebase_prisma = createClient();
   }
   prisma = global.__knowledgebase_prisma;
 }
 
 export { prisma };
 
-// Database utilities
 export async function connectToDatabase() {
   try {
     await prisma.$connect();
@@ -42,7 +49,6 @@ export async function disconnectFromDatabase() {
   }
 }
 
-// Health check for database connection
 export async function checkDatabaseHealth() {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -56,4 +62,4 @@ export async function checkDatabaseHealth() {
   }
 }
 
-export default prisma; 
+export default prisma;

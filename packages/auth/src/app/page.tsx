@@ -1,8 +1,9 @@
 import { auth } from "@/auth";
+import { headers } from "next/headers";
 import Link from "next/link";
 
 export default async function AuthHomePage() {
-  const session = await auth();
+  const session = await auth.api.getSession({ headers: await headers() });
 
   // Check if user is admin
   const adminUsers = process.env.ADMIN_USERS?.split(',').map(email => email.trim()) || [];

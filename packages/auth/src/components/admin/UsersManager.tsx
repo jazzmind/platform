@@ -15,8 +15,10 @@ interface User {
   id: string;
   name?: string;
   email?: string;
-  emailVerified?: Date;
+  emailVerified?: boolean;
   image?: string;
+  role?: string | null;
+  banned?: boolean | null;
   createdAt: Date;
   updatedAt: Date;
   [key: string]: any;

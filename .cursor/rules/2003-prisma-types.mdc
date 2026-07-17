@@ -1,88 +1,57 @@
 ---
-description: ALWAYS use type imports with Prisma client to avoid type errors
+description: ALWAYS use type imports with Prisma 7 generated client to avoid type errors
 globs: 
 alwaysApply: false
 ---
 
-# Prisma Type Handling
+# Prisma 7 Type Handling
 
 ## Context
 - When working with Prisma models in TypeScript files
-- When importing types from Prisma Client 
+- When importing types from the generated Prisma Client
 - When defining component props or state variables that use Prisma models
 
 ## Requirements
 
-- ALWAYS use `type` keyword: `import type { ModelName } from '@prisma/client'`
+- NEVER import from `@prisma/client` — always from the generated output path
+- Platform: `import { PrismaClient } from '../generated/prisma/client'` (relative to `packages/auth/`)
+- Intranet: `import { PrismaClient } from '../generated/prisma/client'` (relative to repo root)
+- Other packages: `import type { User } from '../../../auth/generated/prisma/client'`
+- ALWAYS use `type` keyword for type-only imports: `import type { User } from '...'`
+- ALWAYS use `PrismaPg` adapter when creating PrismaClient instances
 - Use local interfaces when imports fail
-- Handle null image fields (headshots/logos)
-- For type issues:
-  1. Regenerate Prisma client after schema changes
-  2. Create explicit interfaces when imports fail
-  3. Verify fields against Prisma schema
-
-### Quote Model Example
-```typescript
-interface Quote {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  text: string;
-  author: string;
-  role: string;
-  company?: string | null;
-  type: string;
-  featured: boolean;
-  active: boolean;
-  headshot?: string | null;
-  companyLogo?: string | null;
-  sequence: number;
-}
-```
+- After schema changes: run `npm run db:generate` to regenerate client
 
 ## Examples
 
 <example>
-✅ Good type import:
+✅ Prisma 7 correct usage:
 ```typescript
-import type { Quote, User } from '@prisma/client';
+import { PrismaClient } from '../generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-function QuoteManager({ initialQuotes }: { initialQuotes: Quote[] }) {
-  // Implementation
-}
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 ```
 </example>
 
 <example>
-✅ Good fallback:
+✅ Type-only import:
 ```typescript
-interface Quote {
-  id: string;
-  text: string;
-  author: string;
-  // other fields
-}
-
-function QuoteManager({ initialQuotes }: { initialQuotes: Quote[] }) {
-  // Implementation
-}
+import type { User, Session } from '../generated/prisma/client';
 ```
 </example>
 
 <example type="invalid">
-❌ Bad usage:
+❌ Old Prisma 6 pattern (broken in v7):
 ```typescript
-import { Quote } from '@prisma/client'; // Missing 'type'
-
-// Or assuming unknown fields:
-function QuoteDisplay({ quote }: { quote: any }) {
-  return <div>{quote.nonExistentField}</div>
-}
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 ```
 </example>
 
 <critical>
-- NEVER use Prisma import without 'type' keyword for models
-- ALWAYS check schema when uncertain about fields
-- Define local interfaces when type errors occur
-</critical> 
+- NEVER import from `@prisma/client` — use the generated output path
+- NEVER create PrismaClient without a driver adapter
+- ALWAYS run `npm run db:generate` after schema changes
+</critical>

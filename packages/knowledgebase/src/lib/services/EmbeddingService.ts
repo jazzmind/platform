@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import type { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '../../../../auth/generated/prisma/client';
 import crypto from 'crypto';
 import type { 
   ContentChunk, 

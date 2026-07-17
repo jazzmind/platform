@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { SignalingMessage } from "@prisma/client";
+import { SignalingMessage } from "../../../../../../../auth/generated/prisma/client";
 
 export type RTCMessage = {
   type: string;

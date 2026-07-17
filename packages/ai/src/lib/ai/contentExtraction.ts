@@ -781,8 +781,11 @@ export async function generateKnowledgeBasedResponse(
       if (fileId) {
         console.log(`DEBUG: Searching specific file ${fileId} for all semantic sections`);
         try {
-          const { PrismaClient } = await import('@prisma/client');
-          const prisma = new PrismaClient();
+          const { PrismaClient } = await import('../../../../auth/generated/prisma/client');
+          const { PrismaPg } = await import('@prisma/adapter-pg');
+          const prisma = new PrismaClient({
+            adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
+          });
           
           const fileSemanticSections = await prisma.fileData.findMany({
             where: {
@@ -834,8 +837,11 @@ export async function generateKnowledgeBasedResponse(
       if (fallbackContext.length === 0) {
         console.log('DEBUG: Trying broader semantic section search');
         try {
-          const { PrismaClient } = await import('@prisma/client');
-          const prisma = new PrismaClient();
+          const { PrismaClient } = await import('../../../../auth/generated/prisma/client');
+          const { PrismaPg } = await import('@prisma/adapter-pg');
+          const prisma = new PrismaClient({
+            adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
+          });
           
           const allSemanticSections = await prisma.fileData.findMany({
             where: {

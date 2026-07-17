@@ -6,270 +6,267 @@
 // while keeping packages independent for standalone operation.
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../packages/auth/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ============================================================================
-// R2DTAX/PRISMA PACKAGE MODELS
+// AUTH/PRISMA PACKAGE MODELS
 // ============================================================================
 
-model Project {
-  id              String        @id @default(cuid())
-  name            String
-  reference       String?       // Project reference code like "INT20_01"
-  startDate       DateTime
-  endDate         DateTime
-  totalBudget     Decimal?      @db.Decimal(15, 2)
-  description     String        @db.Text
-  primaryContact  String?
-  status          ProjectStatus @default(ACTIVE)
-  organizationId  String        // Multi-tenant isolation
-  // Relations
-  activities      RDActivity[]
-  narratives      RDNarrative[]
-  evidence        Evidence[]
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  // Admin plugin fields
+  role       String?
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
+  accounts      Account[]
+  sessions      Session[]
+  passkeys      Passkey[]
+  // Custom authorization relationships (unchanged)
+  roleAssignments RoleAssignment[]
+  resourceAccess  ResourceAccess[]
+  grantedRoles    RoleAssignment[] @relation("GrantedRoles")
+  grantedAccess   ResourceAccess[] @relation("GrantedAccess")
+  auditLogs       AuthAuditLog[]
+  @@index([role])
+  @@index([banned])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  createdBy String?
-  @@map("projects")
+  // Admin plugin: impersonation support
+  impersonatedBy String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+  @@index([expiresAt])
 }
 
-model RDActivity {
-  id           String         @id @default(cuid())
-  projectId    String
-  type         ActivityType
-  name         String
-  hypothesis   String?        @db.Text
-  experiments  String?        @db.Text
-  results      String?        @db.Text
-  startDate    DateTime
-  endDate      DateTime
-  expenditure  Decimal?       @db.Decimal(15, 2)
-  status       ActivityStatus @default(PLANNED)
-  // Relations
-  project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  timeEntries  TimeEntry[]
-  narratives   RDNarrative[]
-  evidence     Evidence[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("rd_activities")
-}
-
-model TimeEntry {
-  id               String    @id @default(cuid())
-  activityId       String
-  userId           String
-  date             DateTime  @db.Date
-  hours            Decimal   @db.Decimal(5, 2)
-  description      String    @db.Text
-  approved         Boolean   @default(false)
-  approvedBy       String?
-  approvedAt       DateTime?
-  evidenceFileId   String?   // Reference to knowledgebase file
-  // Relations
-  activity         RDActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("time_entries")
-}
-
-model RDNarrative {
-  id           String        @id @default(cuid())
-  projectId    String
-  activityId   String?       // Optional - for activity-specific narratives
-  type         NarrativeType
-  content      String        @db.Text
-  version      Int           @default(1)
-  generatedAt  DateTime      @default(now())
-  approved     Boolean       @default(false)
-  approvedBy   String?
-  approvedAt   DateTime?
-  metadata     Json?         // Generation metadata (AI model, prompts, etc.)
-  // Relations
-  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  activity     RDActivity?   @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("rd_narratives")
-}
-
-model Evidence {
-  id           String       @id @default(cuid())
-  projectId    String
-  activityId   String?      // Optional - can be project-level evidence
-  fileId       String       // Knowledgebase file reference
-  type         EvidenceType
-  description  String       @db.Text
-  uploadedAt   DateTime     @default(now())
-  uploadedBy   String
-  // Relations
-  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  activity     RDActivity?  @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("evidence")
-}
-
-enum ProjectStatus {
-  ACTIVE
-  COMPLETED
-  CANCELLED
-}
-
-enum ActivityType {
-  CORE
-  SUPPORTING
-}
-
-enum ActivityStatus {
-  PLANNED
-  ACTIVE
-  COMPLETED
-  CANCELLED
-}
-
-enum NarrativeType {
-  CORE_ACTIVITY
-  SUPPORTING_ACTIVITY
-  PROJECT_SUMMARY
-  COMPLIANCE_REPORT
-}
-
-enum EvidenceType {
-  DOCUMENT
-  EXPERIMENT_DATA
-  LITERATURE_REVIEW
-  MEETING_NOTES
-  TECHNICAL_SPECIFICATION
-  RESEARCH_PAPER
-} 
-
-// ============================================================================
-// POLYSEC/PRISMA PACKAGE MODELS
-// ============================================================================
-
-model PolicyDocument {
-  id         String   @id @default(cuid())
-  title      String
-  version    String?
-  uploadDate DateTime @default(now())
-  fileType   FileType
-  fileName   String
-  fileSize   Int
-  fileUrl    String   // Vercel blob URL
-  content    Json     // Extracted text and metadata
-  sections   Json     // Document sections for search
-  status     ProcessingStatus @default(PROCESSING)
-  // Relations
-  questionAnswers SecurityQuestion[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("policy_documents")
-}
-
-model SecurityQuestion {
-  id         String   @id @default(cuid())
-  question   String
-  category   String?
-  framework  String?
-  answer     String?
-  sources    Json?    // Array of referenced document sections
-  confidence Float?   // Answer confidence score (0-1)
-  // Relations
-  documentId String?
-  document   PolicyDocument? @relation(fields: [documentId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("security_questions")
-}
-
-model ComplianceFramework {
-  id           String @id @default(cuid())
-  name         String @unique // SOC2, ISO 27001, etc.
-  requirements Json   // Framework requirements
-  controls     Json   // Control mappings
-  version      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  @@map("compliance_frameworks")
-}
-
-enum FileType {
-  PDF
-  DOCX
-  TXT
-}
-
-enum ProcessingStatus {
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
-  CANCELLED
-} 
-
-// ============================================================================
-// MEETINGS/PRISMA PACKAGE MODELS
-// ============================================================================
-
-model MeetingEvent {
-  id              String    @id @default(cuid())
-  title           String
-  description     String?
-  objective       String?
-  location        String?
-  organizerId     String    // References User.id from the auth package
-  createdBy       String?   // Could be same as organizerId or another identifier
-  participantIds  String[]  // Stores user IDs of potential or invited participants
-  calendarIds     String[]  // IDs of calendars to check for group events
-  isGroupEvent    Boolean   @default(false)
-  duration        Int?      // Duration in minutes
-  dateRangeStart  DateTime?
-  dateRangeEnd    DateTime?
-  frequency       String?   // e.g., "weekly", "bi-weekly", or a cron string for recurring
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  // Potentially, link to the User model in the auth package via API, not direct relation
-  // organizer User @relation(fields: [organizerId], references: [id]) // This would require a monolithic schema
-  userAvailabilities UserAvailability[]
-  scheduledMeetings  ScheduledMeeting[]
-  @@index([organizerId])
-}
-
-model UserAvailability {
-  id             String   @id @default(cuid())
-  meetingEventId String
-  userId         String   // References User.id from the auth package
-  calendarId     String?  // Specific calendar if user has multiple
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  meetingEvent MeetingEvent @relation(fields: [meetingEventId], references: [id], onDelete: Cascade)
-  // user User @relation(fields: [userId], references: [id]) // Again, API-based link
-  availableSlots Json // Array of { startTime: DateTime, endTime: DateTime }
-  @@unique([meetingEventId, userId, calendarId])
-  @@index([meetingEventId])
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?   @db.Text
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([providerId, accountId])
   @@index([userId])
 }
 
-model ScheduledMeeting {
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  @@index([identifier])
+  @@index([expiresAt])
+}
+
+model Passkey {
+  id           String    @id @default(cuid())
+  name         String?
+  publicKey    String    @db.Text
+  userId       String
+  credentialID String    @unique
+  counter      Int
+  deviceType   String
+  backedUp     Boolean
+  transports   String?
+  createdAt    DateTime? @default(now())
+  aaguid       String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model Package {
+  id               String           @id @default(cuid())
+  name             String           @unique
+  displayName      String
+  description      String?
+  registrationType RegistrationType @default(APPROVAL_REQUIRED)
+  isActive         Boolean          @default(true)
+  permissions     Permission[]
+  roles           Role[]
+  roleAssignments RoleAssignment[]
+  resourceAccess  ResourceAccess[]
+  auditLogs       AuthAuditLog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([name])
+  @@index([isActive])
+}
+
+model Role {
   id           String   @id @default(cuid())
-  meetingEventId String
-  title        String
-  startTime    DateTime
-  endTime      DateTime
-  location     String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  meetingEvent MeetingEvent @relation(fields: [meetingEventId], references: [id], onDelete: Cascade)
-  participantIds String[] // Stores user IDs of confirmed participants
-  // participants User[] @relation(...) // API-based link
-  @@index([meetingEventId])
+  name         String
+  displayName  String
+  description  String?
+  packageId    String?
+  isSystemRole Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  package     Package?         @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  permissions RolePermission[]
+  assignments RoleAssignment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([name, packageId])
+  @@index([packageId])
+  @@index([isSystemRole])
+}
+
+model Permission {
+  id          String  @id @default(cuid())
+  name        String
+  displayName String
+  description String?
+  packageId   String
+  category    String?
+  isActive    Boolean @default(true)
+  package         Package          @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  rolePermissions RolePermission[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([name, packageId])
+  @@index([packageId])
+  @@index([category])
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  roleId       String
+  permissionId String
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model RoleAssignment {
+  id           String    @id @default(cuid())
+  userId       String
+  roleId       String
+  packageId    String?
+  resourceType String?
+  resourceId   String?
+  grantedBy    String?
+  expiresAt    DateTime?
+  isActive     Boolean   @default(true)
+  metadata     Json?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role          Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  package       Package? @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  grantedByUser User?    @relation("GrantedRoles", fields: [grantedBy], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([userId, roleId, packageId, resourceType, resourceId])
+  @@index([userId])
+  @@index([roleId])
+  @@index([packageId])
+  @@index([resourceType, resourceId])
+  @@index([isActive])
+}
+
+model ResourceAccess {
+  id           String     @id @default(cuid())
+  userId       String
+  packageId    String
+  resourceType String
+  resourceId   String
+  accessType   AccessType
+  grantedBy    String?
+  expiresAt    DateTime?
+  isActive     Boolean    @default(true)
+  metadata     Json?
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package       Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  grantedByUser User?   @relation("GrantedAccess", fields: [grantedBy], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([userId, packageId, resourceType, resourceId, accessType])
+  @@index([userId])
+  @@index([packageId])
+  @@index([resourceType, resourceId])
+  @@index([accessType])
+  @@index([isActive])
+}
+
+model AuthAuditLog {
+  id           String      @id @default(cuid())
+  userId       String?
+  targetUserId String?
+  packageId    String?
+  action       AuditAction
+  resourceType String?
+  resourceId   String?
+  details      Json?
+  ipAddress    String?
+  userAgent    String?
+  user    User?    @relation(fields: [userId], references: [id])
+  package Package? @relation(fields: [packageId], references: [id])
+  createdAt DateTime @default(now())
+  @@index([userId])
+  @@index([targetUserId])
+  @@index([packageId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+enum RegistrationType {
+  SELF_REGISTER
+  APPROVAL_REQUIRED
+  ADMIN_ONLY
+}
+
+enum AccessType {
+  OWNER
+  EDITOR
+  VIEWER
+  LIMITED_EDITOR
+  COLLABORATOR
+  CUSTOM
+}
+
+enum AuditAction {
+  ROLE_ASSIGNED
+  ROLE_REVOKED
+  PERMISSION_GRANTED
+  PERMISSION_REVOKED
+  RESOURCE_ACCESS_GRANTED
+  RESOURCE_ACCESS_REVOKED
+  PACKAGE_REGISTERED
+  PACKAGE_DEACTIVATED
+  USER_APPROVED
+  USER_DENIED
 }
 
 // ============================================================================
@@ -397,344 +394,62 @@ model Document {
   @@map("documents")
 }
 
-model Account {
-  id                String  @id
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-
-model AuthAuditLog {
-  id           String      @id
-  userId       String?
-  targetUserId String?
-  packageId    String?
-  action       AuditAction
-  resourceType String?
-  resourceId   String?
-  details      Json?
-  ipAddress    String?
-  userAgent    String?
-  createdAt    DateTime    @default(now())
-  Package      Package?    @relation(fields: [packageId], references: [id])
-  User         User?       @relation(fields: [userId], references: [id])
-  @@index([action])
-  @@index([createdAt])
-  @@index([packageId])
-  @@index([targetUserId])
-  @@index([userId])
-}
-
-model Authenticator {
-  id                   String   @id
-  userId               String
-  counter              BigInt
-  credentialDeviceType String?  @default("platform")
-  credentialBackedUp   Boolean? @default(false)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime
-  credentialPublicKey  Bytes
-  credentialID         Bytes    @unique
-  transports           String[]
-  User                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Package {
-  id               String           @id
-  name             String           @unique
-  displayName      String
+model MeetingEvent {
+  id               String             @id
+  title            String
   description      String?
-  registrationType RegistrationType @default(APPROVAL_REQUIRED)
-  isActive         Boolean          @default(true)
-  createdAt        DateTime         @default(now())
+  objective        String?
+  location         String?
+  organizerId      String
+  createdBy        String?
+  participantIds   String[]
+  calendarIds      String[]
+  isGroupEvent     Boolean            @default(false)
+  duration         Int?
+  dateRangeStart   DateTime?
+  dateRangeEnd     DateTime?
+  frequency        String?
+  createdAt        DateTime           @default(now())
   updatedAt        DateTime
-  AuthAuditLog     AuthAuditLog[]
-  Permission       Permission[]
-  ResourceAccess   ResourceAccess[]
-  Role             Role[]
-  RoleAssignment   RoleAssignment[]
-  @@index([isActive])
-  @@index([name])
+  ScheduledMeeting ScheduledMeeting[]
+  UserAvailability UserAvailability[]
+  @@index([organizerId])
 }
 
-model PasskeyChallenge {
-  id        String   @id
-  userId    String   @unique
-  challenge String
-  createdAt DateTime @default(now())
-  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Permission {
-  id             String           @id
-  name           String
-  displayName    String
-  description    String?
-  packageId      String
-  category       String?
-  isActive       Boolean          @default(true)
-  createdAt      DateTime         @default(now())
+model ScheduledMeeting {
+  id             String       @id
+  meetingEventId String
+  title          String
+  startTime      DateTime
+  endTime        DateTime
+  location       String?
+  createdAt      DateTime     @default(now())
   updatedAt      DateTime
-  Package        Package          @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  RolePermission RolePermission[]
-  @@unique([name, packageId])
-  @@index([category])
-  @@index([packageId])
+  participantIds String[]
+  MeetingEvent   MeetingEvent @relation(fields: [meetingEventId], references: [id], onDelete: Cascade)
+  @@index([meetingEventId])
 }
 
-model ResourceAccess {
-  id                                  String     @id
-  userId                              String
-  packageId                           String
-  resourceType                        String
-  resourceId                          String
-  accessType                          AccessType
-  grantedBy                           String?
-  expiresAt                           DateTime?
-  isActive                            Boolean    @default(true)
-  metadata                            Json?
-  createdAt                           DateTime   @default(now())
-  updatedAt                           DateTime
-  User_ResourceAccess_grantedByToUser User?      @relation("ResourceAccess_grantedByToUser", fields: [grantedBy], references: [id])
-  Package                             Package    @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  User_ResourceAccess_userIdToUser    User       @relation("ResourceAccess_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([userId, packageId, resourceType, resourceId, accessType])
-  @@index([accessType])
-  @@index([isActive])
-  @@index([packageId])
-  @@index([resourceType, resourceId])
-  @@index([userId])
-}
-
-model Role {
-  id             String           @id
-  name           String
-  displayName    String
-  description    String?
-  packageId      String?
-  isSystemRole   Boolean          @default(false)
-  isActive       Boolean          @default(true)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime
-  Package        Package?         @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  RoleAssignment RoleAssignment[]
-  RolePermission RolePermission[]
-  @@unique([name, packageId])
-  @@index([isSystemRole])
-  @@index([packageId])
-}
-
-model RoleAssignment {
-  id                                  String    @id
-  userId                              String
-  roleId                              String
-  packageId                           String?
-  resourceType                        String?
-  resourceId                          String?
-  grantedBy                           String?
-  expiresAt                           DateTime?
-  isActive                            Boolean   @default(true)
-  metadata                            Json?
-  createdAt                           DateTime  @default(now())
-  updatedAt                           DateTime
-  User_RoleAssignment_grantedByToUser User?     @relation("RoleAssignment_grantedByToUser", fields: [grantedBy], references: [id])
-  Package                             Package?  @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  Role                                Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  User_RoleAssignment_userIdToUser    User      @relation("RoleAssignment_userIdToUser", fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([userId, roleId, packageId, resourceType, resourceId])
-  @@index([isActive])
-  @@index([packageId])
-  @@index([resourceType, resourceId])
-  @@index([roleId])
-  @@index([userId])
-}
-
-model RolePermission {
-  id           String     @id
-  roleId       String
-  permissionId String
-  createdAt    DateTime   @default(now())
-  Permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
-  Role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  @@unique([roleId, permissionId])
-  @@index([permissionId])
-  @@index([roleId])
-}
-
-model Session {
-  id           String   @id
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId])
-}
-
-model User {
-  id                                            String            @id
-  name                                          String?
-  email                                         String?           @unique
-  emailVerified                                 DateTime?
-  image                                         String?
-  createdAt                                     DateTime          @default(now())
-  updatedAt                                     DateTime
-  Account                                       Account[]
-  AuthAuditLog                                  AuthAuditLog[]
-  Authenticator                                 Authenticator[]
-  PasskeyChallenge                              PasskeyChallenge?
-  ResourceAccess_ResourceAccess_grantedByToUser ResourceAccess[]  @relation("ResourceAccess_grantedByToUser")
-  ResourceAccess_ResourceAccess_userIdToUser    ResourceAccess[]  @relation("ResourceAccess_userIdToUser")
-  RoleAssignment_RoleAssignment_grantedByToUser RoleAssignment[]  @relation("RoleAssignment_grantedByToUser")
-  RoleAssignment_RoleAssignment_userIdToUser    RoleAssignment[]  @relation("RoleAssignment_userIdToUser")
-  Session                                       Session[]
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  id         String   @id
-  @@unique([identifier, token])
-}
-
-model compliance_frameworks {
-  id           String   @id
-  name         String   @unique
-  requirements Json
-  controls     Json
-  version      String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime
-}
-
-model evidence {
-  id            String         @id
-  projectId     String
-  activityId    String?
-  fileId        String
-  type          EvidenceType
-  description   String
-  uploadedAt    DateTime       @default(now())
-  uploadedBy    String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime
-  rd_activities rd_activities? @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  projects      projects       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-}
-
-model policy_documents {
-  id                 String               @id
-  title              String
-  version            String?
-  uploadDate         DateTime             @default(now())
-  fileType           FileType
-  fileName           String
-  fileSize           Int
-  fileUrl            String
-  content            Json
-  sections           Json
-  status             ProcessingStatus     @default(PROCESSING)
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime
-  security_questions security_questions[]
-}
-
-model projects {
-  id             String          @id
-  name           String
-  reference      String?
-  startDate      DateTime
-  endDate        DateTime
-  totalBudget    Decimal?        @db.Decimal(15, 2)
-  description    String
-  primaryContact String?
-  status         ProjectStatus   @default(ACTIVE)
-  organizationId String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime
-  createdBy      String?
-  evidence       evidence[]
-  rd_activities  rd_activities[]
-  rd_narratives  rd_narratives[]
-}
-
-model rd_activities {
-  id            String          @id
-  projectId     String
-  type          ActivityType
-  name          String
-  hypothesis    String?
-  experiments   String?
-  results       String?
-  startDate     DateTime
-  endDate       DateTime
-  expenditure   Decimal?        @db.Decimal(15, 2)
-  status        ActivityStatus  @default(PLANNED)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime
-  evidence      evidence[]
-  projects      projects        @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  rd_narratives rd_narratives[]
-  time_entries  time_entries[]
-}
-
-model rd_narratives {
-  id            String         @id
-  projectId     String
-  activityId    String?
-  type          NarrativeType
-  content       String
-  version       Int            @default(1)
-  generatedAt   DateTime       @default(now())
-  approved      Boolean        @default(false)
-  approvedBy    String?
-  approvedAt    DateTime?
-  metadata      Json?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime
-  rd_activities rd_activities? @relation(fields: [activityId], references: [id], onDelete: Cascade)
-  projects      projects       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-}
-
-model security_questions {
-  id               String            @id
-  question         String
-  category         String?
-  framework        String?
-  answer           String?
-  sources          Json?
-  confidence       Float?
-  documentId       String?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime
-  policy_documents policy_documents? @relation(fields: [documentId], references: [id])
-}
-
-model time_entries {
-  id             String        @id
-  activityId     String
+model UserAvailability {
+  id             String       @id
+  meetingEventId String
   userId         String
-  date           DateTime      @db.Date
-  hours          Decimal       @db.Decimal(5, 2)
-  description    String
-  approved       Boolean       @default(false)
-  approvedBy     String?
-  approvedAt     DateTime?
-  evidenceFileId String?
-  createdAt      DateTime      @default(now())
+  calendarId     String?
+  createdAt      DateTime     @default(now())
   updatedAt      DateTime
-  rd_activities  rd_activities @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  availableSlots Json
+  MeetingEvent   MeetingEvent @relation(fields: [meetingEventId], references: [id], onDelete: Cascade)
+  @@unique([meetingEventId, userId, calendarId])
+  @@index([meetingEventId])
+  @@index([userId])
+}
+
+enum ProcessingStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
 }
 
 enum ProcessingStage {
@@ -766,31 +481,195 @@ enum DocumentFileType {
   PPTX
 }
 
-enum AccessType {
-  OWNER
-  EDITOR
-  VIEWER
-  LIMITED_EDITOR
-  COLLABORATOR
-  CUSTOM
+enum ActivityStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
 }
 
-enum AuditAction {
-  ROLE_ASSIGNED
-  ROLE_REVOKED
-  PERMISSION_GRANTED
-  PERMISSION_REVOKED
-  RESOURCE_ACCESS_GRANTED
-  RESOURCE_ACCESS_REVOKED
-  PACKAGE_REGISTERED
-  PACKAGE_DEACTIVATED
-  USER_APPROVED
-  USER_DENIED
+enum ActivityType {
+  CORE
+  SUPPORTING
 }
 
-enum RegistrationType {
-  SELF_REGISTER
-  APPROVAL_REQUIRED
-  ADMIN_ONLY
+enum EvidenceType {
+  DOCUMENT
+  EXPERIMENT_DATA
+  LITERATURE_REVIEW
+  MEETING_NOTES
+  TECHNICAL_SPECIFICATION
+  RESEARCH_PAPER
+}
+
+enum FileType {
+  PDF
+  DOCX
+  TXT
+}
+
+enum NarrativeType {
+  CORE_ACTIVITY
+  SUPPORTING_ACTIVITY
+  PROJECT_SUMMARY
+  COMPLIANCE_REPORT
+}
+
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+// ============================================================================
+// POLYSEC/PRISMA PACKAGE MODELS
+// ============================================================================
+
+model PolicyDocument {
+  id         String   @id @default(cuid())
+  title      String
+  version    String?
+  uploadDate DateTime @default(now())
+  fileType   FileType
+  fileName   String
+  fileSize   Int
+  fileUrl    String   // Vercel blob URL
+  content    Json     // Extracted text and metadata
+  sections   Json     // Document sections for search
+  status     ProcessingStatus @default(PROCESSING)
+  // Relations
+  questionAnswers SecurityQuestion[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("policy_documents")
+}
+
+model SecurityQuestion {
+  id         String   @id @default(cuid())
+  question   String
+  category   String?
+  framework  String?
+  answer     String?
+  sources    Json?    // Array of referenced document sections
+  confidence Float?   // Answer confidence score (0-1)
+  // Relations
+  documentId String?
+  document   PolicyDocument? @relation(fields: [documentId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("security_questions")
+}
+
+model ComplianceFramework {
+  id           String @id @default(cuid())
+  name         String @unique // SOC2, ISO 27001, etc.
+  requirements Json   // Framework requirements
+  controls     Json   // Control mappings
+  version      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("compliance_frameworks")
+}
+
+// ============================================================================
+// R2DTAX/PRISMA PACKAGE MODELS
+// ============================================================================
+
+model Project {
+  id              String        @id @default(cuid())
+  name            String
+  reference       String?       // Project reference code like "INT20_01"
+  startDate       DateTime
+  endDate         DateTime
+  totalBudget     Decimal?      @db.Decimal(15, 2)
+  description     String        @db.Text
+  primaryContact  String?
+  status          ProjectStatus @default(ACTIVE)
+  organizationId  String        // Multi-tenant isolation
+  // Relations
+  activities      RDActivity[]
+  narratives      RDNarrative[]
+  evidence        Evidence[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String?
+  @@map("projects")
+}
+
+model RDActivity {
+  id           String         @id @default(cuid())
+  projectId    String
+  type         ActivityType
+  name         String
+  hypothesis   String?        @db.Text
+  experiments  String?        @db.Text
+  results      String?        @db.Text
+  startDate    DateTime
+  endDate      DateTime
+  expenditure  Decimal?       @db.Decimal(15, 2)
+  status       ActivityStatus @default(PLANNED)
+  // Relations
+  project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  timeEntries  TimeEntry[]
+  narratives   RDNarrative[]
+  evidence     Evidence[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("rd_activities")
+}
+
+model TimeEntry {
+  id               String    @id @default(cuid())
+  activityId       String
+  userId           String
+  date             DateTime  @db.Date
+  hours            Decimal   @db.Decimal(5, 2)
+  description      String    @db.Text
+  approved         Boolean   @default(false)
+  approvedBy       String?
+  approvedAt       DateTime?
+  evidenceFileId   String?   // Reference to knowledgebase file
+  // Relations
+  activity         RDActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("time_entries")
+}
+
+model RDNarrative {
+  id           String        @id @default(cuid())
+  projectId    String
+  activityId   String?       // Optional - for activity-specific narratives
+  type         NarrativeType
+  content      String        @db.Text
+  version      Int           @default(1)
+  generatedAt  DateTime      @default(now())
+  approved     Boolean       @default(false)
+  approvedBy   String?
+  approvedAt   DateTime?
+  metadata     Json?         // Generation metadata (AI model, prompts, etc.)
+  // Relations
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  activity     RDActivity?   @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("rd_narratives")
+}
+
+model Evidence {
+  id           String       @id @default(cuid())
+  projectId    String
+  activityId   String?      // Optional - can be project-level evidence
+  fileId       String       // Knowledgebase file reference
+  type         EvidenceType
+  description  String       @db.Text
+  uploadedAt   DateTime     @default(now())
+  uploadedBy   String
+  // Relations
+  project      Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  activity     RDActivity?  @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("evidence")
 }
 

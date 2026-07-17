@@ -81,6 +81,29 @@ function extractModelsAndEnums(schemaContent, packageName) {
   return { models, enums };
 }
 
+// Legacy NextAuth-era models that no longer exist in the auth package after
+// the better-auth migration. If any other package's schema still defines
+// them, they are dropped during consolidation.
+const LEGACY_AUTH_MODELS = new Set([
+  'Authenticator',
+  'PasskeyChallenge',
+  'VerificationToken',
+]);
+
+// Lowercase models from knowledgebase that are superseded by PascalCase
+// versions with @@map in polysec/r2dtax. Keeping both causes @@map/pkey
+// collisions in Prisma 7+.
+const SUPERSEDED_KB_MODELS = new Set([
+  'policy_documents',
+  'security_questions',
+  'compliance_frameworks',
+  'projects',
+  'rd_activities',
+  'time_entries',
+  'rd_narratives',
+  'evidence',
+]);
+
 function deduplicateModels(allModels) {
   const seen = new Map();
   const deduplicated = [];
@@ -93,6 +116,16 @@ function deduplicateModels(allModels) {
     const type = match[1];
     const name = match[2];
     const key = `${type}:${name}`;
+
+    if (type === 'model' && LEGACY_AUTH_MODELS.has(name) && model.package !== 'auth/prisma') {
+      console.log(`⚠️  Dropping legacy NextAuth model '${name}' from ${model.package}`);
+      continue;
+    }
+
+    if (type === 'model' && SUPERSEDED_KB_MODELS.has(name)) {
+      console.log(`⚠️  Dropping superseded lowercase model '${name}' from ${model.package}`);
+      continue;
+    }
 
     if (seen.has(key)) {
       console.log(`⚠️  Duplicate ${type} '${name}' found in ${model.package} (keeping first from ${seen.get(key).package})`);
@@ -112,6 +145,18 @@ async function consolidateSchemas() {
   // Find all package schema files
   const packageSchemas = glob.sync('*/prisma/schema.prisma', { cwd: PACKAGES_DIR });
   const websiteSchema = path.join(WEBSITE_DIR, 'prisma', 'schema.prisma');
+
+  // Process the auth package first so its canonical definitions of User,
+  // Session, Account, Package, Role, Permission, RoleAssignment,
+  // ResourceAccess, AuthAuditLog and the related enums win deduplication.
+  // Any other package that redefines these models is a legacy copy and will
+  // be dropped by the dedupe pass.
+  packageSchemas.sort((a, b) => {
+    const aAuth = a.startsWith('auth/') ? -1 : 0;
+    const bAuth = b.startsWith('auth/') ? -1 : 0;
+    if (aAuth !== bAuth) return aAuth - bAuth;
+    return a.localeCompare(b);
+  });
 
   let allModels = [];
   let allEnums = [];
@@ -153,12 +198,12 @@ async function consolidateSchemas() {
 // while keeping packages independent for standalone operation.
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../packages/auth/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 `;
