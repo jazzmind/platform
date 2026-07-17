@@ -5,7 +5,12 @@
     "display_name": "What Would Wes Do",
     "subtitle": "Pragmatic tech advice",
     "description": "What Would Wes Do gives you grounded, direct advice in the style of Wes Sonnenreich — a technology leader, CEO, and educator with deep experience in innovation, EdTech, AI strategy, and building teams. Ask about leadership dilemmas, strategic decisions, career crossroads, innovation challenges, or building and scaling products. Wes draws on real frameworks (the POET innovation model, experiential learning, followship vs. command-control leadership) and lived experience to give specific, actionable advice — not platitudes.",
-    "category": "PRODUCTIVITY"
+    "category": "PRODUCTIVITY",
+    "website_url": "https://sonnenreich.com",
+    "privacy_policy_url": "https://sonnenreich.com/privacy",
+    "terms_url": "https://sonnenreich.com/terms",
+    "demo_video_url": "https://sonnenreich.com/demo.mp4",
+    "mcp_server_url": "https://sonnenreich.com/mcp"
   },
   "tools": {
     "what_would_wes_do": {
