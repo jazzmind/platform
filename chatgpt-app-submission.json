@@ -1,0 +1,92 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "What Would Wes Do",
+    "subtitle": "Pragmatic tech advice",
+    "description": "What Would Wes Do gives you grounded, direct advice in the style of Wes Sonnenreich — a technology leader, CEO, and educator with deep experience in innovation, EdTech, AI strategy, and building teams. Ask about leadership dilemmas, strategic decisions, career crossroads, innovation challenges, or building and scaling products. Wes draws on real frameworks (the POET innovation model, experiential learning, followship vs. command-control leadership) and lived experience to give specific, actionable advice — not platitudes.",
+    "category": "PRODUCTIVITY"
+  },
+  "tools": {
+    "what_would_wes_do": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "The tool generates advisory text by reading local content files and calling OpenAI; it does not write to any database, file, or external system.",
+        "open_world_justification": "The tool only reads local filesystem content and calls the OpenAI completions API — it does not post, publish, or modify any publicly visible state.",
+        "destructive_justification": "The tool performs no deletions, overwrites, or irreversible actions of any kind."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "User asks for advice on a leadership dilemma about managing an underperforming team member.",
+      "user_prompt": "I have a team member who is technically strong but constantly misses deadlines and blocks the rest of the team. I've had two conversations with them and nothing has changed. What would Wes do?",
+      "file_attachment_urls": null,
+      "tools_triggered": "what_would_wes_do",
+      "expected_output": "Direct advice on the leadership situation, likely referencing authenticity, followship frameworks, and a concrete next step such as setting a clear performance agreement with a deadline.",
+      "expected_output_url": null
+    },
+    {
+      "description": "User asks for advice on whether to ship an MVP or keep building.",
+      "user_prompt": "Our product has been in development for 8 months. My investors want us to ship but the team says it's not ready. What would Wes do?",
+      "file_attachment_urls": null,
+      "tools_triggered": "what_would_wes_do",
+      "expected_output": "Actionable advice favoring shipping with the right caveats, referencing Wes's philosophy of shipping to learn and avoiding perfection paralysis, with a concrete recommendation.",
+      "expected_output_url": null
+    },
+    {
+      "description": "User asks for advice on building an innovation culture inside a large organisation.",
+      "user_prompt": "I'm trying to build an innovation program at a 10,000-person company. Leadership says they support it but keep pulling resources. What would Wes do?",
+      "file_attachment_urls": null,
+      "tools_triggered": "what_would_wes_do",
+      "expected_output": "Advice grounded in the POET innovation model (Passion, Options, Experience, Team), addressing the gap between stated support and actual behaviour, with specific steps to protect the innovation ecosystem.",
+      "expected_output_url": null
+    },
+    {
+      "description": "User asks for advice on integrating AI into an educational product.",
+      "user_prompt": "We're an EdTech company being pressured to add AI features but we're not sure where to start or whether it will actually improve learning outcomes. What would Wes do?",
+      "file_attachment_urls": null,
+      "tools_triggered": "what_would_wes_do",
+      "expected_output": "Advice drawing on the AI in EdTech roundtable insights — acknowledging uncertainty, prioritising human connection over automation, and recommending a sandbox/core dual roadmap rather than all-in adoption.",
+      "expected_output_url": null
+    },
+    {
+      "description": "User asks for career advice about making a difficult pivot.",
+      "user_prompt": "I've been a software engineer for 10 years and I want to move into product leadership but every job posting asks for 5 years of PM experience. How do I break in? What would Wes do?",
+      "file_attachment_urls": null,
+      "tools_triggered": "what_would_wes_do",
+      "expected_output": "Direct career advice referencing experiential learning principles — build a narrative through doing, not just credentials — with specific actionable steps like taking on internal projects, getting a mentor, or running a small product experiment.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Request is completely outside Wes's domain — asks about cooking recipes.",
+      "user_prompt": "What's the best recipe for a chicken tikka masala?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because the request is about cooking and has no connection to leadership, innovation, EdTech, AI strategy, or career decisions.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Request asks for real-time or live data the app cannot provide.",
+      "user_prompt": "What is the current stock price of OpenAI?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because it does not have access to real-time financial data and the request is not a decision or dilemma requiring Wes-style advice.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Request is a factual lookup with no advisory component.",
+      "user_prompt": "When was the Model Context Protocol first released?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because this is a factual lookup rather than a situation requiring pragmatic advice, and ChatGPT can answer it directly without the tool.",
+      "expected_output_url": null
+    }
+  ]
+}
