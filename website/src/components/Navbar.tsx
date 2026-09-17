@@ -52,6 +52,7 @@ export default function Navbar() {
             <NavLink href="/events">Events</NavLink>
             <NavLink href="/presentations">Presentations</NavLink>
             <NavLink href="/publications">Publications</NavLink>
+            <NavLink href="/founder-circle">Founder Circle</NavLink>
             <NavLink href="/contact">Contact</NavLink>
           </div>
           
@@ -84,6 +85,7 @@ export default function Navbar() {
               <NavLink href="/events" onClick={closeMenu} isMobile>Events</NavLink>
               <NavLink href="/presentations" onClick={closeMenu} isMobile>Presentations</NavLink>
               <NavLink href="/publications" onClick={closeMenu} isMobile>Publications</NavLink>
+              <NavLink href="/founder-circle" onClick={closeMenu} isMobile>Founder Circle</NavLink>
               <NavLink href="/contact" onClick={closeMenu} isMobile>Contact</NavLink>
             </div>
           </div>
