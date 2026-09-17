@@ -17,10 +17,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!topic) return {};
 
   return {
-    title: `${topic.title} — MITAS Founder Circle | Wes Sonnenreich`,
+    title: `${topic.title} — MIT Founders' Circle | Wes Sonnenreich`,
     description: topic.coreInsight.slice(0, 160),
     openGraph: {
-      title: `${topic.title} — MITAS Founder Circle`,
+      title: `${topic.title} — MIT Founders' Circle`,
       description: topic.coreInsight.slice(0, 160),
       type: "article",
     },

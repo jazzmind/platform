@@ -24,10 +24,10 @@ export const topics: Topic[] = [
   {
     id: "fundraising",
     title: "Fundraising",
-    subtitle: "Lessons from the Founder Circle",
+    subtitle: "Lessons from MIT Founders' Circle",
     description:
       "Navigating the emotional and tactical realities of raising capital — from reading investor signals to sequencing meetings strategically.",
-    icon: "💰",
+    icon: "Banknote",
     coreInsight:
       "Fundraising is not a single pitch that succeeds or fails — it's a repeated cycle of pitching, interpreting ambiguous signals, refining narrative, and sustaining momentum under uncertainty. Founders who treat it as a learning system outperform those who treat it as a series of auditions.",
     sections: [
@@ -221,10 +221,10 @@ You never deliver your worst pitch to your best prospect. Confidence compounds �
   {
     id: "structuring",
     title: "Structuring",
-    subtitle: "Lessons from the Founder Circle",
+    subtitle: "Lessons from MIT Founders' Circle",
     description:
       "Navigating equity splits, vesting schedules, essential legal documents, and cap table hygiene in the first 18 months.",
-    icon: "📋",
+    icon: "Scale",
     coreInsight:
       "The most consistent lesson across founders who've navigated co-founder splits, early hires, and investor negotiations: complexity in equity structures creates friction that compounds over time. The arrangements that feel 'fair and sophisticated' at formation become the source of resentment, renegotiation, and breakups later.",
     sections: [
@@ -389,10 +389,10 @@ Due diligence goes both ways. Verify reputation. Check founder references — no
   {
     id: "early-stage-growth",
     title: "Early-Stage Growth",
-    subtitle: "Lessons from the Founder Circle",
+    subtitle: "Lessons from MIT Founders' Circle",
     description:
       "Why product-market fit isn't enough, how to run real growth experiments, and the domain expertise moat in an AI-accelerated world.",
-    icon: "📈",
+    icon: "TrendingUp",
     coreInsight:
       "Strong product-market fit does not guarantee a viable business. One founder shut down a product with five-figure enterprise deals and paying customers because the target market became unviable due to external forces. The complete validation checklist must include buyer capability, market stability, and market durability — not just market size.",
     sections: [
@@ -564,7 +564,7 @@ What enables a good shutdown: Trust in yourself to eventually find the right thi
     subtitle: "When the Tools Get Commoditized",
     description:
       "How to stay defensible when software gets easy to build, navigate career pivots, and use AI for preparation rather than just production.",
-    icon: "🧭",
+    icon: "Compass",
     coreInsight:
       "As AI collapses the cost and time to build software, the competitive advantage shifts decisively toward domain expertise, human judgment, and positioning. The tools are getting commoditized. What you know about a specific problem, and how you position yourself relative to the people who need that problem solved, is what remains hard to replicate.",
     sections: [
@@ -699,7 +699,7 @@ For founders building software products: the first 80% gets faster. The last 20%
     subtitle: "The Things That Keep You Sane",
     description:
       "How stress actually shows up in founders, what genuinely helps, and how to reframe success when the goalposts never stop moving.",
-    icon: "🧘",
+    icon: "Activity",
     coreInsight:
       "Everyone in the room is stressed, everyone handles it differently, and nobody has it figured out. But the founders who are functioning well under sustained pressure have developed a more self-aware relationship with their stress — they know their triggers, they know what breaks them, and they know what repairs them. The useful distinction isn't between stressed and unstressed people. It's between people who have learned how stress shows up in their own body, and people who haven't.",
     sections: [
@@ -838,7 +838,7 @@ This group, and conversations like it, serve as one of those circles of trust. A
     subtitle: "The Cargo Cult and the Infinite Call Center",
     description:
       "Processing AI anxiety honestly, understanding where coding is going, geopolitical dynamics, and finding customers when everyone can build an app.",
-    icon: "🤖",
+    icon: "Bot",
     coreInsight:
       "AI has crossed a perceptual threshold — it no longer behaves like a faster version of something familiar. The business challenge is figuring out how to operate effectively in an environment where you're relying on a tool whose operations you can't fully observe, producing output you can't fully verify in real time. You don't need to understand how the models work internally. You need to understand what they're good at, what they're bad at, and how to structure your workflow so their mistakes get caught before they cause damage.",
     sections: [
@@ -982,7 +982,7 @@ Before asking for the email, give them something they can't easily get elsewhere
     subtitle: "The Average Human, the Long Due Diligence, and Knowing When to Shut Up",
     description:
       "When ten months of due diligence ends in a no, why AI is the average human, and when founders still need to hire people.",
-    icon: "⏱️",
+    icon: "Clock",
     coreInsight:
       "If a deal doesn't happen within the first couple of months, it's probably not going to happen. Extended timelines almost always indicate that something else is going on beneath the surface. Meanwhile, AI is trained on all human knowledge — which makes it the average human by construction. In finance, trading on average is buying at market price. That's not how you make money. The things that generate returns are, by definition, the things that require something beyond average-human capability.",
     sections: [
@@ -1104,7 +1104,7 @@ The broader observation: 3D printing sits at the intersection of several themes 
     subtitle: "Threshold Friends and the Effort Nobody Tells You About",
     description:
       "Why the founder lifestyle is structurally hostile to deep relationships, and how the founders who have real social lives got there through deliberate, repeated effort.",
-    icon: "🤝",
+    icon: "Users",
     coreInsight:
       "Every founder in the room values relationships, every founder underinvests in them, and the ones who have functioning social lives got there through deliberate, repeated effort — not luck, chemistry, or circumstance. The founder lifestyle is structurally hostile to deep relationships. Geographic mobility, schedule unpredictability, financial instability, and emotional volatility all work against the conditions that friendships require. This isn't a personal failing — it's an operating environment problem. And like any operating environment problem, it can be addressed, but only if you acknowledge it as a design challenge.",
     sections: [

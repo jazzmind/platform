@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { Topic } from "@/data/founder-circle/topics";
+import TopicIcon from "./TopicIcon";
 
 interface TopicCardProps {
   topic: Topic;
@@ -25,10 +26,14 @@ export default function TopicCard({ topic, index }: TopicCardProps) {
           {/* Card header */}
           <div className="p-6 flex-grow">
             <div className="flex items-start justify-between mb-4">
-              <span className="text-4xl leading-none" role="img" aria-label={topic.title}>
-                {topic.icon}
-              </span>
-              <span className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
+              <div className="w-11 h-11 rounded-xl bg-red-50 dark:bg-red-900/30 flex items-center justify-center">
+                <TopicIcon
+                  name={topic.icon}
+                  className="w-5 h-5 text-red-600 dark:text-red-400"
+                  strokeWidth={1.75}
+                />
+              </div>
+              <span className="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">
                 {topic.principles.length} principles
               </span>
             </div>

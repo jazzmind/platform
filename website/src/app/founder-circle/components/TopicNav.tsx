@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import TopicIcon from "./TopicIcon";
 import type { Topic } from "@/data/founder-circle/topics";
 
 interface TopicNavProps {
@@ -39,8 +40,8 @@ export default function TopicNav({ prev, next }: TopicNavProps) {
               <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wide mb-0.5">
                 Previous
               </p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors truncate">
-                <span className="mr-1.5">{prev.icon}</span>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors truncate flex items-center gap-1.5">
+                <TopicIcon name={prev.icon} className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
                 {prev.title}
               </p>
             </div>
@@ -75,9 +76,9 @@ export default function TopicNav({ prev, next }: TopicNavProps) {
               <p className="text-xs text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wide mb-0.5">
                 Next
               </p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors truncate">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors truncate flex items-center gap-1.5 justify-end">
                 {next.title}
-                <span className="ml-1.5">{next.icon}</span>
+                <TopicIcon name={next.icon} className="w-3.5 h-3.5 flex-shrink-0" strokeWidth={2} />
               </p>
             </div>
             <div className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-gray-200 dark:border-gray-600 group-hover:border-red-500 dark:group-hover:border-red-500 flex items-center justify-center transition-colors">

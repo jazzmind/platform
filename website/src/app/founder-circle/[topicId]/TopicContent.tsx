@@ -6,6 +6,7 @@ import type { Topic } from "@/data/founder-circle/topics";
 import SectionRenderer from "../components/SectionRenderer";
 import PrinciplesSummary from "../components/PrinciplesSummary";
 import TopicNav from "../components/TopicNav";
+import TopicIcon from "../components/TopicIcon";
 
 interface TopicContentProps {
   topic: Topic;
@@ -97,7 +98,7 @@ export default function TopicContent({ topic, prev, next }: TopicContentProps) {
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
             <a href="/founder-circle" className="hover:text-red-400 transition-colors">
-              Founder Circle
+              MIT Founders&apos; Circle
             </a>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -107,9 +108,13 @@ export default function TopicContent({ topic, prev, next }: TopicContentProps) {
 
           <div className="max-w-3xl">
             <div className="flex items-center gap-4 mb-4">
-              <span className="text-5xl" role="img" aria-label={topic.title}>
-                {topic.icon}
-              </span>
+              <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
+                <TopicIcon
+                  name={topic.icon}
+                  className="w-7 h-7 text-red-300"
+                  strokeWidth={1.5}
+                />
+              </div>
               <div>
                 <p className="text-red-400 text-sm font-medium tracking-wide uppercase mb-1">
                   {topic.subtitle}
@@ -257,8 +262,7 @@ export default function TopicContent({ topic, prev, next }: TopicContentProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
                   All lessons
-                </a>
-              </div>
+                </a>              </div>
             </div>
           </aside>
 
